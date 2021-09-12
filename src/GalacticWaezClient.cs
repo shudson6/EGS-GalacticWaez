@@ -8,12 +8,6 @@ using Eleon.Modding;
 
 namespace GalacticWaez
 {
-    class CommandToken
-    {
-        public const string Introducer = "/waez";
-        public const string Init = "init";
-    }
-
     public class GalacticWaezClient : IMod
     {
         IModApi modApi;
