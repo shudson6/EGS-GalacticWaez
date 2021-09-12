@@ -4,25 +4,76 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using Eleon.Modding;
+using System.IO;
 
 namespace GalacticWaez
 {
     class StarFinder
     {
-        // https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-memory_basic_information
+        readonly VectorInt3 soughtVector;
+        public int StarsFound { get => hits; }
 
-        // PAGE_READWRITE = 0x04
-        const int DesiredPageProtection = 0x04;
+        int hits;
 
-        // MEM_COMMIT = 0x1000
-        const int DesiredPageState = 0x1000;
+        public StarFinder(VectorInt3 knownPosition)
+        {
+            soughtVector = knownPosition;
+            hits = 0;
+        }
 
-        // MEM_PRIVATE = 0x20000
-        const int DesiredPageType = 0x20000;
+        unsafe public void Search()
+        {
+            // need to get system info for page size and valid address range
+            Kernel32.SYSTEM_INFO sysInfo;
+            Kernel32.GetSystemInfo(out sysInfo);
 
-        Thread starFinder = null;
+            ulong baseAddress = (ulong)sysInfo.lpMinimumApplicationAddress.ToInt64();
+            ulong maxAddress = (ulong)sysInfo.lpMaximumApplicationAddress.ToInt64();
+            Kernel32.MEMORY_BASIC_INFORMATION memInfo = default;
+            while (baseAddress < maxAddress)
+            {
+                if (Kernel32.VirtualQuery(baseAddress, out memInfo, Marshal.SizeOf(memInfo)) == 0)
+                {
+                    // ignore the error and move on to the next page
+                    baseAddress += sysInfo.dwPageSize;
+                    continue;
+                }
 
-        public bool IsBusy { get => starFinder?.IsAlive ?? false; }
+                if (memInfo.Protect == Kernel32.DesiredPageProtection
+                    && memInfo.State == Kernel32.DesiredPageState
+                    && memInfo.Type == Kernel32.DesiredPageType
+                ) {
+                    ScanRegion(memInfo.BaseAddress.ToUInt64(), (ulong)memInfo.RegionSize.ToInt64());
+                }
+
+                baseAddress += (ulong)memInfo.RegionSize.ToInt64();
+            }
+        }
+
+        unsafe void ScanRegion(ulong baseAddress, ulong size)
+        {
+            // we're looking for ints and assuming the values are qword-aligned
+            const int Step = 4;
+
+            // we're looking for 3 vector members plus an ordinal, 4 ints total
+            const int StarDataPadding = 16;
+            ulong limit = size - StarDataPadding;
+            for (ulong i = 0; i < limit; i += Step)
+            {
+                if (IntValueAt(baseAddress + i) == soughtVector.x
+                    && IntValueAt(baseAddress + i + 4) == soughtVector.y
+                    && IntValueAt(baseAddress + i + 8) == soughtVector.z
+                ) {
+                    hits++;
+                }
+            }
+        }
+
+        unsafe int IntValueAt(ulong address)
+        {
+            return *(int*)address;
+        }
 
         /*
          * This struct represents the star data as found in the game's memory.
@@ -43,8 +94,22 @@ namespace GalacticWaez
 
     static class Kernel32
     {
+        /* 
+         * More info about these definitions is at:
+         * https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-memory_basic_information
+         */
+
+        // PAGE_READWRITE = 0x04
+        public const int DesiredPageProtection = 0x04;
+
+        // MEM_COMMIT = 0x1000
+        public const int DesiredPageState = 0x1000;
+
+        // MEM_PRIVATE = 0x20000
+        public const int DesiredPageType = 0x20000;
+
         [StructLayout(LayoutKind.Sequential)]
-        struct MEMORY_BASIC_INFORMATION
+        public struct MEMORY_BASIC_INFORMATION
         {
             public UIntPtr BaseAddress;
             public UIntPtr AllocationBase;
@@ -56,7 +121,7 @@ namespace GalacticWaez
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        struct SYSTEM_INFO
+        public struct SYSTEM_INFO
         {
             public uint dwOemId;
             public uint dwPageSize;
@@ -71,14 +136,16 @@ namespace GalacticWaez
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern int VirtualQuery(
+        public static extern int 
+        VirtualQuery(
             ulong lpAddress,
             out MEMORY_BASIC_INFORMATION lpBuffer,
             int dwLength
         );
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern void GetSystemInfo(
+        public static extern void 
+        GetSystemInfo(
             [MarshalAs(UnmanagedType.Struct)] out SYSTEM_INFO lpSystemInfo
         );
     }

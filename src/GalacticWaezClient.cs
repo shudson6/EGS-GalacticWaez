@@ -58,7 +58,12 @@ namespace GalacticWaez
                 if (command.Equals(CommandToken.Init))
                 {
                     modApi.Log("Initializing galactic highway map...");
-                    // TODO: begin memory scan
+                    // TODO: create Initializer class to handle this
+                    // and other necessary business for building the map
+                    StarFinder sf = new StarFinder(
+                                    knownPosition: new VectorInt3(13400000, 2500000, 12600000));
+                    sf.Search();
+                    modApi.Log($"Found {sf.StarsFound} occurrences of the vector.");
                 }
             }
         }
