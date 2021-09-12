@@ -11,6 +11,8 @@ namespace GalacticWaez
 {
     class StarFinder
     {
+        const int SizeOfStarData = 24;
+
         readonly VectorInt3 soughtVector;
         public int StarsFound { get => hits; }
 
@@ -22,7 +24,7 @@ namespace GalacticWaez
             hits = 0;
         }
 
-        unsafe public void Search()
+        public void Search()
         {
             // need to get system info for page size and valid address range
             Kernel32.SYSTEM_INFO sysInfo;
@@ -51,7 +53,7 @@ namespace GalacticWaez
             }
         }
 
-        unsafe void ScanRegion(ulong baseAddress, ulong size)
+        void ScanRegion(ulong baseAddress, ulong size)
         {
             // we're looking for ints and assuming the values are qword-aligned
             const int Step = 4;
@@ -65,9 +67,38 @@ namespace GalacticWaez
                     && IntValueAt(baseAddress + i + 4) == soughtVector.y
                     && IntValueAt(baseAddress + i + 8) == soughtVector.z
                 ) {
-                    hits++;
+                    int foo = CountPossibleInstances(baseAddress, size, i);
+                    if (foo > hits) hits = foo;
                 }
             }
+        }
+
+        int CountPossibleInstances(ulong baseAddress, ulong size, ulong vectorIndex)
+        {
+            // in {x, y, z, id} vectorLocation points to x. we want id
+            ulong idAddress = baseAddress + vectorIndex + 12;
+            int id = IntValueAt(idAddress);
+            // make sure the counting starts at 0
+            if (id < 0)
+            {
+                return 0;
+            }
+            if (id > 0)
+            {
+                idAddress -= (uint)id * SizeOfStarData;
+                if (idAddress < baseAddress)
+                {
+                    return 0;
+                }
+            }
+            id = 0;
+            while (id == IntValueAt(idAddress))
+            {
+                id++;
+                idAddress += SizeOfStarData;
+            }
+
+            return id;
         }
 
         unsafe int IntValueAt(ulong address)
