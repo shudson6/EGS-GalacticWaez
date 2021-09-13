@@ -2,13 +2,13 @@
 
 namespace GalacticWaez
 {
-    class Const
+    public class Const
     {
         public const float BaseWarpRange = 30;
         public const int SectorsPerLY = 100000;
     }
 
-    class PlayerData
+    public class PlayerData
     {
         public IPlayer Entity { get; }
         public float WarpRange { get; }
@@ -20,7 +20,7 @@ namespace GalacticWaez
         }
     }
 
-    struct StarPosition
+    public struct StarPosition
     {
         public readonly int sectorX;
         public readonly int sectorY;

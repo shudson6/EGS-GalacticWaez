@@ -55,6 +55,7 @@
     <Compile Include="src\GalacticWaezClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\CommandHandler.cs" />
+    <Compile Include="src\Galaxy.cs" />
     <Compile Include="src\SaveGameDB.cs" />
     <Compile Include="src\StarFinder.cs" />
   </ItemGroup>

@@ -19,11 +19,11 @@ namespace GalacticWaez
     struct InitializationResult
     {
         // TODO: replace with galaxy class when written
-        public readonly Object obj;
+        public readonly Galaxy galaxy;
         public readonly int elapsedMillis;
-        public InitializationResult(Object obj, int millis)
+        public InitializationResult(Galaxy galaxy, int millis)
         {
-            this.obj = obj;
+            this.galaxy = galaxy;
             elapsedMillis = millis;
         }
     }
@@ -68,10 +68,11 @@ namespace GalacticWaez
             var playerData = db.GetPlayerData();
             var stopWatch = Stopwatch.StartNew();
             var starPositions = new StarFinder(db.GetFirstKnownStarPosition()).Search();
+            var galaxy = Galaxy.CreateNew(starPositions, playerData.WarpRange);
             stopWatch.Stop();
 
             // surely this won't take so long we actually lose data with this downcast :P
-            return new InitializationResult(starPositions, (int)stopWatch.ElapsedMilliseconds);
+            return new InitializationResult(galaxy, (int)stopWatch.ElapsedMilliseconds);
         }
 
         void OnUpdateDuringInit()
@@ -79,8 +80,10 @@ namespace GalacticWaez
             if (task.IsCompleted)
             {
                 var result = task.Result;
-                modApi.Log("Constructing galactic highway map took "
-                        + $"{(float)result.elapsedMillis / 1000,0:F3}s.");
+                modApi.Log("Constructing galactic highway map "
+                        + $"({result.galaxy.StarCount} stars and "
+                        + $"{result.galaxy.WarpLines} warp lines) "
+                        + $"took {(float)result.elapsedMillis / 1000,0:F3}s.");
                 modApi.Application.Update -= OnUpdateDuringInit;
                 modApi.GUI.ShowGameMessage("Waez ready.");
             }
