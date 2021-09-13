@@ -2,6 +2,11 @@
 
 namespace GalacticWaez.src
 {
+    // can't find a minheap/priority queue in the game files, and I don't want
+    // to bring in additional dependencies
+    // only reason this is remotely generic is because i haven't written the
+    // pathing algo yet, so i don't know what the type will be. the ordering
+    // will be based on a float cost.
     class Minheap<ItemType>
     {
         class Node
