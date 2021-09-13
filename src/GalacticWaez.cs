@@ -1,4 +1,4 @@
-﻿using static GalacticWaez.Const;
+﻿using Eleon.Modding;
 
 namespace GalacticWaez
 {
@@ -10,7 +10,20 @@ namespace GalacticWaez
 
     class Const
     {
+        public const float BaseWarpRange = 30;
         public const int SectorsPerLY = 100000;
+    }
+
+    class PlayerData
+    {
+        public IPlayer Entity { get; }
+        public float WarpRange { get; }
+
+        public PlayerData(IPlayer player, float warpRange)
+        {
+            Entity = player;
+            WarpRange = warpRange;
+        }
     }
 
     struct StarPosition
