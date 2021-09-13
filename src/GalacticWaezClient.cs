@@ -67,19 +67,11 @@ namespace GalacticWaez
                     modApi.Log("Initializing galactic highway map...");
                     // TODO: create Initializer class to handle this
                     // and other necessary business for building the map
-                    var finder = new StarFinder(new SaveGameDB(modApi).GetFirstKnownStarPosition());
+                    var finder = new StarFinder(
+                        new SaveGameDB(modApi.Application.GetPathFor(AppFolder.SaveGame))
+                        .GetFirstKnownStarPosition());
                     var stars = finder.Search();
                     modApi.Log($"Found {stars.Count()} stars.");
-                    string starDataDir = $"{saveGameDir}\\Content\\GalacticWaez";
-                    Directory.CreateDirectory(starDataDir);
-                    StreamWriter writer = new StreamWriter(
-                        new FileStream($"{starDataDir}\\stardata.csv",
-                        FileMode.Create, FileAccess.Write));
-                    foreach (var starPos in stars)
-                    {
-                        writer.WriteLine($"{starPos.sectorX},{starPos.sectorY},{starPos.sectorZ}");
-                    }
-                    writer.Close();
                 }
             }
         }

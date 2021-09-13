@@ -11,13 +11,11 @@ namespace GalacticWaez
 {
     class SaveGameDB
     {
-        IModApi modApi;
         string saveGameDir;
         
-        public SaveGameDB(IModApi modApi)
+        public SaveGameDB(string saveGameDir)
         {
-            this.modApi = modApi;
-            saveGameDir = modApi.Application.GetPathFor(AppFolder.SaveGame);
+            this.saveGameDir = saveGameDir;
         }
 
         public VectorInt3 GetFirstKnownStarPosition()
@@ -30,6 +28,7 @@ namespace GalacticWaez
             {
                 connection = GetConnection();
                 command = connection.CreateCommand();
+                // players have to start somewhere; there will always be at least one entry
                 command.CommandText = "select sectorx, sectory, sectorz from SolarSystems limit 1;";
                 reader = command.ExecuteReader();
                 reader.Read();
