@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Eleon.Modding;
 using static GalacticWaez.Const;
@@ -11,17 +12,13 @@ namespace GalacticWaez
         const int StarCountThreshold = 1000;
 
         readonly VectorInt3 soughtVector;
-        public int StarsFound { get => hits; }
-
-        int hits;
 
         public StarFinder(VectorInt3 knownPosition)
         {
             soughtVector = knownPosition;
-            hits = 0;
         }
 
-        public void Search()
+        public IEnumerable<StarPosition> Search()
         {
             // need to get system info for page size and valid address range
             Kernel32.SYSTEM_INFO sysInfo;
@@ -43,14 +40,19 @@ namespace GalacticWaez
                     && memInfo.State == Kernel32.DesiredPageState
                     && memInfo.Type == Kernel32.DesiredPageType
                 ) {
-                    ScanRegion(memInfo.BaseAddress.ToUInt64(), (ulong)memInfo.RegionSize.ToInt64());
+                    var starDataArray = ScanRegion(memInfo.BaseAddress.ToUInt64(), (ulong)memInfo.RegionSize.ToInt64());
+                    if (starDataArray.baseAddress != 0)
+                    {
+                        return ExtractStarPositions(starDataArray);
+                    }
                 }
 
                 baseAddress += (ulong)memInfo.RegionSize.ToInt64();
             }
+            return null;
         }
 
-        void ScanRegion(ulong baseAddress, ulong size)
+        StarDataArray ScanRegion(ulong baseAddress, ulong size)
         {
             // we're looking for ints and assuming the values are qword-aligned
             const int Step = 4;
@@ -64,40 +66,74 @@ namespace GalacticWaez
                     && IntValueAt(baseAddress + i + 4) == soughtVector.y
                     && IntValueAt(baseAddress + i + 8) == soughtVector.z
                 ) {
-                    int foo = CountPossibleInstances(baseAddress, size, i);
-                    if (foo > hits) hits = foo;
+                    var starDataArray = LocateStarDataArray(baseAddress, size, i);
+                    if (starDataArray.baseAddress != 0)
+                    {
+                        return starDataArray;
+                    }
                 }
             }
+            return default;
         }
 
-        int CountPossibleInstances(ulong baseAddress, ulong size, ulong vectorIndex)
+        StarDataArray LocateStarDataArray(ulong baseAddress, ulong size, ulong vectorIndex)
         {
-            // in {x, y, z, id} vectorLocation points to x. we want id
-            ulong idAddress = baseAddress + vectorIndex + 12;
-            int id = IntValueAt(idAddress);
+            // we have found our vector. might we have found the star data array?
+            // vectorIndex points us to StarData.x; x is 8 bytes into a StarData struct
+            ulong instanceAddress = baseAddress + vectorIndex - 8;
+            // id is 20 bytes deep
+            int id = IntValueAt(instanceAddress + 20);
             // make sure the counting starts at 0
             if (id < 0)
             {
-                return 0;
+                return default;
             }
             if (id > 0)
             {
-                idAddress -= (uint)id * SizeOfStarData;
-                if (idAddress < baseAddress)
+                instanceAddress -= (uint)id * SizeOfStarData;
+                if (instanceAddress < baseAddress)
                 {
-                    return 0;
+                    return default;
                 }
             }
-            id = 0;
-            while (id == IntValueAt(idAddress)
-                && LooksLikeStarPosition(IntValueAt(idAddress - 12),
-                    IntValueAt(idAddress - 8), IntValueAt(idAddress - 4))
+            // now instanceAddress points to the first element of the StarData array,
+            // IF we have found it. let's find out
+            int count = CountStarDataElements(instanceAddress, baseAddress + size);
+            if (count > StarCountThreshold)
+            {
+                return new StarDataArray(instanceAddress, count);
+            }
+            return default;
+        }
+
+        int CountStarDataElements(ulong baseAddress, ulong upperBoundAddress)
+        {
+            int id = 0;
+            while (id == IntValueAt(baseAddress + 20)
+                && LooksLikeStarPosition(IntValueAt(baseAddress + 8),
+                    IntValueAt(baseAddress + 12), IntValueAt(baseAddress + 16))
             ) {
                 id++;
-                idAddress += SizeOfStarData;
+                baseAddress += SizeOfStarData;
             }
 
-            return id > StarCountThreshold ? id : 0;
+            return id;
+        }
+
+        IEnumerable<StarPosition> ExtractStarPositions(StarDataArray starDataArray)
+        {
+            var starPosition = new StarPosition[starDataArray.count];
+            int i = 0;
+            ulong addr = starDataArray.baseAddress;
+            for (; i < starPosition.Length; i++, addr += SizeOfStarData)
+            {
+                starPosition[i] = new StarPosition(
+                    IntValueAt(addr + 8),
+                    IntValueAt(addr + 12),
+                    IntValueAt(addr + 16)
+                );
+            }
+            return starPosition;
         }
 
         unsafe int IntValueAt(ulong address)
@@ -126,6 +162,17 @@ namespace GalacticWaez
             public readonly int sectorY;
             public readonly int sectorZ;
             public readonly int id;
+        }
+
+        struct StarDataArray
+        {
+            public readonly ulong baseAddress;
+            public readonly int count;
+            public StarDataArray(ulong baseAddress, int count)
+            {
+                this.baseAddress = baseAddress;
+                this.count = count;
+            }
         }
     }
 

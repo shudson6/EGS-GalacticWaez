@@ -82,9 +82,18 @@ namespace GalacticWaez
                     dbCommand.Dispose();
                     dbConn.Dispose();
                     var finder = new StarFinder(knownPosition);
-                    finder.Search();
-                    modApi.Log($"Found {finder.StarsFound} stars.");
-
+                    var stars = finder.Search();
+                    modApi.Log($"Found {stars.Count()} stars.");
+                    string starDataDir = $"{saveGameDir}\\Content\\GalacticWaez";
+                    Directory.CreateDirectory(starDataDir);
+                    StreamWriter writer = new StreamWriter(
+                        new FileStream($"{starDataDir}\\stardata.csv",
+                        FileMode.Create, FileAccess.Write));
+                    foreach (var starPos in stars)
+                    {
+                        writer.WriteLine($"{starPos.sectorX},{starPos.sectorY},{starPos.sectorZ}");
+                    }
+                    writer.Close();
                 }
             }
         }
