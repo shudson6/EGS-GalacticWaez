@@ -6,16 +6,53 @@ using System.Threading.Tasks;
 using Eleon.Modding;
 using Mono.Data.Sqlite;
 using System.Data;
+using static GalacticWaez.Const;
 
 namespace GalacticWaez
 {
     class SaveGameDB
     {
-        string saveGameDir;
+        IModApi modApi;
         
-        public SaveGameDB(string saveGameDir)
+        public SaveGameDB(IModApi modApi)
         {
-            this.saveGameDir = saveGameDir;
+            this.modApi = modApi;
+        }
+
+        public PlayerData GetPlayerData()
+        {
+            float warpRange = BaseWarpRange;
+            IPlayer player = modApi.Application.LocalPlayer;
+
+            SqliteConnection connection = null;
+            SqliteCommand command = null;
+            IDataReader reader = null;
+
+            try
+            {
+                connection = GetConnection();
+                command = connection.CreateCommand();
+                command.CommandText = "select value from PlayerSkillValues where "
+                    + $"entityid='{player.Id}' and name='PilotLYRange';";
+                reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    warpRange += reader.GetFloat(0);
+                }
+            }
+            catch (SqliteException ex)
+            {
+                modApi.Log($"SqliteException in GetPlayerData: {ex.Message}");
+                modApi.Log($"Using base warp range ({BaseWarpRange}LY) for {player.Name}");
+            }
+            finally
+            {
+                reader?.Dispose();
+                command?.Dispose();
+                connection?.Dispose();
+            }
+
+            return new PlayerData(player, warpRange);
         }
 
         public VectorInt3 GetFirstKnownStarPosition()
@@ -50,7 +87,7 @@ namespace GalacticWaez
         {
             string openMode = writeable ? "ReadWrite" : "ReadOnly";
             var details = new SqliteConnectionStringBuilder();
-            details.DataSource = $"{saveGameDir}\\global.db";
+            details.DataSource = modApi.Application.GetPathFor(AppFolder.SaveGame) + "\\global.db";
             details.Add("Mode", openMode);
             var connection = new SqliteConnection(details.ToString());
             connection.Open();
