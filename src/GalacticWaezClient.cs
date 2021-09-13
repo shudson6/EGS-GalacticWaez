@@ -67,21 +67,7 @@ namespace GalacticWaez
                     modApi.Log("Initializing galactic highway map...");
                     // TODO: create Initializer class to handle this
                     // and other necessary business for building the map
-                    var scsb = new SqliteConnectionStringBuilder();
-                    scsb.DataSource = $"{saveGameDir}\\global.db";
-                    scsb.Add("Mode", "ReadOnly");
-                    SqliteConnection dbConn = new SqliteConnection(scsb.ToString());
-                    dbConn.Open();
-                    SqliteCommand dbCommand = dbConn.CreateCommand();
-                    dbCommand.CommandText = "select sectorx, sectory, sectorz from SolarSystems limit 1;";
-                    IDataReader reader = dbCommand.ExecuteReader();
-                    reader.Read();
-                    var knownPosition = new VectorInt3(reader.GetInt32(0),
-                        reader.GetInt32(1), reader.GetInt32(2));
-                    reader.Dispose();
-                    dbCommand.Dispose();
-                    dbConn.Dispose();
-                    var finder = new StarFinder(knownPosition);
+                    var finder = new StarFinder(new SaveGameDB(modApi).GetFirstKnownStarPosition());
                     var stars = finder.Search();
                     modApi.Log($"Found {stars.Count()} stars.");
                     string starDataDir = $"{saveGameDir}\\Content\\GalacticWaez";
