@@ -1,21 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Mono.Data.Sqlite;
-using Eleon;
-using Eleon.Modding;
+﻿using Eleon.Modding;
 
 namespace GalacticWaez
 {
     public class GalacticWaezClient : IMod
     {
         IModApi modApi;
-        string saveGameDir = null;
+        CommandHandler commandHandler = null;
 
         public void Init(IModApi modApi)
         {
@@ -27,7 +17,6 @@ namespace GalacticWaez
         public void Shutdown()
         {
             modApi.GameEvent -= OnGameEvent;
-            modApi.Application.ChatMessageSent -= OnChatMessageSent;
             modApi.Log("GalacticWaezClient detached.");
         }
 
@@ -43,36 +32,17 @@ namespace GalacticWaez
                 case GameEventType.GameStarted:
                     if (modApi.Application.Mode == ApplicationMode.SinglePlayer)
                     {
-                        saveGameDir = modApi.Application.GetPathFor(AppFolder.SaveGame);
-                        modApi.Application.ChatMessageSent += OnChatMessageSent;
+                        commandHandler = new CommandHandler(modApi);
+                        modApi.Application.ChatMessageSent += commandHandler.HandleChatCommand;
                         modApi.Log("Listening for commands.");
                     }
                     break;
 
                 case GameEventType.GameEnded:
-                    saveGameDir = null;
-                    modApi.Application.ChatMessageSent -= OnChatMessageSent;
+                    modApi.Application.ChatMessageSent -= commandHandler.HandleChatCommand;
+                    commandHandler = null;
                     modApi.Log("Stopped listening for commands.");
                     break;
-            }
-        }
-
-        void OnChatMessageSent(MessageData messageData)
-        {
-            if (messageData.Text.StartsWith(CommandToken.Introducer))
-            {
-                string command = messageData.Text.Substring(CommandToken.Introducer.Length).Trim();
-                if (command.Equals(CommandToken.Init))
-                {
-                    modApi.Log("Initializing galactic highway map...");
-                    // TODO: create Initializer class to handle this
-                    // and other necessary business for building the map
-                    var finder = new StarFinder(
-                        new SaveGameDB(modApi.Application.GetPathFor(AppFolder.SaveGame))
-                        .GetFirstKnownStarPosition());
-                    var stars = finder.Search();
-                    modApi.Log($"Found {stars.Count()} stars.");
-                }
             }
         }
     }

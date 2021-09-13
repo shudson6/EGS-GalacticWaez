@@ -2,12 +2,6 @@
 
 namespace GalacticWaez
 {
-    class CommandToken
-    {
-        public const string Introducer = "/waez";
-        public const string Init = "init";
-    }
-
     class Const
     {
         public const float BaseWarpRange = 30;
