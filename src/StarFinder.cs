@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
 using Eleon.Modding;
-using System.IO;
+using static GalacticWaez.Const;
 
 namespace GalacticWaez
 {
     class StarFinder
     {
         const int SizeOfStarData = 24;
+        const int StarCountThreshold = 1000;
 
         readonly VectorInt3 soughtVector;
         public int StarsFound { get => hits; }
@@ -92,18 +89,27 @@ namespace GalacticWaez
                 }
             }
             id = 0;
-            while (id == IntValueAt(idAddress))
-            {
+            while (id == IntValueAt(idAddress)
+                && LooksLikeStarPosition(IntValueAt(idAddress - 12),
+                    IntValueAt(idAddress - 8), IntValueAt(idAddress - 4))
+            ) {
                 id++;
                 idAddress += SizeOfStarData;
             }
 
-            return id;
+            return id > StarCountThreshold ? id : 0;
         }
 
         unsafe int IntValueAt(ulong address)
         {
             return *(int*)address;
+        }
+
+        bool LooksLikeStarPosition(int x, int y, int z)
+        {
+            return x % SectorsPerLY == 0
+                && y % SectorsPerLY == 0
+                && z % SectorsPerLY == 0;
         }
 
         /*
