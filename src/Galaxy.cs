@@ -12,13 +12,19 @@ namespace GalacticWaez
 
         public class Node
         {
+            // in test runs (some vanilla, some reforged eden), each star is in
+            // warp range of over 60 others, on average, and that's without
+            // warp upgrades. that doesn't make for a large dictionary, but this
+            // needs to populate tens of thousands of them quickly
+            // also, msdn says the capacity should not be divisible by a small prime
+            public const int InitialNeighborCapacity = 131;
             public VectorInt3 Position { get; }
             public Dictionary<Node, float> Neighbors { get; }
 
-            public Node(VectorInt3 position, Dictionary<Node, float> neighbors)
+            public Node(VectorInt3 position)
             {
                 Position = position;
-                Neighbors = neighbors;
+                Neighbors = new Dictionary<Node, float>(InitialNeighborCapacity);
             }
 
             public float DistanceTo(Node other)
@@ -32,14 +38,13 @@ namespace GalacticWaez
 
         public static Galaxy CreateNew(IEnumerable<VectorInt3> starPositions, float warpRange)
         {
-            var nodes = new List<Node>();
+            var nodes = new List<Node>(starPositions.Count());
             long warpLines = 0;
             foreach (var sp in starPositions)
             {
                 var n = new Node(new VectorInt3(sp.x / SectorsPerLY,
-                        sp.y / SectorsPerLY, 
-                        sp.z / SectorsPerLY),
-                        new Dictionary<Node, float>());
+                        sp.y / SectorsPerLY,
+                        sp.z / SectorsPerLY));
                 foreach (var p in nodes)
                 {
                     if (!AreCloseEnough(n, p, warpRange)) continue;
@@ -58,7 +63,7 @@ namespace GalacticWaez
         // axis to ensure that a cube of side length range could contain
         // both.
         // saves a lot of Math.sqrt() calls. When tested on a Reforged
-        // Eden save with 43000+ stars, reduced construction time by
+        // Eden dump with 43000+ stars, reduced construction time by
         // over 3/4 (from 120+ seconds to fewer than 30).
         private static bool AreCloseEnough(Node a, Node b, float range)
         {
