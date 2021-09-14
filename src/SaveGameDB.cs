@@ -83,6 +83,44 @@ namespace GalacticWaez
             }
         }
 
+        public bool GetBookmarkVector(string bookmarkName, out VectorInt3 coordinates)
+        {
+            SqliteConnection connection = null;
+            SqliteCommand command = null;
+            IDataReader reader = null;
+
+            try
+            {
+                connection = GetConnection();
+                command = connection.CreateCommand();
+                command.CommandText = "select sectorx, sectory, sectorz from Bookmarks "
+                        + $"where type='0' and name='{bookmarkName}' and entityid="
+                        + $"'{modApi.Application.LocalPlayer.Id}';";
+                reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    coordinates = new VectorInt3(
+                        reader.GetInt32(0),
+                        reader.GetInt32(1),
+                        reader.GetInt32(2)
+                    );
+                    return true;
+                }
+            }
+            catch (SqliteException ex)
+            {
+                modApi.Log($"SqliteException in GetBookmarkVector: {ex.Message}");
+            }
+            finally
+            {
+                reader?.Dispose();
+                command?.Dispose();
+                connection?.Dispose();
+            }
+            coordinates = ErrorVector;
+            return false;
+        }
+
         SqliteConnection GetConnection(bool writeable = false)
         {
             string openMode = writeable ? "ReadWrite" : "ReadOnly";
