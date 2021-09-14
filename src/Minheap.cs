@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GalacticWaez.src
+namespace GalacticWaez
 {
     // can't find a minheap/priority queue in the game files, and I don't want
     // to bring in additional dependencies

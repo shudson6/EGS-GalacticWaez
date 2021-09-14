@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Eleon.Modding;
 
-namespace GalacticWaez.src
+namespace GalacticWaez
 {
     class AstarPathfinder
     {
