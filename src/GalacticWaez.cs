@@ -34,6 +34,11 @@ namespace GalacticWaez
 
         public SectorCoordinates ToSectorCoordinates() =>
             new SectorCoordinates(x * SectorsPerLY, y * SectorsPerLY, z * SectorsPerLY);
+
+        public override string ToString()
+        {
+            return $"({x}, {y}, {z})";
+        }
     }
 
     public class PlayerData

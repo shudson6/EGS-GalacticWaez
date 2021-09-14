@@ -183,13 +183,25 @@ namespace GalacticWaez
                 modApi.ClientPlayfield.SolarSystemCoordinates);
 
             string bookmarkName = (string)obj;
-            SectorCoordinates goalCoords;
-            if (!saveGameDB.GetBookmarkVector(bookmarkName, out goalCoords))
+            SectorCoordinates goalSectorCoords;
+            if (!saveGameDB.GetBookmarkVector(bookmarkName, out goalSectorCoords))
             { 
                 return "I don't see that bookmark.";
             }
+            var goalCoords = new LYCoordinates(goalSectorCoords);
 
-            return "Navigation function incomplete.";
+            var path = AstarPathfinder.FindPath(
+                galaxy.GetNode(startCoords),
+                galaxy.GetNode(goalCoords));
+
+            var message = new StringBuilder();
+            message.AppendLine("Found path:");
+            foreach (var coord in path.Skip(1))
+            {
+                message.AppendLine(coord.ToString());
+            }
+
+            return message.ToString();
         }
 
         void OnUpdateDuringNavigation()
