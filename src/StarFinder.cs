@@ -109,7 +109,8 @@ namespace GalacticWaez
         int CountStarDataElements(ulong baseAddress, ulong upperBoundAddress)
         {
             int id = 0;
-            while (id == IntValueAt(baseAddress + 20)
+            while (baseAddress + SizeOfStarData < upperBoundAddress
+                && id == IntValueAt(baseAddress + 20)
                 && LooksLikeStarPosition(IntValueAt(baseAddress + 8),
                     IntValueAt(baseAddress + 12), IntValueAt(baseAddress + 16))
             ) {
