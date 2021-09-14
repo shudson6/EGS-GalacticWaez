@@ -41,9 +41,9 @@ namespace GalacticWaez
         }
 
         IModApi modApi;
+        SaveGameDB saveGameDB;
         Task<InitializationResult> initializer = null;
         Task<string> navigator = null;
-        Task messenger;
 
         private State status;
 
@@ -53,12 +53,12 @@ namespace GalacticWaez
         {
             this.modApi = modApi;
             status = State.Uninitialized;
+            saveGameDB = new SaveGameDB(modApi);
         }
 
         public void SendPlayerMessage(string message)
         {
             var md = new MessageData();
-            md.GameTime += 5;
             md.SenderType = SenderType.System;
             md.Channel = MsgChannel.Global;
             md.SenderNameOverride = "Waez";
@@ -124,10 +124,9 @@ namespace GalacticWaez
         {
             try
             {
-                var db = new SaveGameDB(modApi);
-                var playerData = db.GetPlayerData();
+                var playerData = saveGameDB.GetPlayerData();
                 var stopWatch = Stopwatch.StartNew();
-                var starPositions = new StarFinder(db.GetFirstKnownStarPosition()).Search();
+                var starPositions = new StarFinder(saveGameDB.GetFirstKnownStarPosition()).Search();
                 var galaxy = Galaxy.CreateNew(starPositions, playerData.WarpRange);
                 stopWatch.Stop();
                 
@@ -176,9 +175,19 @@ namespace GalacticWaez
 
         string NavigateTo(Object obj)
         {
-            string bookmarkName = (string)obj;
+            // you have no idea how happy i am not to have to fight the game
+            // to get these coordinates :D yaaaaaaaaaas!
+            var startCoords = modApi.ClientPlayfield.SolarSystemCoordinates;
 
-            return "Navigation function is not finished yet.";
+            string bookmarkName = (string)obj;
+            VectorInt3 goalCoords;
+            if (!saveGameDB.GetBookmarkVector(bookmarkName, out goalCoords))
+            { 
+                return "I don't see that bookmark.";
+            }
+            
+            return $"You are in {modApi.ClientPlayfield.SolarSystemName}, located at "
+                + startCoords.ToString();
         }
 
         void OnUpdateDuringNavigation()
@@ -189,6 +198,7 @@ namespace GalacticWaez
                 modApi.Log(navigator.Result);
                 status = State.Ready;
                 modApi.GUI.ShowGameMessage(navigator.Result);
+                SendPlayerMessage(navigator.Result);
             }
         }
     }
