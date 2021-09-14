@@ -19,18 +19,4 @@ namespace GalacticWaez
             WarpRange = warpRange;
         }
     }
-
-    public struct StarPosition
-    {
-        public readonly int sectorX;
-        public readonly int sectorY;
-        public readonly int sectorZ;
-
-        public StarPosition(int sectorX, int sectorY, int sectorZ)
-        {
-            this.sectorX = sectorX;
-            this.sectorY = sectorY;
-            this.sectorZ = sectorZ;
-        }
-    }
 }

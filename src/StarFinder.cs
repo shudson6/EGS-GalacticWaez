@@ -18,7 +18,7 @@ namespace GalacticWaez
             soughtVector = knownPosition;
         }
 
-        public IEnumerable<StarPosition> Search()
+        public IEnumerable<VectorInt3> Search()
         {
             // need to get system info for page size and valid address range
             Kernel32.SYSTEM_INFO sysInfo;
@@ -120,14 +120,14 @@ namespace GalacticWaez
             return id;
         }
 
-        IEnumerable<StarPosition> ExtractStarPositions(StarDataArray starDataArray)
+        IEnumerable<VectorInt3> ExtractStarPositions(StarDataArray starDataArray)
         {
-            var starPosition = new StarPosition[starDataArray.count];
+            var starPosition = new VectorInt3[starDataArray.count];
             int i = 0;
             ulong addr = starDataArray.baseAddress;
             for (; i < starPosition.Length; i++, addr += SizeOfStarData)
             {
-                starPosition[i] = new StarPosition(
+                starPosition[i] = new VectorInt3(
                     IntValueAt(addr + 8),
                     IntValueAt(addr + 12),
                     IntValueAt(addr + 16)

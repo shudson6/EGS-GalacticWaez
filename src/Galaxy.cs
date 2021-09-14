@@ -30,15 +30,15 @@ namespace GalacticWaez
             }
         }
 
-        public static Galaxy CreateNew(IEnumerable<StarPosition> starPositions, float warpRange)
+        public static Galaxy CreateNew(IEnumerable<VectorInt3> starPositions, float warpRange)
         {
             var nodes = new List<Node>();
             long warpLines = 0;
             foreach (var sp in starPositions)
             {
-                var n = new Node(new VectorInt3(sp.sectorX / SectorsPerLY,
-                        sp.sectorY / SectorsPerLY, 
-                        sp.sectorZ / SectorsPerLY),
+                var n = new Node(new VectorInt3(sp.x / SectorsPerLY,
+                        sp.y / SectorsPerLY, 
+                        sp.z / SectorsPerLY),
                         new Dictionary<Node, float>());
                 foreach (var p in nodes)
                 {
