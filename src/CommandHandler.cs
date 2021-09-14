@@ -44,6 +44,7 @@ namespace GalacticWaez
         SaveGameDB saveGameDB;
         Task<InitializationResult> initializer = null;
         Task<string> navigator = null;
+        Galaxy galaxy = null;
 
         private State status;
 
@@ -147,11 +148,11 @@ namespace GalacticWaez
             if (initializer.IsCompleted)
             {
                 modApi.Application.Update -= OnUpdateDuringInit;
-                var result = initializer.Result;
+                galaxy = initializer.Result.galaxy;
                 modApi.Log("Constructing galactic highway map "
-                        + $"({result.galaxy.StarCount} stars and "
-                        + $"{result.galaxy.WarpLines} warp lines) "
-                        + $"took {(float)result.elapsedMillis / 1000,0:F3}s.");
+                        + $"({initializer.Result.galaxy.StarCount} stars and "
+                        + $"{initializer.Result.galaxy.WarpLines} warp lines) "
+                        + $"took {(float)initializer.Result.elapsedMillis / 1000,0:F3}s.");
                 status = State.Ready;
                 if (modApi.GUI.IsWorldVisible)
                 {
@@ -185,9 +186,8 @@ namespace GalacticWaez
             { 
                 return "I don't see that bookmark.";
             }
-            
-            return $"You are in {modApi.ClientPlayfield.SolarSystemName}, located at "
-                + startCoords.ToString();
+
+            return "Navigation function incomplete.";
         }
 
         void OnUpdateDuringNavigation()

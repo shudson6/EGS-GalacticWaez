@@ -78,12 +78,11 @@ namespace GalacticWaez
 
         // finds the node that matches the coordinates.
         // provide sector coordinates
-        public Node GetNode(int x, int y, int z)
+        public Node GetNode(VectorInt3 coords)
         {
-            var v = new VectorInt3(x, y, z);
             foreach (var n in nodes)
             {
-                if (n.Position.Equals(v))
+                if (n.Position.Equals(coords))
                 {
                     return n;
                 }
