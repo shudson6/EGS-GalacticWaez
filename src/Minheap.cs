@@ -7,7 +7,7 @@ namespace GalacticWaez
     // only reason this is remotely generic is because i haven't written the
     // pathing algo yet, so i don't know what the type will be. the ordering
     // will be based on a float cost.
-    class Minheap<ItemType>
+    public class Minheap<ItemType>
     {
         class Node
         {
