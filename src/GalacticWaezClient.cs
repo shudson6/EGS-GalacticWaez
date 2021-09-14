@@ -34,15 +34,27 @@ namespace GalacticWaez
                     {
                         commandHandler = new CommandHandler(modApi);
                         modApi.Application.ChatMessageSent += commandHandler.HandleChatCommand;
+                        modApi.Application.Update += OnWorldVisibleOnce;
                         modApi.Log("Listening for commands.");
                     }
                     break;
 
                 case GameEventType.GameEnded:
                     modApi.Application.ChatMessageSent -= commandHandler.HandleChatCommand;
+                    modApi.Application.Update -= OnWorldVisibleOnce;
                     commandHandler = null;
                     modApi.Log("Stopped listening for commands.");
                     break;
+            }
+        }
+
+        void OnWorldVisibleOnce()
+        {
+            if (modApi.GUI.IsWorldVisible
+                && commandHandler.Status.Equals(CommandHandler.State.Uninitialized))
+            {
+                commandHandler.Initialize();
+                modApi.Application.Update -= OnWorldVisibleOnce;
             }
         }
     }
