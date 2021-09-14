@@ -22,9 +22,9 @@ namespace GalacticWaez
             }
         }
 
-        public static IEnumerable<VectorInt3> FindPath(Galaxy.Node start, Galaxy.Node goal)
+        public static IEnumerable<LYCoordinates> FindPath(Galaxy.Node start, Galaxy.Node goal)
         {
-            var visitedStars = new Dictionary<VectorInt3, PathNode>();
+            var visitedStars = new Dictionary<LYCoordinates, PathNode>();
             var minheap = new Minheap<PathNode>();
             minheap.Insert(new PathNode(start, null), 0);
             PathNode goalNode = null;
@@ -53,10 +53,10 @@ namespace GalacticWaez
             return ListifyPath(goalNode);
         }
 
-        static IEnumerable<VectorInt3> ListifyPath(PathNode node)
+        static IEnumerable<LYCoordinates> ListifyPath(PathNode node)
         {
             if (node == null) return null;
-            var path = new List<VectorInt3>();
+            var path = new List<LYCoordinates>();
             for(; node != null; node = node.Previous)
             {
                 path.Add(node.Star.Position);

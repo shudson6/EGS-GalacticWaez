@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Eleon.Modding;
 using static GalacticWaez.Const;
+using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
@@ -18,14 +19,17 @@ namespace GalacticWaez
             // needs to populate tens of thousands of them quickly
             // also, msdn says the capacity should not be divisible by a small prime
             public const int InitialNeighborCapacity = 131;
-            public VectorInt3 Position { get; }
+            public LYCoordinates Position { get; }
             public Dictionary<Node, float> Neighbors { get; }
 
-            public Node(VectorInt3 position)
+            public Node(LYCoordinates position)
             {
                 Position = position;
                 Neighbors = new Dictionary<Node, float>(InitialNeighborCapacity);
             }
+
+            public Node(SectorCoordinates position) : this(new LYCoordinates(position))
+            { }
 
             public float DistanceTo(Node other)
             {
@@ -36,15 +40,13 @@ namespace GalacticWaez
             }
         }
 
-        public static Galaxy CreateNew(IEnumerable<VectorInt3> starPositions, float warpRange)
+        public static Galaxy CreateNew(IEnumerable<SectorCoordinates> starPositions, float warpRange)
         {
             var nodes = new List<Node>(starPositions.Count());
             long warpLines = 0;
             foreach (var sp in starPositions)
             {
-                var n = new Node(new VectorInt3(sp.x / SectorsPerLY,
-                        sp.y / SectorsPerLY,
-                        sp.z / SectorsPerLY));
+                var n = new Node(sp);
                 foreach (var p in nodes)
                 {
                     if (!AreCloseEnough(n, p, warpRange)) continue;
@@ -83,7 +85,7 @@ namespace GalacticWaez
 
         // finds the node that matches the coordinates.
         // provide sector coordinates
-        public Node GetNode(VectorInt3 coords)
+        public Node GetNode(LYCoordinates coords)
         {
             foreach (var n in nodes)
             {

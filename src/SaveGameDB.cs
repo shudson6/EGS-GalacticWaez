@@ -7,6 +7,7 @@ using Eleon.Modding;
 using Mono.Data.Sqlite;
 using System.Data;
 using static GalacticWaez.Const;
+using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
@@ -55,7 +56,7 @@ namespace GalacticWaez
             return new PlayerData(player, warpRange);
         }
 
-        public VectorInt3 GetFirstKnownStarPosition()
+        public SectorCoordinates GetFirstKnownStarPosition()
         {
             SqliteConnection connection = null;
             SqliteCommand command = null;
@@ -69,7 +70,7 @@ namespace GalacticWaez
                 command.CommandText = "select sectorx, sectory, sectorz from SolarSystems limit 1;";
                 reader = command.ExecuteReader();
                 reader.Read();
-                return new VectorInt3(
+                return new SectorCoordinates(
                     reader.GetInt32(0),
                     reader.GetInt32(1),
                     reader.GetInt32(2)
@@ -83,7 +84,7 @@ namespace GalacticWaez
             }
         }
 
-        public bool GetBookmarkVector(string bookmarkName, out VectorInt3 coordinates)
+        public bool GetBookmarkVector(string bookmarkName, out SectorCoordinates coordinates)
         {
             SqliteConnection connection = null;
             SqliteCommand command = null;
@@ -99,7 +100,7 @@ namespace GalacticWaez
                 reader = command.ExecuteReader();
                 if (reader.Read())
                 {
-                    coordinates = new VectorInt3(
+                    coordinates = new SectorCoordinates(
                         reader.GetInt32(0),
                         reader.GetInt32(1),
                         reader.GetInt32(2)

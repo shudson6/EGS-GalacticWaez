@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Eleon.Modding;
 using static GalacticWaez.Const;
+using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
@@ -11,14 +12,14 @@ namespace GalacticWaez
         const int SizeOfStarData = 24;
         const int StarCountThreshold = 1000;
 
-        readonly VectorInt3 soughtVector;
+        readonly SectorCoordinates soughtVector;
 
-        public StarFinder(VectorInt3 knownPosition)
+        public StarFinder(SectorCoordinates knownPosition)
         {
             soughtVector = knownPosition;
         }
 
-        public IEnumerable<VectorInt3> Search()
+        public IEnumerable<SectorCoordinates> Search()
         {
             // need to get system info for page size and valid address range
             Kernel32.SYSTEM_INFO sysInfo;
@@ -121,14 +122,14 @@ namespace GalacticWaez
             return id;
         }
 
-        IEnumerable<VectorInt3> ExtractStarPositions(StarDataArray starDataArray)
+        IEnumerable<SectorCoordinates> ExtractStarPositions(StarDataArray starDataArray)
         {
-            var starPosition = new VectorInt3[starDataArray.count];
+            var starPosition = new SectorCoordinates[starDataArray.count];
             int i = 0;
             ulong addr = starDataArray.baseAddress;
             for (; i < starPosition.Length; i++, addr += SizeOfStarData)
             {
-                starPosition[i] = new VectorInt3(
+                starPosition[i] = new SectorCoordinates(
                     IntValueAt(addr + 8),
                     IntValueAt(addr + 12),
                     IntValueAt(addr + 16)
