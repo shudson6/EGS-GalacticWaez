@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Eleon;
 using Eleon.Modding;
 using static GalacticWaez.CommandToken;
+using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
@@ -178,10 +179,11 @@ namespace GalacticWaez
         {
             // you have no idea how happy i am not to have to fight the game
             // to get these coordinates :D yaaaaaaaaaas!
-            var startCoords = modApi.ClientPlayfield.SolarSystemCoordinates;
+            var startCoords = new LYCoordinates(
+                modApi.ClientPlayfield.SolarSystemCoordinates);
 
             string bookmarkName = (string)obj;
-            VectorInt3 goalCoords;
+            SectorCoordinates goalCoords;
             if (!saveGameDB.GetBookmarkVector(bookmarkName, out goalCoords))
             { 
                 return "I don't see that bookmark.";

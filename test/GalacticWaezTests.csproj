@@ -55,6 +55,7 @@
     <Compile Include="GalaxyDataPrep.cs" />
     <Compile Include="GalaxyTests.cs" />
     <Compile Include="MinheapTests.cs" />
+    <Compile Include="PathfinderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -7,7 +7,7 @@ using Eleon.Modding;
 
 namespace GalacticWaez
 {
-    class AstarPathfinder
+    public class AstarPathfinder
     {
         class PathNode
         {
