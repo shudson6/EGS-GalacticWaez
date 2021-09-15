@@ -181,6 +181,31 @@ namespace GalacticWaez
             }
         }
 
+        public int ClearPathMarkers(int playerId)
+        {
+            SqliteConnection connection = null;
+            SqliteCommand command = null;
+
+            try
+            {
+                connection = GetConnection(writeable: true);
+                command = connection.CreateCommand();
+                command.CommandText = "delete from Bookmarks where "
+                    + $"entityid='{playerId}' and name like 'Waez\\_%' escape '\\';";
+                return command.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                modApi.Log($"SqliteException in ClearPathMarkers: {ex.Message}");
+                return 0;
+            }
+            finally
+            {
+                command?.Dispose();
+                connection?.Dispose();
+            }
+        }
+
         SqliteConnection GetConnection(bool writeable = false)
         {
             string openMode = writeable ? "ReadWrite" : "ReadOnly";

@@ -18,6 +18,7 @@ namespace GalacticWaez
         public const string To = "to";
         public const string GetStatus = "status";
         public const string Help = "help";
+        public const string Clear = "clear";
     }
 
     struct InitializationResult
@@ -93,6 +94,11 @@ namespace GalacticWaez
                     HandleHelpRequest();
                     return;
                 }
+                if (commandText.Equals(Clear))
+                {
+                    HandleClearRequest();
+                    return;
+                }
                 string[] tokens = commandText.Split(separator: new[] { ' ' }, count: 2);
                 if (tokens.Length == 2 && tokens[0].Equals(To))
                 {
@@ -116,7 +122,16 @@ namespace GalacticWaez
                 + "to [mapmarker]: plot a course to [mapmarker] and add mapmarkers for each step\n"
                 + "status: find out what Waze is up to\n"
                 + "init: initialize Waze. this should happen automatically\n"
+                + "clear: remove all map markers that start with Waez_\n"
                 + "help: get this help message\n"
+                );
+        }
+
+        void HandleClearRequest()
+        {
+            SendPlayerMessage("Removed "
+                + saveGameDB.ClearPathMarkers(localPlayerData.Entity.Id)
+                + " map markers."
                 );
         }
 
