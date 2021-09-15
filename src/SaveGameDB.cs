@@ -122,6 +122,65 @@ namespace GalacticWaez
             return false;
         }
 
+        // returns the number of bookmarks added
+        public int InsertBookmarks(IEnumerable<SectorCoordinates> positions, PlayerData playerData)
+        {
+            SqliteConnection connection = null;
+            SqliteCommand command = null;
+
+            try
+            {
+                connection = GetConnection(writeable: true);
+                command = connection.CreateCommand();
+                int bid = GetStartingBookmarkId(command);
+                var sql = new StringBuilder(
+                    "insert into Bookmarks ('bid','type','refid','facgroup','facid','entityid',"
+                    + "'name','sectorx','sectory','sectorz','posx','posy','posz','icon','isshared',"
+                    + "'iswaypoint','isremove','isshowhud','iscallback','createdticks',"
+                    + "'expireafterticks','mindistance','maxdistance') values "
+                    );
+                int stepNo = 1;
+                ulong ticks = modApi.Application.GameTicks;
+                foreach (var p in positions)
+                {
+                    sql.Append($"({bid},0,0,1,");
+                    sql.Append($"{playerData.Entity.Faction.Id},{playerData.Entity.Id},");
+                    sql.Append($"'Waez_{stepNo}',{p.x},{p.y},{p.z},0,0,0,2,0,1,1,1,0,");
+                    sql.Append($"{ticks},0,0,{playerData.WarpRange + 1}),");
+                    stepNo++;
+                    bid++;
+                }
+                sql.Replace(',', ';', sql.Length - 1, 1);
+                command.CommandText = sql.ToString();
+                return command.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                modApi.Log($"SqliteException in InsertBookmarks: {ex.Message}");
+            }
+            finally
+            {
+                command?.Dispose();
+                connection?.Dispose();
+            }
+            return 0;
+        }
+
+        int GetStartingBookmarkId(SqliteCommand command)
+        {
+            IDataReader reader = null;
+            try
+            {
+                command.CommandText = "select max(bid) from Bookmarks;";
+                reader = command.ExecuteReader();
+                return reader.Read() ? reader.GetInt32(0) + 1 : 1;
+            }
+            finally
+            {
+                reader?.Dispose();
+            }
+        }
+
         SqliteConnection GetConnection(bool writeable = false)
         {
             string openMode = writeable ? "ReadWrite" : "ReadOnly";
