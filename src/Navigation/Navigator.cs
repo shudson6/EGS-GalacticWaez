@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Eleon.Modding;
+using GalacticWaez;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
-using Callback = GalacticWaez.Command.CommandHandler.DoneCallback;
 
 namespace GalacticWaez.Navigation
 {
     public class Navigator
     {
+        public delegate void DoneCallback(string message);
+
         private Task<string> navigation = null;
-        private Callback doneCallback;
+        private DoneCallback doneCallback;
         private PlayerData player;
         private readonly IModApi modApi;
         private readonly Galaxy galaxy;
@@ -24,7 +26,7 @@ namespace GalacticWaez.Navigation
             db = new SaveGameDB(modApi);
         }
 
-        public void HandlePathRequest(string request, PlayerData player, Callback doneCallback)
+        public void HandlePathRequest(string request, PlayerData player, DoneCallback doneCallback)
         {
             this.doneCallback = doneCallback;
             this.player = player;

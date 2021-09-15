@@ -20,8 +20,6 @@ namespace GalacticWaez.Command
 
     public class CommandHandler
     {
-        public delegate void DoneCallback(string message);
-
         public enum State
         {
             Uninitialized,
@@ -95,10 +93,8 @@ namespace GalacticWaez.Command
             + "clear: remove all map markers that start with Waez_\n"
             + "help: get this help message\n";
 
-        void HandleHelpRequest()
-        {
-            modApi.Application.SendChatMessage(new ChatMessage(HelpText, localPlayerData.Entity));
-        }
+        void HandleHelpRequest() => modApi.Application
+            .SendChatMessage(new ChatMessage(HelpText, localPlayerData.Entity));
 
         void HandleClearRequest()
         {
@@ -108,64 +104,23 @@ namespace GalacticWaez.Command
             modApi.Application.SendChatMessage(new ChatMessage(message, localPlayerData.Entity));
         }
 
-        /***********************************************************************
-         *
-         * Initialization/Map-Building stuff
-         *
-         **********************************************************************/
-
         public void Initialize()
         {
             if (status == State.Uninitialized)
             {
                 status = State.Initializing;
-                initializer = Task<InitializationResult>.Factory.StartNew(BuildGalaxyMap);
-                modApi.Application.Update += OnUpdateDuringInit;
+                localPlayerData = new PlayerData(modApi.Application.LocalPlayer, Const.BaseWarpRange);
+                new Initializer(modApi).Initialize((galaxy, response) =>
+                {
+                    this.galaxy = galaxy;
+                    status = State.Ready;
+                    modApi.Log(response);
+                });
             }
             else
             {
                 string message = "Cannot init because Waez is " + status.ToString();
                 modApi.Application.SendChatMessage(new ChatMessage(message, localPlayerData.Entity));
-            }
-        }
-
-        InitializationResult BuildGalaxyMap()
-        {
-            try
-            {
-                localPlayerData = saveGameDB.GetPlayerData();
-                var stopWatch = Stopwatch.StartNew();
-                var starPositions = new StarFinder(saveGameDB.GetFirstKnownStarPosition()).Search();
-                var galaxy = Galaxy.CreateNew(starPositions, localPlayerData.WarpRange);
-                stopWatch.Stop();
-                
-                // surely this won't take so long we actually lose data with this downcast :P
-                return new InitializationResult(galaxy, (int)stopWatch.ElapsedMilliseconds);
-            }
-            catch (Exception ex)
-            {
-                modApi.LogError(ex.Message);
-                status = State.Uninitialized;
-            }
-
-            return default;
-        }
-
-        void OnUpdateDuringInit()
-        {
-            if (initializer.IsCompleted)
-            {
-                modApi.Application.Update -= OnUpdateDuringInit;
-                galaxy = initializer.Result.galaxy;
-                modApi.Log("Constructing galactic highway map "
-                        + $"({initializer.Result.galaxy.StarCount} stars and "
-                        + $"{initializer.Result.galaxy.WarpLines} warp lines) "
-                        + $"took {(float)initializer.Result.elapsedMillis / 1000,0:F3}s.");
-                status = State.Ready;
-                if (modApi.GUI.IsWorldVisible)
-                {
-                    modApi.GUI.ShowGameMessage("Waez ready.");
-                }
             }
         }
 
