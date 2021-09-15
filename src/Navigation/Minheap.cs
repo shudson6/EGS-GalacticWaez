@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GalacticWaez
+namespace GalacticWaez.Navigation
 {
     // can't find a minheap/priority queue in the game files, and I don't want
     // to bring in additional dependencies
@@ -20,7 +20,7 @@ namespace GalacticWaez
             }
         }
 
-        private List<Node> nodes;
+        private readonly List<Node> nodes;
 
         public int Count { get => nodes.Count; }
 
@@ -58,7 +58,7 @@ namespace GalacticWaez
                 int parent = Parent(index);
                 if (nodes[index].Priority.CompareTo(nodes[parent].Priority) < 0)
                 {
-                    swap(index, parent);
+                    Swap(index, parent);
                     Bubble(parent);
                 }
             }
@@ -80,7 +80,7 @@ namespace GalacticWaez
 
             if (nodes[index].Priority.CompareTo(nodes[child].Priority) > 0)
             {
-                swap(index, child);
+                Swap(index, child);
                 Sink(child);
             }
         }
@@ -89,7 +89,7 @@ namespace GalacticWaez
         int Right(int index) => 2 * index + 2;
         int Parent(int index) => (index + 1) / 2 - 1;
 
-        void swap(int a, int b)
+        void Swap(int a, int b)
         {
             Node temp = nodes[a];
             nodes[a] = nodes[b];

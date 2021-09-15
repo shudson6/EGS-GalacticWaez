@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using GalacticWaez;
+using GalacticWaez.Navigation;
 
 namespace GalacticWaezTests
 {
@@ -12,7 +13,7 @@ namespace GalacticWaezTests
         static Galaxy TestGalaxy;
 
         [ClassInitialize]
-        public static void Setup(TestContext wtf)
+        public static void Setup(TestContext _)
         {
             TestGalaxy = Galaxy.CreateNew(GalaxyDataPrep.Locations, Const.BaseWarpRange);
         }

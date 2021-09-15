@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Eleon;
 using Eleon.Modding;
-using SectorCoordinates = Eleon.Modding.VectorInt3;
+using GalacticWaez.Navigation;
 
 namespace GalacticWaez.Command
 {
     struct InitializationResult
     {
-        // TODO: replace with galaxy class when written
         public readonly Galaxy galaxy;
         public readonly int elapsedMillis;
         public InitializationResult(Galaxy galaxy, int millis)
@@ -22,8 +18,10 @@ namespace GalacticWaez.Command
         }
     }
 
-    class CommandHandler
+    public class CommandHandler
     {
+        public delegate void DoneCallback(string message);
+
         public enum State
         {
             Uninitialized,
@@ -32,10 +30,9 @@ namespace GalacticWaez.Command
             Busy
         }
 
-        IModApi modApi;
-        SaveGameDB saveGameDB;
+        private readonly IModApi modApi;
+        private readonly SaveGameDB saveGameDB;
         Task<InitializationResult> initializer = null;
-        Task<string> navigator = null;
         Galaxy galaxy = null;
 
         private State status;
@@ -172,21 +169,6 @@ namespace GalacticWaez.Command
             }
         }
 
-        /***********************************************************************
-         *
-         * Pathfinding and Bookmarks
-         *
-         * The navigation command "/waez to ..." gets handled here.
-         * HandleNavRequest gets called by the interpreter, starts another
-         * thread to execute NavigateTo, and adds OnUpdateDuringNavigation to
-         * the Application.Update delegate to poll that other thread every frame
-         * til it's done.
-         * 
-         * DO NOT call NavigateTo or OnUpdateDuringNavigation
-         * I think this section needs to be its own class.
-         *
-         **********************************************************************/
-
         void HandleNavRequest(string bookmarkName)
         {
             if (status != State.Ready)
@@ -196,83 +178,14 @@ namespace GalacticWaez.Command
                 return;
             }
             status = State.Busy;
-            navigator = Task<string>.Factory.StartNew(function: NavigateTo, state: bookmarkName);
-            modApi.Application.Update += OnUpdateDuringNavigation;
-        }
-
-        string NavigateTo(Object state)
-        {
-            // you have no idea how happy i am not to have to fight the game
-            // to get these coordinates :D yaaaaaaaaaas!
-            var startCoords = new LYCoordinates(
-                modApi.ClientPlayfield.SolarSystemCoordinates);
-
-            string bookmarkName = (string)state;
-            SectorCoordinates goalSectorCoords;
-            if (!saveGameDB.GetBookmarkVector(bookmarkName, out goalSectorCoords))
-            { 
-                return "I don't see that bookmark.";
-            }
-            var goalCoords = new LYCoordinates(goalSectorCoords);
-            if (goalCoords.Equals(startCoords))
-            {
-                return "It appears you are already there.";
-            }
-
-            var path = AstarPathfinder.FindPath(
-                galaxy.GetNode(startCoords),
-                galaxy.GetNode(goalCoords));
-
-            if (path == null)
-            {
-                return "No path found.";
-            }
-            if (path.Count() == 1)
-            {   // should never happen because of the check up there ^^
-                return "It appears you are already there.";
-            }
-            if (path.Count() == 2)
-            {
-                return "It appears you are already in warp range.";
-            }
-
-            var sectorCoords = new List<SectorCoordinates>(path.Count() - 1);
-            foreach (var coord in path.Skip(1).Take(path.Count() - 2))
-            {
-                sectorCoords.Add(coord.ToSectorCoordinates());
-            }
-
-            int steps = saveGameDB.InsertBookmarks(sectorCoords, localPlayerData);
-
-            var message = new StringBuilder();
-            message.AppendLine("Found path:");
-            foreach (var coord in path.Skip(1))
-            {
-                message.AppendLine(coord.ToString());
-            }
-
-            if (steps == sectorCoords.Count)
-            {
-                message.Append($"Added {steps} bookmarks to Galaxy Map.");
-            }
-            else
-            {
-                message.Append("Failed to add some or all bookmarks.");
-            }
-
-            return message.ToString();
-        }
-
-        void OnUpdateDuringNavigation()
-        {
-            if (navigator.IsCompleted)
-            {
-                modApi.Application.Update -= OnUpdateDuringNavigation;
-                modApi.Log(navigator.Result);
-                status = State.Ready;
-                modApi.GUI.ShowGameMessage(navigator.Result);
-                modApi.Application.SendChatMessage(new ChatMessage(navigator.Result, localPlayerData.Entity));
-            }
+            new Navigator(modApi, galaxy)
+                .HandlePathRequest(bookmarkName, localPlayerData,
+                response =>
+                {
+                    status = State.Ready;
+                    modApi.Application.SendChatMessage(
+                        new ChatMessage(response, localPlayerData.Entity));
+                });
         }
     }
 }

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Eleon.Modding;
+﻿using System.Collections.Generic;
 
-namespace GalacticWaez
+namespace GalacticWaez.Navigation
 {
     public class AstarPathfinder
     {

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using Eleon.Modding;
-using static GalacticWaez.Const;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
-namespace GalacticWaez
+namespace GalacticWaez.Navigation
 {
     public class Galaxy
     {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GalacticWaez;
+using GalacticWaez.Navigation;
 using Eleon.Modding;
 
 namespace GalacticWaezTests
@@ -55,8 +56,7 @@ namespace GalacticWaezTests
         public TestNode(VectorInt3 position)
         {
             this.position = position;
-            neighbors = new List<TestNode>();
-            neighbors.Capacity = 100;
+            neighbors = new List<TestNode>(100);
         }
         public float DistanceTo(TestNode other)
         {

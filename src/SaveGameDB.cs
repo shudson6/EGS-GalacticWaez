@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using Eleon.Modding;
 using Mono.Data.Sqlite;
 using System.Data;
@@ -13,7 +10,7 @@ namespace GalacticWaez
 {
     class SaveGameDB
     {
-        IModApi modApi;
+        private readonly IModApi modApi;
         
         public SaveGameDB(IModApi modApi)
         {
@@ -118,7 +115,7 @@ namespace GalacticWaez
                 command?.Dispose();
                 connection?.Dispose();
             }
-            coordinates = ErrorVector;
+            coordinates = default;
             return false;
         }
 
@@ -204,6 +201,42 @@ namespace GalacticWaez
                 command?.Dispose();
                 connection?.Dispose();
             }
+        }
+        public bool GetSolarSystemCoordinates(string starName, out SectorCoordinates coordinates)
+        {
+            SqliteConnection connection = null;
+            SqliteCommand command = null;
+            IDataReader reader = null;
+
+            try
+            {
+                connection = GetConnection();
+                command = connection.CreateCommand();
+                command.CommandText = "select sectorx, sectory, sectorz from SolarSystems "
+                        + $"where name='{starName}';";
+                reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    coordinates = new SectorCoordinates(
+                        reader.GetInt32(0),
+                        reader.GetInt32(1),
+                        reader.GetInt32(2)
+                    );
+                    return true;
+                }
+            }
+            catch (SqliteException ex)
+            {
+                modApi.Log($"SqliteException in GetSolarSystemCoordinates: {ex.Message}");
+            }
+            finally
+            {
+                reader?.Dispose();
+                command?.Dispose();
+                connection?.Dispose();
+            }
+            coordinates = default;
+            return false;
         }
 
         SqliteConnection GetConnection(bool writeable = false)
