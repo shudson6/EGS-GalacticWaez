@@ -50,19 +50,6 @@ namespace GalacticWaez.Command
             saveGameDB = new SaveGameDB(modApi);
         }
 
-        public void SendPlayerMessage(string message)
-        {
-            var md = new MessageData();
-            md.SenderType = SenderType.System;
-            md.Channel = MsgChannel.Global;
-            md.SenderNameOverride = "Waez";
-            md.RecipientEntityId = modApi.Application.LocalPlayer.Id;
-            md.RecipientFaction = modApi.Application.LocalPlayer.Faction;
-            md.Text = message;
-            md.IsTextLocaKey = false;
-            modApi.Application.SendChatMessage(md);
-        }
-
         public void HandleChatCommand(MessageData messageData)
         {
             if (messageData.Text.StartsWith(CommandToken.Introducer))
@@ -94,34 +81,34 @@ namespace GalacticWaez.Command
                     HandleNavRequest(tokens[1]);
                     return;
                 }
-                SendPlayerMessage("Invalid command.");
+                modApi.Application.SendChatMessage(new ChatMessage("Invalid Command", localPlayerData.Entity));
             }
         }
 
         void HandleStatusRequest()
         {
             string message = status.ToString();
-            modApi.GUI.ShowGameMessage($"Waez is {message}.");
-            SendPlayerMessage(message);
+            modApi.Application.SendChatMessage(new ChatMessage(message, localPlayerData.Entity));
         }
+
+        const string HelpText = "Waez commands:\n"
+            + "to [mapmarker]: plot a course to [mapmarker] and add mapmarkers for each step\n"
+            + "status: find out what Waez is up to\n"
+            + "init: initialize Waez. this should happen automatically\n"
+            + "clear: remove all map markers that start with Waez_\n"
+            + "help: get this help message\n";
 
         void HandleHelpRequest()
         {
-            SendPlayerMessage("Waze commands:\n"
-                + "to [mapmarker]: plot a course to [mapmarker] and add mapmarkers for each step\n"
-                + "status: find out what Waze is up to\n"
-                + "init: initialize Waze. this should happen automatically\n"
-                + "clear: remove all map markers that start with Waez_\n"
-                + "help: get this help message\n"
-                );
+            modApi.Application.SendChatMessage(new ChatMessage(HelpText, localPlayerData.Entity));
         }
 
         void HandleClearRequest()
         {
-            SendPlayerMessage("Removed "
+            string message = $"Removed "
                 + saveGameDB.ClearPathMarkers(localPlayerData.Entity.Id)
-                + " map markers."
-                );
+                + " map markers.";
+            modApi.Application.SendChatMessage(new ChatMessage(message, localPlayerData.Entity));
         }
 
         /***********************************************************************
@@ -140,7 +127,8 @@ namespace GalacticWaez.Command
             }
             else
             {
-                SendPlayerMessage("Cannot init because Waez is " + status.ToString());
+                string message = "Cannot init because Waez is " + status.ToString();
+                modApi.Application.SendChatMessage(new ChatMessage(message, localPlayerData.Entity));
             }
         }
 
@@ -203,7 +191,8 @@ namespace GalacticWaez.Command
         {
             if (status != State.Ready)
             {
-                SendPlayerMessage($"Unable: Waez is {status.ToString()}.");
+                string message = "Unable: Waez is " + status.ToString();
+                modApi.Application.SendChatMessage(new ChatMessage(message, localPlayerData.Entity));
                 return;
             }
             status = State.Busy;
@@ -282,7 +271,7 @@ namespace GalacticWaez.Command
                 modApi.Log(navigator.Result);
                 status = State.Ready;
                 modApi.GUI.ShowGameMessage(navigator.Result);
-                SendPlayerMessage(navigator.Result);
+                modApi.Application.SendChatMessage(new ChatMessage(navigator.Result, localPlayerData.Entity));
             }
         }
     }
