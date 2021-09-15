@@ -6,21 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Eleon;
 using Eleon.Modding;
-using static GalacticWaez.CommandToken;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
-namespace GalacticWaez
+namespace GalacticWaez.Command
 {
-    class CommandToken
-    {
-        public const string Introducer = "/waez";
-        public const string Init = "init";
-        public const string To = "to";
-        public const string GetStatus = "status";
-        public const string Help = "help";
-        public const string Clear = "clear";
-    }
-
     struct InitializationResult
     {
         // TODO: replace with galaxy class when written
@@ -76,31 +65,31 @@ namespace GalacticWaez
 
         public void HandleChatCommand(MessageData messageData)
         {
-            if (messageData.Text.StartsWith(Introducer))
+            if (messageData.Text.StartsWith(CommandToken.Introducer))
             {
-                string commandText = messageData.Text.Remove(0, Introducer.Length).Trim();
-                if (commandText.Equals(Init))
+                string commandText = messageData.Text.Remove(0, CommandToken.Introducer.Length).Trim();
+                if (commandText.Equals(CommandToken.Init))
                 {
                     Initialize();
                     return;
                 }
-                if (commandText.Equals(GetStatus))
+                if (commandText.Equals(CommandToken.GetStatus))
                 {
                     HandleStatusRequest();
                     return;
                 }
-                if (commandText.Equals(Help))
+                if (commandText.Equals(CommandToken.Help))
                 {
                     HandleHelpRequest();
                     return;
                 }
-                if (commandText.Equals(Clear))
+                if (commandText.Equals(CommandToken.Clear))
                 {
                     HandleClearRequest();
                     return;
                 }
                 string[] tokens = commandText.Split(separator: new[] { ' ' }, count: 2);
-                if (tokens.Length == 2 && tokens[0].Equals(To))
+                if (tokens.Length == 2 && tokens[0].Equals(CommandToken.To))
                 {
                     HandleNavRequest(tokens[1]);
                     return;

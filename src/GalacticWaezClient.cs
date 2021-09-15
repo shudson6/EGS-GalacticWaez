@@ -1,4 +1,5 @@
 ﻿using Eleon.Modding;
+using GalacticWaez.Command;
 
 namespace GalacticWaez
 {

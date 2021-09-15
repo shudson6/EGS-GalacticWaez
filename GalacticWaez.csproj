@@ -73,10 +73,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\AstarPathfinder.cs" />
+    <Compile Include="src\Command\CommandToken.cs" />
     <Compile Include="src\GalacticWaez.cs" />
     <Compile Include="src\GalacticWaezClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\CommandHandler.cs" />
+    <Compile Include="src\Command\CommandHandler.cs" />
     <Compile Include="src\Galaxy.cs" />
     <Compile Include="src\Minheap.cs" />
     <Compile Include="src\SaveGameDB.cs" />
