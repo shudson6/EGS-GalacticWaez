@@ -88,12 +88,18 @@ namespace GalacticWaez
                     HandleStatusRequest();
                     return;
                 }
+                if (commandText.Equals(Help))
+                {
+                    HandleHelpRequest();
+                    return;
+                }
                 string[] tokens = commandText.Split(separator: new[] { ' ' }, count: 2);
                 if (tokens.Length == 2 && tokens[0].Equals(To))
                 {
                     HandleNavRequest(tokens[1]);
                     return;
                 }
+                SendPlayerMessage("Invalid command.");
             }
         }
 
@@ -102,6 +108,16 @@ namespace GalacticWaez
             string message = status.ToString();
             modApi.GUI.ShowGameMessage($"Waez is {message}.");
             SendPlayerMessage(message);
+        }
+
+        void HandleHelpRequest()
+        {
+            SendPlayerMessage("Waze commands:\n"
+                + "to [mapmarker]: plot a course to [mapmarker] and add mapmarkers for each step\n"
+                + "status: find out what Waze is up to\n"
+                + "init: initialize Waze. this should happen automatically\n"
+                + "help: get this help message\n"
+                );
         }
 
         /***********************************************************************
