@@ -36,16 +36,4 @@ namespace GalacticWaez
             return $"({x}, {y}, {z})";
         }
     }
-
-    public class PlayerData
-    {
-        public IPlayer Entity { get; }
-        public float WarpRange { get; }
-
-        public PlayerData(IPlayer player, float warpRange)
-        {
-            Entity = player;
-            WarpRange = warpRange;
-        }
-    }
 }

@@ -35,8 +35,8 @@ namespace GalacticWaez
             var knownStar = db.GetFirstKnownStarPosition();
             var message = new StringBuilder();
             var stars = FindStarData(knownStar, message);
-            var player = db.GetPlayerData();
-            galaxy = CreateGalaxy(stars, player.WarpRange, message);
+            float range = db.GetLocalPlayerWarpRange();
+            galaxy = CreateGalaxy(stars, range, message);
             return message.ToString();
         }
 

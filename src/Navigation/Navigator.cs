@@ -14,7 +14,7 @@ namespace GalacticWaez.Navigation
 
         private Task<string> navigation = null;
         private DoneCallback doneCallback;
-        private PlayerData player;
+        private IPlayer player;
         private readonly IModApi modApi;
         private readonly Galaxy galaxy;
         private readonly SaveGameDB db;
@@ -26,7 +26,7 @@ namespace GalacticWaez.Navigation
             db = new SaveGameDB(modApi);
         }
 
-        public void HandlePathRequest(string request, PlayerData player, DoneCallback doneCallback)
+        public void HandlePathRequest(string request, IPlayer player, DoneCallback doneCallback)
         {
             this.doneCallback = doneCallback;
             this.player = player;

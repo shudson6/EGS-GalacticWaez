@@ -7,17 +7,6 @@ using GalacticWaez.Navigation;
 
 namespace GalacticWaez.Command
 {
-    struct InitializationResult
-    {
-        public readonly Galaxy galaxy;
-        public readonly int elapsedMillis;
-        public InitializationResult(Galaxy galaxy, int millis)
-        {
-            this.galaxy = galaxy;
-            elapsedMillis = millis;
-        }
-    }
-
     public class CommandHandler
     {
         public enum State
@@ -30,11 +19,9 @@ namespace GalacticWaez.Command
 
         private readonly IModApi modApi;
         private readonly SaveGameDB saveGameDB;
-        Task<InitializationResult> initializer = null;
         Galaxy galaxy = null;
 
         private State status;
-        private PlayerData localPlayerData;
 
         public State Status { get => status; }
 
@@ -76,14 +63,16 @@ namespace GalacticWaez.Command
                     HandleNavRequest(tokens[1]);
                     return;
                 }
-                modApi.Application.SendChatMessage(new ChatMessage("Invalid Command", localPlayerData.Entity));
+                modApi.Application.SendChatMessage(new ChatMessage("Invalid Command", 
+                    modApi.Application.LocalPlayer));
             }
         }
 
         void HandleStatusRequest()
         {
             string message = status.ToString();
-            modApi.Application.SendChatMessage(new ChatMessage(message, localPlayerData.Entity));
+            modApi.Application.SendChatMessage(new ChatMessage(message, 
+                modApi.Application.LocalPlayer));
         }
 
         const string HelpText = "Waez commands:\n"
@@ -94,14 +83,15 @@ namespace GalacticWaez.Command
             + "help: get this help message\n";
 
         void HandleHelpRequest() => modApi.Application
-            .SendChatMessage(new ChatMessage(HelpText, localPlayerData.Entity));
+            .SendChatMessage(new ChatMessage(HelpText, modApi.Application.LocalPlayer));
 
         void HandleClearRequest()
         {
             string message = $"Removed "
-                + saveGameDB.ClearPathMarkers(localPlayerData.Entity.Id)
+                + saveGameDB.ClearPathMarkers(modApi.Application.LocalPlayer.Id)
                 + " map markers.";
-            modApi.Application.SendChatMessage(new ChatMessage(message, localPlayerData.Entity));
+            modApi.Application.SendChatMessage(new ChatMessage(message, 
+                modApi.Application.LocalPlayer));
         }
 
         public void Initialize()
@@ -109,7 +99,6 @@ namespace GalacticWaez.Command
             if (status == State.Uninitialized)
             {
                 status = State.Initializing;
-                localPlayerData = new PlayerData(modApi.Application.LocalPlayer, Const.BaseWarpRange);
                 new Initializer(modApi).Initialize((galaxy, response) =>
                 {
                     this.galaxy = galaxy;
@@ -120,7 +109,8 @@ namespace GalacticWaez.Command
             else
             {
                 string message = "Cannot init because Waez is " + status.ToString();
-                modApi.Application.SendChatMessage(new ChatMessage(message, localPlayerData.Entity));
+                modApi.Application.SendChatMessage(new ChatMessage(message, 
+                    modApi.Application.LocalPlayer));
             }
         }
 
@@ -129,17 +119,18 @@ namespace GalacticWaez.Command
             if (status != State.Ready)
             {
                 string message = "Unable: Waez is " + status.ToString();
-                modApi.Application.SendChatMessage(new ChatMessage(message, localPlayerData.Entity));
+                modApi.Application.SendChatMessage(new ChatMessage(message, 
+                    modApi.Application.LocalPlayer));
                 return;
             }
             status = State.Busy;
             new Navigator(modApi, galaxy)
-                .HandlePathRequest(bookmarkName, localPlayerData,
+                .HandlePathRequest(bookmarkName, modApi.Application.LocalPlayer,
                 response =>
                 {
                     status = State.Ready;
                     modApi.Application.SendChatMessage(
-                        new ChatMessage(response, localPlayerData.Entity));
+                        new ChatMessage(response, modApi.Application.LocalPlayer));
                 });
         }
     }

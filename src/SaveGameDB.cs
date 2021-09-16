@@ -17,10 +17,9 @@ namespace GalacticWaez
             this.modApi = modApi;
         }
 
-        public PlayerData GetPlayerData()
+        public float GetPlayerWarpRange(int playerId)
         {
             float warpRange = BaseWarpRange;
-            IPlayer player = modApi.Application.LocalPlayer;
 
             SqliteConnection connection = null;
             SqliteCommand command = null;
@@ -31,7 +30,7 @@ namespace GalacticWaez
                 connection = GetConnection();
                 command = connection.CreateCommand();
                 command.CommandText = "select value from PlayerSkillValues where "
-                    + $"entityid='{player.Id}' and name='PilotLYRange';";
+                    + $"entityid='{playerId}' and name='PilotLYRange';";
                 reader = command.ExecuteReader();
                 if (reader.Read())
                 {
@@ -41,7 +40,7 @@ namespace GalacticWaez
             catch (SqliteException ex)
             {
                 modApi.Log($"SqliteException in GetPlayerData: {ex.Message}");
-                modApi.Log($"Using base warp range ({BaseWarpRange}LY) for {player.Name}");
+                modApi.Log($"Using base warp range ({BaseWarpRange}LY) for player {playerId}");
             }
             finally
             {
@@ -50,7 +49,12 @@ namespace GalacticWaez
                 connection?.Dispose();
             }
 
-            return new PlayerData(player, warpRange);
+            return warpRange;
+        }
+
+        public float GetLocalPlayerWarpRange()
+        {
+            return GetPlayerWarpRange(modApi.Application.LocalPlayer.Id);
         }
 
         public SectorCoordinates GetFirstKnownStarPosition()
@@ -120,7 +124,7 @@ namespace GalacticWaez
         }
 
         // returns the number of bookmarks added
-        public int InsertBookmarks(IEnumerable<SectorCoordinates> positions, PlayerData playerData)
+        public int InsertBookmarks(IEnumerable<SectorCoordinates> positions, IPlayer player)
         {
             SqliteConnection connection = null;
             SqliteCommand command = null;
@@ -141,9 +145,9 @@ namespace GalacticWaez
                 foreach (var p in positions)
                 {
                     sql.Append($"({bid},0,0,1,");
-                    sql.Append($"{playerData.Entity.Faction.Id},{playerData.Entity.Id},");
-                    sql.Append($"'Waez_{stepNo}',{p.x},{p.y},{p.z},0,0,0,2,0,1,1,1,0,");
-                    sql.Append($"{ticks},0,0,{playerData.WarpRange + 1}),");
+                    sql.Append($"{player.Faction.Id},{player.Id},");
+                    sql.Append($"'Waez_{stepNo}',{p.x},{p.y},{p.z},0,0,0,2,0,1,1,0,0,");
+                    sql.Append($"{ticks},0,0,-1),");
                     stepNo++;
                     bid++;
                 }
