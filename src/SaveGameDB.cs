@@ -147,7 +147,7 @@ namespace GalacticWaez
                     sql.Append($"({bid},0,0,1,");
                     sql.Append($"{player.Faction.Id},{player.Id},");
                     sql.Append($"'Waez_{stepNo}',{p.x},{p.y},{p.z},0,0,0,2,0,1,1,0,0,");
-                    sql.Append($"{ticks},0,0,-1),");
+                    sql.Append($"{ticks},0,0,0),");
                     stepNo++;
                     bid++;
                 }
