@@ -1,5 +1,4 @@
-﻿using Eleon.Modding;
-using static GalacticWaez.Const; 
+﻿using static GalacticWaez.Const; 
 
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
