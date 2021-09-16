@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using static GalacticWaez.Const;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
@@ -6,10 +7,14 @@ namespace GalacticWaez
 {
     public class StarFinder
     {
-        const int SizeOfStarData = 24;
-        const int StarCountThreshold = 1000;
+        // for the call to TryStartNoGCRegion. 2MB should be plenty of room for this op
+        private const long NoGCSize = 2097152;
 
-        readonly SectorCoordinates soughtVector;
+        private const int SizeOfStarData = 24;
+        private const int StarCountThreshold = 1000;
+
+        private readonly SectorCoordinates soughtVector;
+        private bool noResumeGC = false;
 
         public StarFinder(SectorCoordinates knownPosition)
         {
@@ -18,6 +23,7 @@ namespace GalacticWaez
 
         unsafe public SectorCoordinates[] Search()
         {
+            PauseGC();
             // need to get system info for page size and valid address range
             Kernel32.SYSTEM_INFO sysInfo;
             Kernel32.GetSystemInfo(out sysInfo);
@@ -41,16 +47,54 @@ namespace GalacticWaez
                     var starDataArray = ScanRegion(memInfo.BaseAddress, memInfo.RegionSize);
                     if (starDataArray.baseAddress != null)
                     {
+                        ResumeGC();
                         return ExtractStarPositions(starDataArray);
                     }
                 }
 
                 baseAddress += memInfo.RegionSize;
             }
+            ResumeGC();
             return null;
         }
 
-        unsafe StarDataArray ScanRegion(byte* baseAddress, ulong size)
+        private void PauseGC()
+        {
+            try
+            {
+                GC.TryStartNoGCRegion(NoGCSize);
+            }
+            catch (InvalidOperationException _)
+            {
+                // TODO: provide a way to log this
+                // if this happens, someone else already put us in NoGC mode
+                // so we must NOT be the one to change it back
+                noResumeGC = true;
+            }
+            catch
+            {
+                // StarFinder must continue regardless of any exception here
+            }
+        }
+
+        private void ResumeGC()
+        {
+            try
+            {
+                if (!noResumeGC)
+                {
+                    // never guaranteed not to throw
+                    GC.EndNoGCRegion();
+                }
+            }
+            catch 
+            {
+                // TODO: provide a way to log this?
+                // nothing to do; just move on
+            }
+        }
+
+        unsafe private StarDataArray ScanRegion(byte* baseAddress, ulong size)
         {
             int* region = (int*)baseAddress;
             size /= sizeof(int);
@@ -72,7 +116,7 @@ namespace GalacticWaez
             return default;
         }
 
-        unsafe StarDataArray LocateStarDataArray(int* baseAddress, ulong size, ulong vectorIndex)
+        unsafe private StarDataArray LocateStarDataArray(int* baseAddress, ulong size, ulong vectorIndex)
         {
             // we have found our vector. might we have found the star data array?
             // vectorIndex locates StarData.x so back it up to the start of the struct
@@ -96,7 +140,7 @@ namespace GalacticWaez
             return default;
         }
 
-        unsafe int CountStarDataElements(StarData* starData, void* pastEnd)
+        unsafe private int CountStarDataElements(StarData* starData, void* pastEnd)
         {
             int id = 0;
             while (starData < pastEnd
@@ -110,7 +154,7 @@ namespace GalacticWaez
             return id;
         }
 
-        unsafe SectorCoordinates[] ExtractStarPositions(StarDataArray starDataArray)
+        unsafe private SectorCoordinates[] ExtractStarPositions(StarDataArray starDataArray)
         {
             var starPosition = new SectorCoordinates[starDataArray.count];
             for (int i = 0; i < starPosition.Length; i++)
@@ -124,7 +168,7 @@ namespace GalacticWaez
             return starPosition;
         }
 
-        bool LooksLikeStarPosition(int x, int y, int z)
+        private bool LooksLikeStarPosition(int x, int y, int z)
         {
             return x % SectorsPerLY == 0
                 && y % SectorsPerLY == 0
@@ -157,7 +201,7 @@ namespace GalacticWaez
             }
         }
 
-        unsafe struct StarDataArray
+        unsafe private struct StarDataArray
         {
             public readonly StarData* baseAddress;
             public readonly int count;
