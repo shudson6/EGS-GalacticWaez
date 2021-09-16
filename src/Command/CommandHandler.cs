@@ -16,7 +16,7 @@ namespace GalacticWaez.Command
 
         private readonly IModApi modApi;
         private readonly SaveGameDB saveGameDB;
-        Galaxy galaxy = null;
+        private Galaxy galaxy = null;
 
         private State status;
 
@@ -54,6 +54,11 @@ namespace GalacticWaez.Command
                     HandleClearRequest();
                     return;
                 }
+                if (commandText.Equals(CommandToken.Restart))
+                {
+                    HandleRestartRequest();
+                    return;
+                }
                 string[] tokens = commandText.Split(separator: new[] { ' ' }, count: 2);
                 if (tokens.Length == 2 && tokens[0].Equals(CommandToken.To))
                 {
@@ -65,24 +70,24 @@ namespace GalacticWaez.Command
             }
         }
 
-        void HandleStatusRequest()
+        private void HandleStatusRequest()
         {
             string message = status.ToString();
             modApi.Application.SendChatMessage(new ChatMessage(message, 
                 modApi.Application.LocalPlayer));
         }
 
-        const string HelpText = "Waez commands:\n"
+        private const string HelpText = "Waez commands:\n"
             + "to [mapmarker]: plot a course to [mapmarker] and add mapmarkers for each step\n"
             + "status: find out what Waez is up to\n"
             + "init: initialize Waez. this should happen automatically\n"
             + "clear: remove all map markers that start with Waez_\n"
             + "help: get this help message\n";
 
-        void HandleHelpRequest() => modApi.Application
+        private void HandleHelpRequest() => modApi.Application
             .SendChatMessage(new ChatMessage(HelpText, modApi.Application.LocalPlayer));
 
-        void HandleClearRequest()
+        private void HandleClearRequest()
         {
             string message = $"Removed "
                 + saveGameDB.ClearPathMarkers(modApi.Application.LocalPlayer.Id)
@@ -93,25 +98,41 @@ namespace GalacticWaez.Command
 
         public void Initialize()
         {
-            if (status == State.Uninitialized)
-            {
-                status = State.Initializing;
-                new Initializer(modApi).Initialize((galaxy, response) =>
-                {
-                    this.galaxy = galaxy;
-                    status = State.Ready;
-                    modApi.Log(response);
-                });
-            }
-            else
+            if (status != State.Uninitialized)
             {
                 string message = "Cannot init because Waez is " + status.ToString();
                 modApi.Application.SendChatMessage(new ChatMessage(message, 
                     modApi.Application.LocalPlayer));
+                return;
             }
+            DoInit();
         }
 
-        void HandleNavRequest(string bookmarkName)
+        private void HandleRestartRequest()
+        {
+            if (status != State.Ready)
+            {
+                string message = "Cannot restart because Waez is " + status.ToString();
+                modApi.Application.SendChatMessage(new ChatMessage(message, 
+                    modApi.Application.LocalPlayer));
+                return;
+            }
+            DoInit();
+        }
+
+        private void DoInit()
+        {
+            status = State.Initializing;
+            new Initializer(modApi).Initialize((galaxy, response) =>
+            {
+                this.galaxy = galaxy;
+                status = State.Ready;
+                modApi.Log(response);
+                modApi.GUI.ShowGameMessage("Waez is ready.");
+            });
+        }
+
+        private void HandleNavRequest(string bookmarkName)
         {
             if (status != State.Ready)
             {

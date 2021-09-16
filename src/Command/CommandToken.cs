@@ -8,5 +8,6 @@
         public const string GetStatus = "status";
         public const string Help = "help";
         public const string Clear = "clear";
+        public const string Restart = "restart";
     }
 }
