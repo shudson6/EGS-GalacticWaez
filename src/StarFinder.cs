@@ -13,16 +13,12 @@ namespace GalacticWaez
         private const int SizeOfStarData = 24;
         private const int StarCountThreshold = 1000;
 
-        private readonly SectorCoordinates soughtVector;
+        private SectorCoordinates soughtVector;
         private bool noResumeGC = false;
 
-        public StarFinder(SectorCoordinates knownPosition)
+        unsafe public SectorCoordinates[] Search(SectorCoordinates knownPosition)
         {
             soughtVector = knownPosition;
-        }
-
-        unsafe public SectorCoordinates[] Search()
-        {
             PauseGC();
             // need to get system info for page size and valid address range
             Kernel32.SYSTEM_INFO sysInfo;
@@ -73,7 +69,7 @@ namespace GalacticWaez
             }
             catch
             {
-                // StarFinder must continue regardless of any exception here
+                // StarFinder must continue whether or not GC is suspended
             }
         }
 

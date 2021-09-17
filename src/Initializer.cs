@@ -55,7 +55,7 @@ namespace GalacticWaez
         private IEnumerable<SectorCoordinates> FindStarData(SectorCoordinates known, StringBuilder msg)
         {
             var stopwatch = Stopwatch.StartNew();
-            var stars = new StarFinder(known).Search();
+            var stars = new StarFinder().Search(known);
             stopwatch.Stop();
             if (stars == null)
             {
