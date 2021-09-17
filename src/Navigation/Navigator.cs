@@ -46,7 +46,8 @@ namespace GalacticWaez.Navigation
             {
                 return "It appears you are already there.";
             }
-            var path = GetPath(startCoords, goalCoords);
+            float range = new SaveGameDB(modApi).GetLocalPlayerWarpRange();
+            var path = GetPath(startCoords, goalCoords, range);
             if (path == null)
             {
                 return "No path found.";
@@ -73,11 +74,11 @@ namespace GalacticWaez.Navigation
             return $"Path found; {added}/{path.Count()} waypoints added.";
         }
 
-        private IEnumerable<LYCoordinates> GetPath(LYCoordinates start, LYCoordinates goal) =>
-            AstarPathfinder.FindPath(galaxy.GetNode(start), galaxy.GetNode(goal));
+        private IEnumerable<LYCoordinates> GetPath(LYCoordinates start, LYCoordinates goal, float range)
+            => AstarPathfinder.FindPath(galaxy.GetNode(start), galaxy.GetNode(goal), range);
 
-        private LYCoordinates StartCoords() => new LYCoordinates(
-            modApi.ClientPlayfield.SolarSystemCoordinates);
+        private LYCoordinates StartCoords()
+            => new LYCoordinates(modApi.ClientPlayfield.SolarSystemCoordinates);
 
         private bool GoalCoordinates(string goalName, out LYCoordinates goalCoords, out bool isBookmark)
         {

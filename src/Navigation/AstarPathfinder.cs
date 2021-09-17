@@ -17,7 +17,13 @@ namespace GalacticWaez.Navigation
             }
         }
 
-        public static IEnumerable<LYCoordinates> FindPath(Galaxy.Node start, Galaxy.Node goal)
+        /**
+         * Find a path from start to goal. The warpRange parameter can be used
+         * to limit the distance of any single jump. Values of warpRange larger
+         * than the distance used to build the Galaxy have no effect.
+         */
+        public static IEnumerable<LYCoordinates> 
+        FindPath(Galaxy.Node start, Galaxy.Node goal, float warpRange)
         {
             var visitedStars = new Dictionary<LYCoordinates, PathNode>();
             var minheap = new Minheap<PathNode>();
@@ -35,6 +41,9 @@ namespace GalacticWaez.Navigation
                 visitedStars[current.Star.Position] = current;
                 foreach (var kv in current.Star.Neighbors)
                 {
+                    if (kv.Value > warpRange) 
+                        continue;
+
                     var neighbor = new PathNode(kv.Key, current);
                     if (kv.Key == goal)
                     {
@@ -48,7 +57,7 @@ namespace GalacticWaez.Navigation
             return ListifyPath(goalNode);
         }
 
-        static IEnumerable<LYCoordinates> ListifyPath(PathNode node)
+        private static IEnumerable<LYCoordinates> ListifyPath(PathNode node)
         {
             if (node == null) return null;
             var path = new List<LYCoordinates>();
