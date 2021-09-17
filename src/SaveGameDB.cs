@@ -172,7 +172,7 @@ namespace GalacticWaez
             IDataReader reader = null;
             try
             {
-                command.CommandText = "select max(bid) from Bookmarks;";
+                command.CommandText = "select coalesce(max(bid), 1) from Bookmarks;";
                 reader = command.ExecuteReader();
                 return reader.Read() ? reader.GetInt32(0) + 1 : 1;
             }
