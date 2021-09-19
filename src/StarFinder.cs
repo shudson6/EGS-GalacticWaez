@@ -160,66 +160,6 @@ namespace GalacticWaez
             }
         }
 
-        unsafe private StarDataArray ScanRegion(byte* baseAddress, ulong size)
-        {
-            int* region = (int*)baseAddress;
-            size /= sizeof(int);
-            // we're looking for 3 vector members plus an ordinal, 4 ints total
-            ulong limit = size - 4 * sizeof(int);
-            for (ulong i = 0; i < limit; i++)
-            {
-                if (region[i] == soughtVector.x
-                    && region[i + 1] == soughtVector.y
-                    && region[i + 2] == soughtVector.z
-                ) {
-                    var starDataArray = LocateStarDataArray(region, size, i);
-                    if (starDataArray.baseAddress != null)
-                    {
-                        return starDataArray;
-                    }
-                }
-            }
-            return default;
-        }
-
-        unsafe private StarDataArray LocateStarDataArray(int* baseAddress, ulong size, ulong vectorIndex)
-        {
-            // we have found our vector. might we have found the star data array?
-            // vectorIndex locates StarData.x so back it up to the start of the struct
-            StarData* instance = (StarData*)(baseAddress + vectorIndex - 2);
-            if (instance->id < 0)
-            {
-                return default;
-            }
-            instance -= instance->id;
-            if (instance < baseAddress)
-            {
-                return default;
-            }
-            // now instanceAddress points to the first element of the StarData array,
-            // IF we have found it. let's find out
-            int count = CountStarDataElements(instance, baseAddress + size);
-            if (count > StarCountThreshold)
-            {
-                return new StarDataArray(instance, count);
-            }
-            return default;
-        }
-
-        unsafe private int CountStarDataElements(StarData* starData, void* pastEnd)
-        {
-            int id = 0;
-            while (starData < pastEnd
-                && starData->id == id
-                && LooksLikeStarPosition(starData->x, starData->y, starData->z))
-            {
-                id++;
-                starData++;
-            }
-
-            return id;
-        }
-
         unsafe private SectorCoordinates[] ExtractStarPositions(StarDataArray starDataArray)
         {
             var starPosition = new SectorCoordinates[starDataArray.count];
