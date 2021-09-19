@@ -5,7 +5,7 @@ using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
-    public class StarFinder
+    unsafe public class StarFinder
     {
         // for the call to TryStartNoGCRegion. 2MB should be plenty of room for this op
         private const long NoGCSize = 2097152;
@@ -16,23 +16,32 @@ namespace GalacticWaez
         private SectorCoordinates soughtVector;
         private bool noResumeGC = false;
 
+        private readonly Kernel32.SYSTEM_INFO sysInfo;
+        private Kernel32.MEMORY_BASIC_INFORMATION memInfo;
+        private readonly int memInfoSize;
+        private byte* currentRegionBaseAddress;
+
+        public StarFinder()
+        {
+            Kernel32.GetSystemInfo(out sysInfo);
+            currentRegionBaseAddress = sysInfo.lpMinimumApplicationAddress;
+
+            memInfo = default;
+            memInfoSize = Marshal.SizeOf(memInfo);
+        }
+
         unsafe public SectorCoordinates[] Search(SectorCoordinates knownPosition)
         {
             soughtVector = knownPosition;
             PauseGC();
             // need to get system info for page size and valid address range
-            Kernel32.SYSTEM_INFO sysInfo;
-            Kernel32.GetSystemInfo(out sysInfo);
 
-            byte* baseAddress = sysInfo.lpMinimumApplicationAddress;
-            byte* maxAddress = sysInfo.lpMaximumApplicationAddress;
-            Kernel32.MEMORY_BASIC_INFORMATION memInfo = default;
-            while (baseAddress < maxAddress)
+            while (currentRegionBaseAddress < sysInfo.lpMaximumApplicationAddress)
             {
-                if (Kernel32.VirtualQuery(baseAddress, out memInfo, Marshal.SizeOf(memInfo)) == 0)
+                if (Kernel32.VirtualQuery(currentRegionBaseAddress, out memInfo, Marshal.SizeOf(memInfo)) == 0)
                 {
                     // ignore the error and move on to the next page
-                    baseAddress += sysInfo.dwPageSize;
+                    currentRegionBaseAddress += sysInfo.dwPageSize;
                     continue;
                 }
 
@@ -48,7 +57,7 @@ namespace GalacticWaez
                     }
                 }
 
-                baseAddress += memInfo.RegionSize;
+                currentRegionBaseAddress += memInfo.RegionSize;
             }
             ResumeGC();
             return null;
