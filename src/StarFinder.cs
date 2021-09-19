@@ -17,15 +17,12 @@ namespace GalacticWaez
         private bool noResumeGC = false;
 
         private readonly Kernel32.SYSTEM_INFO sysInfo;
-        private Kernel32.MEMORY_BASIC_INFORMATION memInfo;
         private readonly int memInfoSize;
-        private byte* currentRegionBaseAddress;
 
         public StarFinder()
         {
             Kernel32.GetSystemInfo(out sysInfo);
-            currentRegionBaseAddress = sysInfo.lpMinimumApplicationAddress;
-            memInfo = default;
+            Kernel32.MEMORY_BASIC_INFORMATION memInfo = default;
             memInfoSize = Marshal.SizeOf(memInfo);
         }
 
@@ -34,13 +31,25 @@ namespace GalacticWaez
             soughtVector = knownPosition;
             PauseGC();
 
-            while (NextRegion())
+            Kernel32.MEMORY_BASIC_INFORMATION memInfo = default;
+            if (!NextRegion(ref memInfo))
+                return null;
+
+            var arr = default(StarDataArray);
+            while (NextRegion(ref memInfo))
             {
-                var starDataArray = ScanRegion(memInfo.BaseAddress, memInfo.RegionSize);
-                if (starDataArray.baseAddress != null)
+                void* limit = memInfo.BaseAddress + memInfo.RegionSize - SizeOfStarData;
+
+                // assumption: the star data are 32-bit aligned
+                int* addr = (int*)memInfo.BaseAddress;
+                while (addr < limit)
                 {
-                    ResumeGC();
-                    return ExtractStarPositions(starDataArray);
+                    if (CouldBeStarData((StarData*)addr, knownPosition)
+                        && TryVerifyArrayFound(memInfo, (StarData*)addr, ref arr))
+                    {
+                        return ExtractStarPositions(arr);
+                    }
+                    addr++;
                 }
             }
 
@@ -48,21 +57,60 @@ namespace GalacticWaez
             return null;
         }
 
+        unsafe private bool CouldBeStarData(StarData* sd, SectorCoordinates sc)
+        {
+            return (sd->x == sc.x) && (sd->y == sc.y) && (sd->z == sc.z);
+        }
+
+
+        unsafe private bool TryVerifyArrayFound(Kernel32.MEMORY_BASIC_INFORMATION memInfo,
+            StarData* sd, ref StarDataArray arr)
+        {
+            if (sd->id < 0)
+                return false;
+
+            sd -= sd->id;
+            if (sd < memInfo.BaseAddress)
+                return false;
+
+            StarData* begin = sd;
+            void* limit = memInfo.BaseAddress + memInfo.RegionSize;
+            int expected = 0;
+            while (sd->id == expected)
+            {
+                expected++;
+                sd++;
+                if (sd >= limit && NextRegion(ref memInfo))
+                {
+                    // carry on into the next region
+                    sd = (StarData*)memInfo.BaseAddress;
+                    limit = memInfo.BaseAddress + memInfo.RegionSize;
+                }
+            }
+            if (expected > StarCountThreshold)
+            {
+                arr = new StarDataArray(begin, expected);
+                return true;
+            }
+            return false;
+        }
+
         /**
          * Returns true if memInfo describes a valid region for searching.
          */
-        unsafe private bool NextRegion()
+        unsafe private bool NextRegion(ref Kernel32.MEMORY_BASIC_INFORMATION memInfo)
         {
-            // no need for bottom edge check:
-            // currentRegionBaseAddress is initialized to the minimum address in the constructor
-            // and region size defaults to zero
-            while (currentRegionBaseAddress < sysInfo.lpMaximumApplicationAddress)
+            byte* baseAddress = (memInfo.BaseAddress != null) 
+                ? memInfo.BaseAddress 
+                : sysInfo.lpMinimumApplicationAddress;
+
+            while (baseAddress < sysInfo.lpMaximumApplicationAddress)
             {
-                currentRegionBaseAddress += memInfo.RegionSize;
-                if (Kernel32.VirtualQuery(currentRegionBaseAddress, out memInfo, memInfoSize) == 0)
+                baseAddress += memInfo.RegionSize;
+                if (Kernel32.VirtualQuery(baseAddress, out memInfo, memInfoSize) == 0)
                 {
                     // ignore the error and move on to the next page
-                    currentRegionBaseAddress += sysInfo.dwPageSize;
+                    baseAddress += sysInfo.dwPageSize;
                     continue;
                 }
 

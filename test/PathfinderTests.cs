@@ -25,7 +25,8 @@ namespace GalacticWaezTests
             var end = new LYCoordinates(124, 17, 132);
             var path = AstarPathfinder.FindPath(
                 TestGalaxy.GetNode(start),
-                TestGalaxy.GetNode(end));
+                TestGalaxy.GetNode(end),
+                Const.BaseWarpRange);
             Assert.IsNotNull(path);
             Assert.AreEqual(2, path.Count());
         }
@@ -40,7 +41,8 @@ namespace GalacticWaezTests
                 int b = rand.Next(GalaxyDataPrep.Locations.Count);
                 AstarPathfinder.FindPath(
                     TestGalaxy.GetNode(new LYCoordinates(GalaxyDataPrep.Locations.ElementAt(a))),
-                    TestGalaxy.GetNode(new LYCoordinates(GalaxyDataPrep.Locations.ElementAt(b)))
+                    TestGalaxy.GetNode(new LYCoordinates(GalaxyDataPrep.Locations.ElementAt(b))),
+                    Const.BaseWarpRange
                     );
             }
         }
