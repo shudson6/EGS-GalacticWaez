@@ -25,7 +25,6 @@ namespace GalacticWaez
         {
             Kernel32.GetSystemInfo(out sysInfo);
             currentRegionBaseAddress = sysInfo.lpMinimumApplicationAddress;
-
             memInfo = default;
             memInfoSize = Marshal.SizeOf(memInfo);
         }
@@ -34,11 +33,33 @@ namespace GalacticWaez
         {
             soughtVector = knownPosition;
             PauseGC();
-            // need to get system info for page size and valid address range
 
+            while (NextRegion())
+            {
+                var starDataArray = ScanRegion(memInfo.BaseAddress, memInfo.RegionSize);
+                if (starDataArray.baseAddress != null)
+                {
+                    ResumeGC();
+                    return ExtractStarPositions(starDataArray);
+                }
+            }
+
+            ResumeGC();
+            return null;
+        }
+
+        /**
+         * Returns true if memInfo describes a valid region for searching.
+         */
+        unsafe private bool NextRegion()
+        {
+            // no need for bottom edge check:
+            // currentRegionBaseAddress is initialized to the minimum address in the constructor
+            // and region size defaults to zero
             while (currentRegionBaseAddress < sysInfo.lpMaximumApplicationAddress)
             {
-                if (Kernel32.VirtualQuery(currentRegionBaseAddress, out memInfo, Marshal.SizeOf(memInfo)) == 0)
+                currentRegionBaseAddress += memInfo.RegionSize;
+                if (Kernel32.VirtualQuery(currentRegionBaseAddress, out memInfo, memInfoSize) == 0)
                 {
                     // ignore the error and move on to the next page
                     currentRegionBaseAddress += sysInfo.dwPageSize;
@@ -49,18 +70,10 @@ namespace GalacticWaez
                     && memInfo.State == Kernel32.DesiredPageState
                     && memInfo.Type == Kernel32.DesiredPageType
                 ) {
-                    var starDataArray = ScanRegion(memInfo.BaseAddress, memInfo.RegionSize);
-                    if (starDataArray.baseAddress != null)
-                    {
-                        ResumeGC();
-                        return ExtractStarPositions(starDataArray);
-                    }
+                    return true;
                 }
-
-                currentRegionBaseAddress += memInfo.RegionSize;
             }
-            ResumeGC();
-            return null;
+            return false;
         }
 
         private void PauseGC()
