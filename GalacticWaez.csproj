@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="src\Initializer.cs" />
     <Compile Include="src\Navigation\AstarPathfinder.cs" />
     <Compile Include="src\Command\CommandToken.cs" />

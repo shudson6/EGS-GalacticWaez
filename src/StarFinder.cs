@@ -26,10 +26,11 @@ namespace GalacticWaez
 
             byte* baseAddress = sysInfo.lpMinimumApplicationAddress;
             byte* maxAddress = sysInfo.lpMaximumApplicationAddress;
-            Kernel32.MEMORY_BASIC_INFORMATION memInfo = default;
+            Kernel32.MEMORY_BASIC_INFORMATION memInfo;
             while (baseAddress < maxAddress)
             {
-                if (Kernel32.VirtualQuery(baseAddress, out memInfo, Marshal.SizeOf(memInfo)) == 0)
+                if (Kernel32.VirtualQuery(baseAddress, out memInfo, 
+                    Marshal.SizeOf<Kernel32.MEMORY_BASIC_INFORMATION>()) == 0)
                 {
                     // ignore the error and move on to the next page
                     baseAddress += sysInfo.dwPageSize;
@@ -60,7 +61,7 @@ namespace GalacticWaez
             {
                 GC.TryStartNoGCRegion(NoGCSize);
             }
-            catch (InvalidOperationException _)
+            catch (InvalidOperationException)
             {
                 // TODO: provide a way to log this
                 // if this happens, someone else already put us in NoGC mode
