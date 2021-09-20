@@ -5,7 +5,7 @@ using System.Linq;
 using Eleon.Modding;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
-namespace GalacticWaez.src
+namespace GalacticWaez
 {
     public class StarDataStorage
     {
@@ -83,7 +83,7 @@ namespace GalacticWaez.src
                     FilePath, FileMode.Create, FileAccess.Write
                     ));
 
-                writer.Write(count);
+                writer.WriteLine(count);
                 foreach (var pos in positions)
                 {
                     writer.WriteLine($"{pos.x},{pos.y},{pos.z}");

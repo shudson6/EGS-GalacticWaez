@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Eleon.Modding;
@@ -53,6 +54,25 @@ namespace GalacticWaez
         }
 
         private IEnumerable<SectorCoordinates> FindStarData(SectorCoordinates known, StringBuilder msg)
+        {
+            var stored = new StarDataStorage(modApi);
+            if (stored.Exists())
+            {
+                var loaded = stored.Load();
+                msg.AppendLine($"Loaded {loaded.Count()} stars from file.");
+                return loaded;
+            }
+            msg.AppendLine("No stored star data; scanning memory.");
+            var found = ScrapeForStarData(known, msg);
+            if ((found?.Count() ?? 0) > 0)
+            {
+                msg.AppendLine("Writing star positions to file...");
+                stored.Store(found);
+            }
+            return found;
+        }
+
+        private IEnumerable<SectorCoordinates> ScrapeForStarData(SectorCoordinates known, StringBuilder msg)
         {
             var stopwatch = Stopwatch.StartNew();
             var stars = new StarFinder().Search(known);
