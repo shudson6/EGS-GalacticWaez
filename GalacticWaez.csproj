@@ -84,6 +84,7 @@
     <Compile Include="src\Navigation\Minheap.cs" />
     <Compile Include="src\Navigation\Navigator.cs" />
     <Compile Include="src\SaveGameDB.cs" />
+    <Compile Include="src\StarDataStorage.cs" />
     <Compile Include="src\StarFinder.cs" />
     <Compile Include="src\ChatMessage.cs" />
   </ItemGroup>
