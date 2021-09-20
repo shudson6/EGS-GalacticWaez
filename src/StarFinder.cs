@@ -130,7 +130,7 @@ namespace GalacticWaez
             {
                 GC.TryStartNoGCRegion(NoGCSize);
             }
-            catch (InvalidOperationException _)
+            catch (InvalidOperationException)
             {
                 // TODO: provide a way to log this
                 // if this happens, someone else already put us in NoGC mode

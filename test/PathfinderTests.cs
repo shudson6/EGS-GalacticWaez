@@ -26,7 +26,8 @@ namespace GalacticWaezTests
             var path = AstarPathfinder.FindPath(
                 TestGalaxy.GetNode(start),
                 TestGalaxy.GetNode(end),
-                Const.BaseWarpRange);
+                Const.BaseWarpRange
+                );
             Assert.IsNotNull(path);
             Assert.AreEqual(2, path.Count());
         }
