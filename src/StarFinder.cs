@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 using static GalacticWaez.Const;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
+using System.IO;
+using System.Collections.Generic;
+
 namespace GalacticWaez
 {
     unsafe public class StarFinder
@@ -12,8 +15,9 @@ namespace GalacticWaez
 
         private const int SizeOfStarData = 24;
         private const int StarCountThreshold = 1000;
+        private const long RegionSizeThreshold = SizeOfStarData * StarCountThreshold;
+        private const int RegionListInitialCapacity = 293;
 
-        private SectorCoordinates soughtVector;
         private bool noResumeGC = false;
 
         private readonly Kernel32.SYSTEM_INFO sysInfo;
@@ -28,25 +32,36 @@ namespace GalacticWaez
 
         unsafe public SectorCoordinates[] Search(SectorCoordinates knownPosition)
         {
-            soughtVector = knownPosition;
             PauseGC();
 
+            var mbi = new List<Kernel32.MEMORY_BASIC_INFORMATION>(RegionListInitialCapacity);
             Kernel32.MEMORY_BASIC_INFORMATION memInfo = default;
-            if (!NextRegion(ref memInfo))
-                return null;
-
-            var arr = default(StarDataArray);
+            // have to go bottom to top to get the regions
+            // bc VirtualQuery only rounds down to the page boundary, not the region boundary
+            // so counting backward is a nightmare
             while (NextRegion(ref memInfo))
             {
-                void* limit = memInfo.BaseAddress + memInfo.RegionSize - SizeOfStarData;
+                if (memInfo.RegionSize >= RegionSizeThreshold)
+                {
+                    mbi.Add(memInfo);
+                }
+            }
+            mbi.Reverse();
+
+            var arr = default(StarDataArray);
+            foreach (var mem in mbi)
+            {
+                void* limit = mem.BaseAddress + mem.RegionSize - SizeOfStarData;
 
                 // assumption: the star data are 32-bit aligned
-                int* addr = (int*)memInfo.BaseAddress;
+                int* addr = (int*)mem.BaseAddress;
+
                 while (addr < limit)
                 {
                     if (CouldBeStarData((StarData*)addr, knownPosition)
-                        && TryVerifyArrayFound(memInfo, (StarData*)addr, ref arr))
+                        && TryVerifyArrayFound(mem, (StarData*)addr, ref arr))
                     {
+                        ResumeGC();
                         return ExtractStarPositions(arr);
                     }
                     addr++;
@@ -74,18 +89,12 @@ namespace GalacticWaez
                 return false;
 
             StarData* begin = sd;
-            void* limit = memInfo.BaseAddress + memInfo.RegionSize;
+            void* limit = memInfo.BaseAddress + memInfo.RegionSize - SizeOfStarData;
             int expected = 0;
-            while (sd->id == expected)
+            while (sd <= limit && sd->id == expected)
             {
                 expected++;
                 sd++;
-                if (sd >= limit && NextRegion(ref memInfo))
-                {
-                    // carry on into the next region
-                    sd = (StarData*)memInfo.BaseAddress;
-                    limit = memInfo.BaseAddress + memInfo.RegionSize;
-                }
             }
             if (expected > StarCountThreshold)
             {
