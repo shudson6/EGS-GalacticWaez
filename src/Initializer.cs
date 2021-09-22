@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Eleon.Modding;
@@ -19,26 +19,19 @@ namespace GalacticWaez
         /// </summary>
         public enum Source
         {
-            /// <summary>
-            /// Look for stored data first; scan memory if not found.
-            /// </summary>
+            /// <summary>Look for stored data first; scan memory if not found.</summary>
             Normal,
-            /// <summary>
-            /// Look for file only; don't fall back to memory scan.
-            /// </summary>
+            /// <summary>Look for file only; don't fall back to memory scan.</summary>
             File,
-            /// <summary>
-            /// Scan memory only.
-            /// </summary>
+            /// <summary>Scan memory only.</summary>
             Scanner
         }
 
-        public delegate void DoneCallback(Galaxy galaxy, string message);
+        public delegate void DoneCallback(Galaxy galaxy, AggregateException ex);
 
         private readonly IModApi modApi;
         private DoneCallback doneCallback;
-        private Galaxy galaxy;
-        private Task<string> init;
+        private Task<Galaxy> init;
 
         public Initializer(IModApi modApi)
         {
@@ -48,11 +41,11 @@ namespace GalacticWaez
         public void Initialize(Source source, DoneCallback doneCallback)
         {
             this.doneCallback = doneCallback;
-            init = Task<string>.Factory.StartNew(function: BuildGalaxyMap, state: source);
+            init = Task<Galaxy>.Factory.StartNew(function: BuildGalaxyMap, state: source);
             modApi.Application.Update += OnUpdateDuringInit;
         }
 
-        private string BuildGalaxyMap(object obj)
+        private Galaxy BuildGalaxyMap(object obj)
         {
             IEnumerable<SectorCoordinates> stars = null;
             var source = (Source)obj;
@@ -70,18 +63,21 @@ namespace GalacticWaez
                     stars = ScanForStarData();
                     break;
             }
-            var message = new StringBuilder();
-            galaxy = CreateGalaxy(stars, Const.BaseWarpRange, message);
-            return message.ToString();
+            return CreateGalaxy(stars, Const.BaseWarpRange);
         }
 
-        private Galaxy CreateGalaxy(IEnumerable<SectorCoordinates> locations, float range, StringBuilder msg)
+        private Galaxy CreateGalaxy(IEnumerable<SectorCoordinates> locations, float range)
         {
+            if (locations == null)
+            {
+                modApi.LogWarning("No star positions. Can't create galactic highway map.");
+                return null;
+            }
             var stopwatch = Stopwatch.StartNew();
             var g = Galaxy.CreateNew(locations, range);
             stopwatch.Stop();
             float time = (float)stopwatch.ElapsedMilliseconds / 1000;
-            msg.AppendLine("Constructed galactic highway map: "
+            modApi.Log("Constructed galactic highway map: "
                 + $"{g.StarCount} stars, {g.WarpLines} warp lines. "
                 + $"Took {time}s.");
             return g;
@@ -140,10 +136,14 @@ namespace GalacticWaez
 
         private void OnUpdateDuringInit()
         {
-            if (!init.IsCompleted) return;
+            if (init.Status < TaskStatus.RanToCompletion)
+                return;
 
             modApi.Application.Update -= OnUpdateDuringInit;
-            doneCallback(galaxy, init.Result);
+            doneCallback(
+                init.IsCompleted ? init.Result : null,
+                init.Exception
+                );
         }
     }
 }
