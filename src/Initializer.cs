@@ -9,8 +9,30 @@ using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
+    /// <summary>
+    /// Used by CommandHandler to build Galaxy
+    /// </summary>
     class Initializer
     {
+        /// <summary>
+        /// Enum that tells Initializer where it should look for star map data.
+        /// </summary>
+        public enum Source
+        {
+            /// <summary>
+            /// Look for stored data first; scan memory if not found.
+            /// </summary>
+            Normal,
+            /// <summary>
+            /// Look for file only; don't fall back to memory scan.
+            /// </summary>
+            File,
+            /// <summary>
+            /// Scan memory only.
+            /// </summary>
+            Scanner
+        }
+
         public delegate void DoneCallback(Galaxy galaxy, string message);
 
         private readonly IModApi modApi;
@@ -23,21 +45,33 @@ namespace GalacticWaez
             this.modApi = modApi;
         }
 
-        public void Initialize(DoneCallback doneCallback)
+        public void Initialize(Source source, DoneCallback doneCallback)
         {
             this.doneCallback = doneCallback;
-            init = Task<string>.Factory.StartNew(BuildGalaxyMap);
+            init = Task<string>.Factory.StartNew(function: BuildGalaxyMap, state: source);
             modApi.Application.Update += OnUpdateDuringInit;
         }
 
-        private string BuildGalaxyMap()
+        private string BuildGalaxyMap(object obj)
         {
-            var db = new SaveGameDB(modApi);
-            var knownStar = db.GetFirstKnownStarPosition();
+            IEnumerable<SectorCoordinates> stars = null;
+            var source = (Source)obj;
+            switch (source)
+            {
+                case Source.Normal:
+                    stars = LoadStarData() ?? ScanForStarData(true);
+                    break;
+
+                case Source.File:
+                    stars = LoadStarData();
+                    break;
+
+                case Source.Scanner:
+                    stars = ScanForStarData();
+                    break;
+            }
             var message = new StringBuilder();
-            var stars = FindStarData(knownStar, message);
-            float range = db.GetLocalPlayerWarpRange();
-            galaxy = CreateGalaxy(stars, range, message);
+            galaxy = CreateGalaxy(stars, Const.BaseWarpRange, message);
             return message.ToString();
         }
 
@@ -53,37 +87,54 @@ namespace GalacticWaez
             return g;
         }
 
-        private IEnumerable<SectorCoordinates> FindStarData(SectorCoordinates known, StringBuilder msg)
+        private IEnumerable<SectorCoordinates> LoadStarData()
         {
             var stored = new StarDataStorage(modApi);
-            if (stored.Exists())
+            if (!stored.Exists())
             {
-                var loaded = stored.Load();
-                msg.AppendLine($"Loaded {loaded.Count()} stars from file.");
-                return loaded;
+                modApi.Log("Stored star data not found.");
+                return null;
             }
-            msg.AppendLine("No stored star data; scanning memory.");
-            var found = ScrapeForStarData(known, msg);
-            if ((found?.Count() ?? 0) > 0)
+            var loaded = stored.Load();
+            if (loaded == null)
             {
-                msg.AppendLine("Writing star positions to file...");
-                stored.Store(found);
+                modApi.Log("Failed to load star data from file: " + stored.FilePath);
             }
-            return found;
+            return loaded;
         }
 
-        private IEnumerable<SectorCoordinates> ScrapeForStarData(SectorCoordinates known, StringBuilder msg)
+        /// <summary>
+        /// Uses StarFinder to scan memory for star position data.
+        /// If save == true, saves the found data.
+        /// </summary>
+        /// <param name="save">
+        /// Set to true to save the found star data.
+        /// Defaults to false.
+        /// </param>
+        /// <returns>
+        /// A collection containing the positions of the stars.
+        /// </returns>
+        private IEnumerable<SectorCoordinates> ScanForStarData(bool save = false)
         {
+            var known = new SaveGameDB(modApi).GetFirstKnownStarPosition();
             var stopwatch = Stopwatch.StartNew();
             var stars = new StarFinder().Search(known);
             stopwatch.Stop();
             if (stars == null)
             {
-                msg.AppendLine("Failed to locate star position data. "
+                modApi.LogWarning("Failed to locate star position data. "
                     + $"Scan took {stopwatch.ElapsedMilliseconds}ms.");
                 return null;
             }
-            msg.AppendLine($"Located {stars.Length} stars in {stopwatch.ElapsedMilliseconds}ms.");
+            modApi.Log($"Located {stars.Length} stars in {stopwatch.ElapsedMilliseconds}ms.");
+            if (save)
+            {
+                var storage = new StarDataStorage(modApi);
+                if (storage.Store(stars))
+                {
+                    modApi.Log("Saved star positions to " + storage.FilePath);
+                }
+            }
             return stars;
         }
 

@@ -54,11 +54,6 @@ namespace GalacticWaez.Command
                     HandleClearRequest();
                     return;
                 }
-                if (commandText.Equals(CommandToken.Restart))
-                {
-                    HandleRestartRequest();
-                    return;
-                }
                 string[] tokens = commandText.Split(separator: new[] { ' ' }, count: 2);
                 if (tokens.Length == 2 && tokens[0].Equals(CommandToken.To))
                 {
@@ -123,7 +118,8 @@ namespace GalacticWaez.Command
         private void DoInit()
         {
             status = State.Initializing;
-            new Initializer(modApi).Initialize((galaxy, response) =>
+            new Initializer(modApi).Initialize(Initializer.Source.Normal, 
+                (galaxy, response) =>
             {
                 this.galaxy = galaxy;
                 status = State.Ready;

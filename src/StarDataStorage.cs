@@ -9,19 +9,19 @@ namespace GalacticWaez
 {
     public class StarDataStorage
     {
-        public const string SavedContentDir = "Content\\GalacticWaez";
-        private const string FileName = "stardata.csv";
+        public const string DefaultContentDir = "Content\\Mods\\GalacticWaez";
+        private const string DefaultFileName = "stardata.csv";
 
         private readonly IModApi modApi;
         private readonly string Dir;
-        private readonly string FilePath;
+        public readonly string FilePath;
 
         public StarDataStorage(IModApi modApi)
         {
             this.modApi = modApi;
             Dir = modApi.Application.GetPathFor(AppFolder.SaveGame)
-                + $"\\{SavedContentDir}";
-            FilePath = $"{Dir}\\{FileName}";
+                + $"\\{DefaultContentDir}";
+            FilePath = $"{Dir}\\{DefaultFileName}";
         }
 
         public bool Exists()
@@ -74,6 +74,7 @@ namespace GalacticWaez
 
         public bool Store(IEnumerable<SectorCoordinates> positions)
         {
+            Directory.CreateDirectory(Dir);
             StreamWriter writer = null;
             int count = positions.Count();
 
