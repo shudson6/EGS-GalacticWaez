@@ -12,7 +12,7 @@ namespace GalacticWaez
     /// <summary>
     /// Used by CommandHandler to build Galaxy
     /// </summary>
-    class Initializer
+    public class Initializer
     {
         /// <summary>
         /// Enum that tells Initializer where it should look for star map data.

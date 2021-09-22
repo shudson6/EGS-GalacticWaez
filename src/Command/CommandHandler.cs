@@ -99,23 +99,6 @@ namespace GalacticWaez.Command
                     modApi.Application.LocalPlayer));
                 return;
             }
-            DoInit();
-        }
-
-        private void HandleRestartRequest()
-        {
-            if (Status != State.Ready)
-            {
-                string message = "Cannot restart because Waez is " + Status.ToString();
-                modApi.Application.SendChatMessage(new ChatMessage(message, 
-                    modApi.Application.LocalPlayer));
-                return;
-            }
-            DoInit();
-        }
-
-        private void DoInit()
-        {
             Status = State.Initializing;
             new Initializer(modApi).Initialize(Initializer.Source.Normal, 
                 (galaxy, exception) =>
