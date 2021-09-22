@@ -91,5 +91,30 @@ namespace GalacticWaezTests
                 fakeApp.FireUpdate();
             }
         }
+
+        [TestMethod]
+        [Timeout(3000)]
+        public void NoFileAndScanFails()
+        {
+            var fakeApp = new FakeApplication(tc.DeploymentDirectory);
+            var modApi = new FakeModApi(fakeApp);
+            var init = new Initializer(modApi);
+            bool done = false;
+            init.Initialize(Initializer.Source.Normal,
+                (galaxy, ex) =>
+                {
+                    Assert.IsNull(galaxy);
+                    Assert.IsTrue(modApi.LogContains("Stored star data not found."));
+                    Assert.IsTrue(modApi.LogContains("Failed to locate star position data. ",
+                        FakeModApi.LogType.Warning
+                        ));
+                    done = true;
+                });
+            while (!done)
+            {
+                Thread.Sleep(20);
+                fakeApp.FireUpdate();
+            }
+        }
     }
 }
