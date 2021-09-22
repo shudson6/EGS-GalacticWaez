@@ -58,7 +58,7 @@ namespace GalacticWaezTests
         {
             foreach (var l in logs)
             {
-                if (l.type == type && l.message == message)
+                if (l.type == type && l.message.StartsWith(message))
                 {
                     return true;
                 }

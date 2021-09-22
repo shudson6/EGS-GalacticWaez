@@ -9,16 +9,10 @@ namespace GalacticWaezTests
     public class FakeApplication : IApplication
     {
         private readonly string RootDir;
-        Timer timer;
 
         public FakeApplication(string rootDir)
         {
             RootDir = rootDir;
-            // simulate update cycle by firing every 20ms (50fps)
-            timer = new Timer(20);
-            timer.Elapsed += (src, e) => Update();
-            timer.AutoReset = true;
-            timer.Enabled = true;
         }
 
         public GameState State => throw new NotImplementedException();
@@ -84,6 +78,11 @@ namespace GalacticWaezTests
         public bool ShowDialogBox(int playerEntityId, DialogConfig config, DialogActionHandler actionHandler, int customValue)
         {
             throw new NotImplementedException();
+        }
+
+        public void FireUpdate()
+        {
+            Update();
         }
     }
 }
