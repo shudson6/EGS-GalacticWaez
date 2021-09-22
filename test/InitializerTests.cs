@@ -20,9 +20,9 @@ namespace GalacticWaezTests
         public void FileNotFound()
         {
             var modApi = new FakeModApi(new FakeApplication(tc.DeploymentDirectory));
-            var cmd = new Initializer(modApi);
+            var init = new Initializer(modApi);
             bool done = false;
-            cmd.Initialize(Initializer.Source.File,
+            init.Initialize(Initializer.Source.File,
                 (galaxy, ex) =>
                 {
                     Assert.IsNull(galaxy);
@@ -30,6 +30,23 @@ namespace GalacticWaezTests
                     done = true;
                 });
             while (!done) ;
+        }
+
+        [TestMethod]
+        [Timeout(3000)]
+        public void NoDataInMemory()
+        {
+            var modApi = new FakeModApi(new FakeApplication(tc.DeploymentDirectory));
+            var init = new Initializer(modApi);
+            bool done = false;
+            init.Initialize(Initializer.Source.Scanner,
+                (galaxy, ex) =>
+                {
+                    Assert.IsNull(galaxy);
+                    Assert.IsTrue(modApi.LogContains("Failed to locate star position data. ",
+                        FakeModApi.LogType.Warning
+                        ));
+                });
         }
     }
 }
