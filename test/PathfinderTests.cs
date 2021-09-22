@@ -1,8 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GalacticWaez;
 using GalacticWaez.Navigation;
+using Eleon.Modding;
 
 namespace GalacticWaezTests
 {
@@ -11,11 +13,14 @@ namespace GalacticWaezTests
     {
         const int RandomTestIterations = 100;
         static Galaxy TestGalaxy;
+        private static IEnumerable<VectorInt3> positions;
 
         [ClassInitialize]
-        public static void Setup(TestContext _)
+        [DeploymentItem("Dependencies\\stardata-test-large.csv")]
+        public static void Setup(TestContext _tc)
         {
-            TestGalaxy = Galaxy.CreateNew(GalaxyDataPrep.Locations, Const.BaseWarpRange);
+            positions = GalaxyDataPrep.LoadPositions(_tc.DeploymentDirectory + "\\stardata-test-large.csv");
+            TestGalaxy = Galaxy.CreateNew(positions, Const.BaseWarpRange);
         }
         
         [TestMethod]
@@ -38,11 +43,11 @@ namespace GalacticWaezTests
             var rand = new Random();
             for (int i = RandomTestIterations; i > 0; i--)
             {
-                int a = rand.Next(GalaxyDataPrep.Locations.Count);
-                int b = rand.Next(GalaxyDataPrep.Locations.Count);
+                int a = rand.Next(positions.Count());
+                int b = rand.Next(positions.Count());
                 AstarPathfinder.FindPath(
-                    TestGalaxy.GetNode(new LYCoordinates(GalaxyDataPrep.Locations.ElementAt(a))),
-                    TestGalaxy.GetNode(new LYCoordinates(GalaxyDataPrep.Locations.ElementAt(b))),
+                    TestGalaxy.GetNode(new LYCoordinates(positions.ElementAt(a))),
+                    TestGalaxy.GetNode(new LYCoordinates(positions.ElementAt(b))),
                     Const.BaseWarpRange
                     );
             }

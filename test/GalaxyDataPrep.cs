@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Collections.Generic;
 using Eleon.Modding;
@@ -6,14 +6,15 @@ using GalacticWaez;
 
 namespace GalacticWaezTests
 {
+    [TestClass]
+    [DeploymentItem("Dependencies\\stardata-test-large.csv")]
     public class GalaxyDataPrep
     {
-        public static IReadOnlyCollection<VectorInt3> Locations { get; }
-
-        static GalaxyDataPrep()
+        public static IEnumerable<VectorInt3> LoadPositions(string starDataFile)
         {
             var reader = new StreamReader(new FileStream(
-                "stardata.csv", FileMode.Open, FileAccess.Read));
+                starDataFile, FileMode.Open, FileAccess.Read
+                ));
             var data = new List<VectorInt3>();
             string line;
             while ((line = reader.ReadLine()) != null)
@@ -25,7 +26,7 @@ namespace GalacticWaezTests
                     int.Parse(coords[2])
                     ));
             }
-            Locations = data;
+            return data;
         }
     }
 }

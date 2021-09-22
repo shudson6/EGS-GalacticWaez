@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using GalacticWaez;
 using GalacticWaez.Navigation;
@@ -13,15 +12,24 @@ namespace GalacticWaezTests
     [TestClass]
     public class GalaxyTests
     {
+        private static IEnumerable<VectorInt3> positions;
+
+        [ClassInitialize]
+        public static void SetupClass(TestContext _tc)
+        {
+            positions = GalaxyDataPrep.LoadPositions(_tc.DeploymentDirectory + "\\stardata-test-large.csv");
+        }
+
         [TestMethod]
+        [DeploymentItem("Dependencies\\stardata-test-large.csv")]
         public void Has_Expected_Count_Stars_Warplines()
         {
             var buildGalaxy = Task<Galaxy>.Factory.StartNew(() =>
-                Galaxy.CreateNew(GalaxyDataPrep.Locations, Const.BaseWarpRange)
+                Galaxy.CreateNew(positions, Const.BaseWarpRange)
                 );
             // meanwhile, build our tedious test galaxy
-            var testGalaxy = new List<TestNode>(GalaxyDataPrep.Locations.Count);
-            foreach (var p in GalaxyDataPrep.Locations)
+            var testGalaxy = new List<TestNode>(positions.Count());
+            foreach (var p in positions)
             {
                 testGalaxy.Add(new TestNode(TestNode.LightYearify(p)));
             }

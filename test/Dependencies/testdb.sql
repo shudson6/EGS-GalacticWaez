@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 DROP TABLE IF EXISTS "SolarSystems";
-CREATE TABLE IF NOT EXISTS "SolarSystems" (
+CREATE TABLE  "SolarSystems" (
 	"ssid"	INTEGER,
 	"name"	TEXT UNIQUE,
 	"startype"	TEXT NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS "SolarSystems" (
 	PRIMARY KEY("ssid")
 );
 DROP TABLE IF EXISTS "Playfields";
-CREATE TABLE IF NOT EXISTS "Playfields" (
+CREATE TABLE  "Playfields" (
 	"ssid"	INTEGER,
 	"pfid"	INTEGER,
 	"pftype"	INTEGER,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS "Playfields" (
 	FOREIGN KEY("ssid") REFERENCES "SolarSystems"("ssid")
 );
 DROP TABLE IF EXISTS "Entities";
-CREATE TABLE IF NOT EXISTS "Entities" (
+CREATE TABLE  "Entities" (
 	"entityid"	INTEGER,
 	"pfid"	INTEGER NOT NULL,
 	"name"	TEXT,
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS "Entities" (
 	FOREIGN KEY("pfid") REFERENCES "Playfields"("pfid")
 );
 DROP TABLE IF EXISTS "Structures";
-CREATE TABLE IF NOT EXISTS "Structures" (
+CREATE TABLE  "Structures" (
 	"entityid"	INTEGER NOT NULL,
 	"lastvisitedticks"	INTEGER DEFAULT 0,
 	"cntblocks"	INTEGER DEFAULT -1,
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS "Structures" (
 	FOREIGN KEY("pilotId") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "StructuresHistory";
-CREATE TABLE IF NOT EXISTS "StructuresHistory" (
+CREATE TABLE  "StructuresHistory" (
 	"shid"	INTEGER NOT NULL,
 	"entityid"	INTEGER NOT NULL,
 	"name"	TEXT,
@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS "StructuresHistory" (
 	FOREIGN KEY("touchedentityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "StructuresDeviceCount";
-CREATE TABLE IF NOT EXISTS "StructuresDeviceCount" (
+CREATE TABLE  "StructuresDeviceCount" (
 	"entityid"	INTEGER NOT NULL,
 	"deviceid"	TEXT,
 	"count"	INTEGER,
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS "StructuresDeviceCount" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "PlayfieldResources";
-CREATE TABLE IF NOT EXISTS "PlayfieldResources" (
+CREATE TABLE  "PlayfieldResources" (
 	"localid"	INTEGER NOT NULL,
 	"pfid"	INTEGER NOT NULL,
 	"blockid"	INTEGER NOT NULL,
@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS "PlayfieldResources" (
 	FOREIGN KEY("pfid") REFERENCES "Playfields"("pfid")
 );
 DROP TABLE IF EXISTS "TerrainPlaceables";
-CREATE TABLE IF NOT EXISTS "TerrainPlaceables" (
+CREATE TABLE  "TerrainPlaceables" (
 	"type"	INTEGER NOT NULL,
 	"pfid"	INTEGER NOT NULL,
 	"entityid"	INTEGER NOT NULL,
@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS "TerrainPlaceables" (
 	FOREIGN KEY("tpentityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "TraderHistory";
-CREATE TABLE IF NOT EXISTS "TraderHistory" (
+CREATE TABLE  "TraderHistory" (
 	"thid"	INTEGER NOT NULL,
 	"gametime"	INTEGER NOT NULL,
 	"entityid"	INTEGER NOT NULL,
@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS "TraderHistory" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "DiscoveredPlayfields";
-CREATE TABLE IF NOT EXISTS "DiscoveredPlayfields" (
+CREATE TABLE  "DiscoveredPlayfields" (
 	"facgroup"	INTEGER NOT NULL,
 	"facid"	INTEGER NOT NULL,
 	"entityid"	INTEGER NOT NULL,
@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS "DiscoveredPlayfields" (
 	FOREIGN KEY("pfid") REFERENCES "Playfields"("pfid")
 );
 DROP TABLE IF EXISTS "ChangedPlayfields";
-CREATE TABLE IF NOT EXISTS "ChangedPlayfields" (
+CREATE TABLE  "ChangedPlayfields" (
 	"cid"	INTEGER NOT NULL,
 	"type"	INTEGER NOT NULL,
 	"entityid"	INTEGER NOT NULL,
@@ -209,7 +209,7 @@ CREATE TABLE IF NOT EXISTS "ChangedPlayfields" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "Bookmarks";
-CREATE TABLE IF NOT EXISTS "Bookmarks" (
+CREATE TABLE  "Bookmarks" (
 	"bid"	INTEGER NOT NULL,
 	"type"	INTEGER NOT NULL,
 	"refid"	INTEGER,
@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS "Bookmarks" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "DiscoveredPOIs";
-CREATE TABLE IF NOT EXISTS "DiscoveredPOIs" (
+CREATE TABLE  "DiscoveredPOIs" (
 	"facgroup"	INTEGER NOT NULL,
 	"facid"	INTEGER NOT NULL,
 	"entityid"	INTEGER NOT NULL,
@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS "DiscoveredPOIs" (
 	FOREIGN KEY("pfid") REFERENCES "Playfields"("pfid")
 );
 DROP TABLE IF EXISTS "VisitedStructures";
-CREATE TABLE IF NOT EXISTS "VisitedStructures" (
+CREATE TABLE  "VisitedStructures" (
 	"vp"	INTEGER NOT NULL,
 	"entityid"	INTEGER NOT NULL,
 	"poiid"	INTEGER NOT NULL,
@@ -262,7 +262,7 @@ CREATE TABLE IF NOT EXISTS "VisitedStructures" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "PlayerStatistics";
-CREATE TABLE IF NOT EXISTS "PlayerStatistics" (
+CREATE TABLE  "PlayerStatistics" (
 	"entityid"	INTEGER NOT NULL,
 	"killedenemies"	INTEGER,
 	"killedallied"	INTEGER,
@@ -288,7 +288,7 @@ CREATE TABLE IF NOT EXISTS "PlayerStatistics" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "PlayerStatisticsOres";
-CREATE TABLE IF NOT EXISTS "PlayerStatisticsOres" (
+CREATE TABLE  "PlayerStatisticsOres" (
 	"entityid"	INTEGER NOT NULL,
 	"id"	INTEGER,
 	"count"	INTEGER,
@@ -296,7 +296,7 @@ CREATE TABLE IF NOT EXISTS "PlayerStatisticsOres" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "PlayerStatisticsCores";
-CREATE TABLE IF NOT EXISTS "PlayerStatisticsCores" (
+CREATE TABLE  "PlayerStatisticsCores" (
 	"entityid"	INTEGER NOT NULL,
 	"id"	INTEGER,
 	"count"	INTEGER,
@@ -304,7 +304,7 @@ CREATE TABLE IF NOT EXISTS "PlayerStatisticsCores" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "PlayerStatisticsPDAChapters";
-CREATE TABLE IF NOT EXISTS "PlayerStatisticsPDAChapters" (
+CREATE TABLE  "PlayerStatisticsPDAChapters" (
 	"pspid"	INTEGER,
 	"entityid"	INTEGER NOT NULL,
 	"chapterid"	TEXT,
@@ -314,7 +314,7 @@ CREATE TABLE IF NOT EXISTS "PlayerStatisticsPDAChapters" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "PlayerStatisticsAIVessels";
-CREATE TABLE IF NOT EXISTS "PlayerStatisticsAIVessels" (
+CREATE TABLE  "PlayerStatisticsAIVessels" (
 	"psaid"	INTEGER,
 	"type"	INTEGER,
 	"entityid"	INTEGER NOT NULL,
@@ -325,7 +325,7 @@ CREATE TABLE IF NOT EXISTS "PlayerStatisticsAIVessels" (
 	FOREIGN KEY("vesselid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "PlayerInventory";
-CREATE TABLE IF NOT EXISTS "PlayerInventory" (
+CREATE TABLE  "PlayerInventory" (
 	"piid"	INTEGER,
 	"entityid"	INTEGER NOT NULL,
 	"gametime"	INTEGER NOT NULL,
@@ -333,7 +333,7 @@ CREATE TABLE IF NOT EXISTS "PlayerInventory" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "PlayerInventoryItems";
-CREATE TABLE IF NOT EXISTS "PlayerInventoryItems" (
+CREATE TABLE  "PlayerInventoryItems" (
 	"id"	INTEGER NOT NULL,
 	"piid"	INTEGER NOT NULL,
 	"item"	INTEGER NOT NULL,
@@ -342,7 +342,7 @@ CREATE TABLE IF NOT EXISTS "PlayerInventoryItems" (
 	FOREIGN KEY("piid") REFERENCES "PlayerInventory"("piid")
 );
 DROP TABLE IF EXISTS "DiscoveredFactions";
-CREATE TABLE IF NOT EXISTS "DiscoveredFactions" (
+CREATE TABLE  "DiscoveredFactions" (
 	"facgroup"	INTEGER NOT NULL,
 	"facid"	INTEGER NOT NULL,
 	"disfacgroup"	INTEGER NOT NULL,
@@ -351,7 +351,7 @@ CREATE TABLE IF NOT EXISTS "DiscoveredFactions" (
 	PRIMARY KEY("facgroup","facid","disfacgroup","disfacid")
 );
 DROP TABLE IF EXISTS "LoginLogoff";
-CREATE TABLE IF NOT EXISTS "LoginLogoff" (
+CREATE TABLE  "LoginLogoff" (
 	"lid"	INTEGER NOT NULL,
 	"entityid"	INTEGER NOT NULL,
 	"playerid"	TEXT NOT NULL,
@@ -376,7 +376,7 @@ CREATE TABLE IF NOT EXISTS "LoginLogoff" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "ServerStartStop";
-CREATE TABLE IF NOT EXISTS "ServerStartStop" (
+CREATE TABLE  "ServerStartStop" (
 	"sid"	INTEGER NOT NULL,
 	"startticks"	INTEGER,
 	"stopticks"	INTEGER,
@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS "ServerStartStop" (
 	PRIMARY KEY("sid")
 );
 DROP TABLE IF EXISTS "PlayerDeaths";
-CREATE TABLE IF NOT EXISTS "PlayerDeaths" (
+CREATE TABLE  "PlayerDeaths" (
 	"pid"	INTEGER NOT NULL,
 	"entityid"	INTEGER NOT NULL,
 	"attentityid"	INTEGER,
@@ -409,7 +409,7 @@ CREATE TABLE IF NOT EXISTS "PlayerDeaths" (
 	FOREIGN KEY("pfid") REFERENCES "Playfields"("pfid")
 );
 DROP TABLE IF EXISTS "PlayerLevelUp";
-CREATE TABLE IF NOT EXISTS "PlayerLevelUp" (
+CREATE TABLE  "PlayerLevelUp" (
 	"plid"	INTEGER NOT NULL,
 	"entityid"	INTEGER NOT NULL,
 	"level"	INTEGER,
@@ -419,7 +419,7 @@ CREATE TABLE IF NOT EXISTS "PlayerLevelUp" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "PlayerPosHistory";
-CREATE TABLE IF NOT EXISTS "PlayerPosHistory" (
+CREATE TABLE  "PlayerPosHistory" (
 	"ppid"	INTEGER NOT NULL,
 	"entityid"	INTEGER NOT NULL,
 	"attentityid"	INTEGER,
@@ -434,7 +434,7 @@ CREATE TABLE IF NOT EXISTS "PlayerPosHistory" (
 	FOREIGN KEY("pfid") REFERENCES "Playfields"("pfid")
 );
 DROP TABLE IF EXISTS "DialogueVars";
-CREATE TABLE IF NOT EXISTS "DialogueVars" (
+CREATE TABLE  "DialogueVars" (
 	"type"	INTEGER NOT NULL,
 	"name"	TEXT NOT NULL,
 	"value"	INTEGER,
@@ -444,13 +444,13 @@ CREATE TABLE IF NOT EXISTS "DialogueVars" (
 	PRIMARY KEY("state","name","entityid")
 );
 DROP TABLE IF EXISTS "DialogueVisitedStates";
-CREATE TABLE IF NOT EXISTS "DialogueVisitedStates" (
+CREATE TABLE  "DialogueVisitedStates" (
 	"state"	TEXT NOT NULL,
 	"count"	INTEGER NOT NULL,
 	PRIMARY KEY("state")
 );
 DROP TABLE IF EXISTS "PlayerData";
-CREATE TABLE IF NOT EXISTS "PlayerData" (
+CREATE TABLE  "PlayerData" (
 	"entityid"	INTEGER NOT NULL,
 	"pfid"	INTEGER,
 	"posx"	REAL,
@@ -465,7 +465,7 @@ CREATE TABLE IF NOT EXISTS "PlayerData" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "PlayerSkillValues";
-CREATE TABLE IF NOT EXISTS "PlayerSkillValues" (
+CREATE TABLE  "PlayerSkillValues" (
 	"entityid"	INTEGER NOT NULL,
 	"name"	TEXT NOT NULL,
 	"value"	REAL,
@@ -473,7 +473,7 @@ CREATE TABLE IF NOT EXISTS "PlayerSkillValues" (
 	FOREIGN KEY("entityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "PerformanceData";
-CREATE TABLE IF NOT EXISTS "PerformanceData" (
+CREATE TABLE  "PerformanceData" (
 	"pdid"	INTEGER NOT NULL,
 	"type"	INTEGER,
 	"uptime"	INTEGER,
@@ -512,7 +512,7 @@ CREATE TABLE IF NOT EXISTS "PerformanceData" (
 	FOREIGN KEY("pfid") REFERENCES "Playfields"("pfid")
 );
 DROP TABLE IF EXISTS "PerformanceDBResults";
-CREATE TABLE IF NOT EXISTS "PerformanceDBResults" (
+CREATE TABLE  "PerformanceDBResults" (
 	"pdid"	INTEGER NOT NULL,
 	"type"	INTEGER,
 	"gametime"	INTEGER,
@@ -522,7 +522,7 @@ CREATE TABLE IF NOT EXISTS "PerformanceDBResults" (
 	PRIMARY KEY("pdid")
 );
 DROP TABLE IF EXISTS "PerformanceNWPackages";
-CREATE TABLE IF NOT EXISTS "PerformanceNWPackages" (
+CREATE TABLE  "PerformanceNWPackages" (
 	"pnid"	INTEGER NOT NULL,
 	"type"	INTEGER,
 	"packageid"	INTEGER,
@@ -535,7 +535,7 @@ CREATE TABLE IF NOT EXISTS "PerformanceNWPackages" (
 	PRIMARY KEY("pnid")
 );
 DROP TABLE IF EXISTS "ChatMessages";
-CREATE TABLE IF NOT EXISTS "ChatMessages" (
+CREATE TABLE  "ChatMessages" (
 	"cmid"	INTEGER NOT NULL,
 	"gametime"	INTEGER,
 	"sendertype"	INTEGER,
@@ -556,7 +556,7 @@ CREATE TABLE IF NOT EXISTS "ChatMessages" (
 	FOREIGN KEY("senderentityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "Marketplace";
-CREATE TABLE IF NOT EXISTS "Marketplace" (
+CREATE TABLE  "Marketplace" (
 	"mpid"	INTEGER NOT NULL,
 	"isforsale"	BOOL,
 	"iscreatorclaimed"	BOOL,
@@ -578,7 +578,7 @@ CREATE TABLE IF NOT EXISTS "Marketplace" (
 	FOREIGN KEY("stationentityid") REFERENCES "Entities"("entityid")
 );
 DROP TABLE IF EXISTS "StationServicesHistory";
-CREATE TABLE IF NOT EXISTS "StationServicesHistory" (
+CREATE TABLE  "StationServicesHistory" (
 	"shid"	INTEGER NOT NULL,
 	"gametime"	INTEGER,
 	"playerid"	INTEGER NOT NULL,
@@ -602,88 +602,88 @@ CREATE TABLE IF NOT EXISTS "StationServicesHistory" (
 	FOREIGN KEY("stationid") REFERENCES "Entities"("entityid"),
 	FOREIGN KEY("playerid") REFERENCES "Entities"("entityid")
 );
-DROP INDEX IF EXISTS "ss_idx_name";
-CREATE UNIQUE INDEX IF NOT EXISTS "ss_idx_name" ON "SolarSystems" (
-	"name"
-);
-DROP INDEX IF EXISTS "pf_idx_name";
-CREATE UNIQUE INDEX IF NOT EXISTS "pf_idx_name" ON "Playfields" (
-	"name"
-);
-DROP INDEX IF EXISTS "pii_idx_piid";
-CREATE INDEX IF NOT EXISTS "pii_idx_piid" ON "PlayerInventoryItems" (
-	"piid"
-);
-DROP INDEX IF EXISTS "lolo_idx_piid";
-CREATE INDEX IF NOT EXISTS "lolo_idx_piid" ON "LoginLogoff" (
-	"entityid",
-	"playerid",
-	"clientid",
-	"loginticks"
-);
-DROP INDEX IF EXISTS "ent_fac_pfid2";
-CREATE INDEX IF NOT EXISTS "ent_fac_pfid2" ON "Entities" (
-	"isstructure",
-	"isremoved",
-	"facgroup",
-	"facid"
-);
-DROP INDEX IF EXISTS "ent_pfid_struct_rem";
-CREATE INDEX IF NOT EXISTS "ent_pfid_struct_rem" ON "Entities" (
-	'pfid',
-	'isstructure',
-	'isremoved'
-);
-DROP INDEX IF EXISTS "discpois_pfid";
-CREATE INDEX IF NOT EXISTS "discpois_pfid" ON "DiscoveredPOIs" (
-	'pfid'
-);
-DROP INDEX IF EXISTS "discpois_poiid";
-CREATE INDEX IF NOT EXISTS "discpois_poiid" ON "DiscoveredPOIs" (
-	"poiid"
-);
-DROP INDEX IF EXISTS "discpois_poitype_pfid_poiid_fac";
-CREATE INDEX IF NOT EXISTS "discpois_poitype_pfid_poiid_fac" ON "DiscoveredPOIs" (
-	"poitype",
-	"pfid",
-	"poiid",
-	"facgroup",
-	"facid"
-);
-DROP INDEX IF EXISTS "structs_teleporter";
-CREATE INDEX IF NOT EXISTS "structs_teleporter" ON "Structures" (
-	"hasteleporter"
-);
-DROP INDEX IF EXISTS "chm_chn_rece";
-CREATE INDEX IF NOT EXISTS "chm_chn_rece" ON "ChatMessages" (
-	"channel",
-	"recentityid"
-);
-DROP INDEX IF EXISTS "chm_chn_fac";
-CREATE INDEX IF NOT EXISTS "chm_chn_fac" ON "ChatMessages" (
-	"channel",
-	"recfacgroup",
-	"recfacid"
-);
-DROP INDEX IF EXISTS "structs_splocked";
-CREATE INDEX IF NOT EXISTS "structs_splocked" ON "Structures" (
-	"hassplocked"
-);
-DROP INDEX IF EXISTS "structs_spunlocked";
-CREATE INDEX IF NOT EXISTS "structs_spunlocked" ON "Structures" (
-	"hasspunlocked"
-);
-DROP INDEX IF EXISTS "discpois_pfid_eid_facgr_poitype";
-CREATE INDEX IF NOT EXISTS "discpois_pfid_eid_facgr_poitype" ON "DiscoveredPOIs" (
-	"poitype",
-	"facgroup",
-	"entityid",
-	"pfid"
-);
-DROP INDEX IF EXISTS "pf_idx_ssid2";
-CREATE INDEX IF NOT EXISTS "pf_idx_ssid2" ON "Playfields" (
-	"ssid"
-);
-DROP VIEW IF EXISTS "ChangedPlayfiedsInShip";
-CREATE VIEW ChangedPlayfiedsInShip  (entityid, shipid, shipname, frompf, topf, distanceau, gametime)AS SELECT cp.entityid, e.entityid, e.name, p1.name, p2.name,        sqrt((p1.sectorx - p2.sectorx) * (p1.sectorx - p2.sectorx) + (p1.sectory - p2.sectory) * (p1.sectory - p2.sectory) + (p1.sectorz - p2.sectorz) * (p1.sectorz - p2.sectorz))*0.1,        cp.gametime FROM ChangedPlayfields cp, Playfields p1, Playfields p2, Entities e WHERE cp.frompfid = p1.pfid AND cp.topfid = p2.pfid AND e.entityid = cp.attentityid ORDER BY cp.gametime DESC;
+--DROP INDEX IF EXISTS "ss_idx_name";
+--CREATE UNIQUE INDEX  "ss_idx_name" ON "SolarSystems" (
+--	"name"
+--);
+--DROP INDEX IF EXISTS "pf_idx_name";
+--CREATE UNIQUE INDEX  "pf_idx_name" ON "Playfields" (
+--	"name"
+--);
+--DROP INDEX IF EXISTS "pii_idx_piid";
+--CREATE INDEX  "pii_idx_piid" ON "PlayerInventoryItems" (
+--	"piid"
+--);
+--DROP INDEX IF EXISTS "lolo_idx_piid";
+--CREATE INDEX  "lolo_idx_piid" ON "LoginLogoff" (
+--	"entityid",
+--	"playerid",
+--	"clientid",
+--	"loginticks"
+--);
+--DROP INDEX IF EXISTS "ent_fac_pfid2";
+--CREATE INDEX  "ent_fac_pfid2" ON "Entities" (
+--	"isstructure",
+--	"isremoved",
+--	"facgroup",
+--	"facid"
+--);
+--DROP INDEX IF EXISTS "ent_pfid_struct_rem";
+--CREATE INDEX  "ent_pfid_struct_rem" ON "Entities" (
+--	'pfid',
+--	'isstructure',
+--	'isremoved'
+--);
+--DROP INDEX IF EXISTS "discpois_pfid";
+--CREATE INDEX  "discpois_pfid" ON "DiscoveredPOIs" (
+--	'pfid'
+--);
+--DROP INDEX IF EXISTS "discpois_poiid";
+--CREATE INDEX  "discpois_poiid" ON "DiscoveredPOIs" (
+--	"poiid"
+--);
+--DROP INDEX IF EXISTS "discpois_poitype_pfid_poiid_fac";
+--CREATE INDEX  "discpois_poitype_pfid_poiid_fac" ON "DiscoveredPOIs" (
+--	"poitype",
+--	"pfid",
+--	"poiid",
+--	"facgroup",
+--	"facid"
+--);
+--DROP INDEX IF EXISTS "structs_teleporter";
+--CREATE INDEX  "structs_teleporter" ON "Structures" (
+--	"hasteleporter"
+--);
+--DROP INDEX IF EXISTS "chm_chn_rece";
+--CREATE INDEX  "chm_chn_rece" ON "ChatMessages" (
+--	"channel",
+--	"recentityid"
+--);
+--DROP INDEX IF EXISTS "chm_chn_fac";
+--CREATE INDEX  "chm_chn_fac" ON "ChatMessages" (
+--	"channel",
+--	"recfacgroup",
+--	"recfacid"
+--);
+--DROP INDEX IF EXISTS "structs_splocked";
+--CREATE INDEX  "structs_splocked" ON "Structures" (
+--	"hassplocked"
+--);
+--DROP INDEX IF EXISTS "structs_spunlocked";
+--CREATE INDEX  "structs_spunlocked" ON "Structures" (
+--	"hasspunlocked"
+--);
+--DROP INDEX IF EXISTS "discpois_pfid_eid_facgr_poitype";
+--CREATE INDEX  "discpois_pfid_eid_facgr_poitype" ON "DiscoveredPOIs" (
+--	"poitype",
+--	"facgroup",
+--	"entityid",
+--	"pfid"
+--);
+--DROP INDEX IF EXISTS "pf_idx_ssid2";
+--CREATE INDEX  "pf_idx_ssid2" ON "Playfields" (
+--	"ssid"
+--);
+--DROP VIEW IF EXISTS "ChangedPlayfiedsInShip";
+--CREATE VIEW ChangedPlayfiedsInShip  (entityid, shipid, shipname, frompf, topf, distanceau, gametime)AS SELECT cp.entityid, e.entityid, e.name, p1.name, p2.name,        sqrt((p1.sectorx - p2.sectorx) * (p1.sectorx - p2.sectorx) + (p1.sectory - p2.sectory) * (p1.sectory - p2.sectory) + (p1.sectorz - p2.sectorz) * (p1.sectorz - p2.sectorz))*0.1,        cp.gametime FROM ChangedPlayfields cp, Playfields p1, Playfields p2, Entities e WHERE cp.frompfid = p1.pfid AND cp.topfid = p2.pfid AND e.entityid = cp.attentityid ORDER BY cp.gametime DESC;
 COMMIT;
