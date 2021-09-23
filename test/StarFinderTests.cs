@@ -41,29 +41,5 @@ namespace GalacticWaezTests
                 i++;
             }
         }
-
-        [TestMethod]
-        public void FindSmallData()
-        {
-            var positions = GalaxyTestData.LoadPositions(
-                baseDir + "\\stardata-test-small.csv");
-            var loaded = new List<StarFinder.StarData>(positions.Count);
-            int i = 0;
-            foreach (var p in positions)
-            {
-                loaded.Add(new StarFinder.StarData(0, -1, p.x, p.y, p.z, i));
-                i++;
-            }
-            var found = new StarFinder().Search(new VectorInt3(
-                loaded[0].x, loaded[0].y, loaded[0].z),
-                positions.Count
-                );
-            i = 0;
-            foreach (var p in positions)
-            {
-                Assert.AreEqual(p, found[i]);
-                i++;
-            }
-        }
     }
 }

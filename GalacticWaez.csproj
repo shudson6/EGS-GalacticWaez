@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="src\Initializer.cs" />
+    <Compile Include="src\IStarFinder.cs" />
     <Compile Include="src\Navigation\AstarPathfinder.cs" />
     <Compile Include="src\Command\CommandToken.cs" />
     <Compile Include="src\GalacticWaez.cs" />

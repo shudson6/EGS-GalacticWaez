@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using Eleon.Modding;
 using GalacticWaez;
 
@@ -24,6 +25,19 @@ namespace GalacticWaezTests
                     int.Parse(coords[1]),
                     int.Parse(coords[2])
                     ));
+            }
+            return data;
+        }
+
+        public static List<StarFinder.StarData> LoadGameStyleStarArray(string starDataFile)
+        {
+            var pos = LoadPositions(starDataFile);
+            int i = 0;
+            var data = new List<StarFinder.StarData>(pos.Count);
+            foreach (var p in pos)
+            {
+                data.Add(new StarFinder.StarData(0, -1, p.x, p.y, p.z, i));
+                i++;
             }
             return data;
         }

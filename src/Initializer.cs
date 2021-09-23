@@ -30,12 +30,17 @@ namespace GalacticWaez
         public delegate void DoneCallback(Galaxy galaxy, AggregateException ex);
 
         private readonly IModApi modApi;
+        private readonly IStarFinder starFinder;
         private DoneCallback doneCallback;
         private Task<Galaxy> init;
 
         public Initializer(IModApi modApi)
+            : this(modApi, new StarFinder()) { }
+
+        public Initializer(IModApi modApi, IStarFinder starFinder)
         {
             this.modApi = modApi;
+            this.starFinder = starFinder;
         }
 
         public void Initialize(Source source, DoneCallback doneCallback)
@@ -114,7 +119,7 @@ namespace GalacticWaez
         {
             var known = new SaveGameDB(modApi).GetFirstKnownStarPosition();
             var stopwatch = Stopwatch.StartNew();
-            var stars = new StarFinder().Search(known);
+            var stars = starFinder.Search(known);
             stopwatch.Stop();
             if (stars == null)
             {

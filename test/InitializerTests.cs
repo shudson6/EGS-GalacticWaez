@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Mono.Data.Sqlite;
 using GalacticWaez;
+using Eleon.Modding;
 
 namespace GalacticWaezTests
 {
@@ -116,5 +117,41 @@ namespace GalacticWaezTests
                 fakeApp.FireUpdate();
             }
         }
+
+        [TestMethod]
+        [Timeout(3000)]
+        public void ScanFindsData_NoSave()
+        {
+            var data = GalaxyTestData.LoadPositions(
+                tc.DeploymentDirectory + "\\stardata-test-small.csv")
+                .ToArray();
+            var starFinder = new FakeStarFinder(data);
+            var fakeApp = new FakeApplication(tc.DeploymentDirectory);
+            var modApi = new FakeModApi(fakeApp);
+            var init = new Initializer(modApi, starFinder);
+            bool done = false;
+            init.Initialize(Initializer.Source.Scanner,
+                (galaxy, ex) =>
+                {
+                    Assert.IsNull(ex);
+                    Assert.IsNotNull(galaxy);
+                    Assert.IsTrue(modApi.LogContains($"Located {data.Length} stars"));
+                    done = true;
+                });
+            while (!done)
+            {
+                Thread.Sleep(20);
+                fakeApp.FireUpdate();
+            }
+        }
+    }
+
+    public class FakeStarFinder : IStarFinder
+    {
+        private readonly VectorInt3[] data;
+
+        public FakeStarFinder(VectorInt3[] starData) => data = starData;
+
+        public VectorInt3[] Search(VectorInt3 knownPosition) => data;
     }
 }
