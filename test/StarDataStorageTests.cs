@@ -54,17 +54,15 @@ namespace GalacticWaezTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FileNotFoundException))]
         public void Load_NotFound()
         {
-            new StarDataStorage(DirectoryPath, "idontexist.foo").Load();
+            Assert.IsNull(new StarDataStorage(DirectoryPath, "idontexist.foo").Load());
         }
 
         [TestMethod]
-        [ExpectedException(typeof(StarDataStorage.ChecksumException))]
         public void Load_BadSum()
         {
-            new StarDataStorage(DirectoryPath, "stardata-test-badsum.csv").Load();
+            Assert.IsNull(new StarDataStorage(DirectoryPath, "stardata-test-badsum.csv").Load());
         }
 
         [TestMethod]

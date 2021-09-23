@@ -1,5 +1,4 @@
-﻿using Eleon.Modding;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez

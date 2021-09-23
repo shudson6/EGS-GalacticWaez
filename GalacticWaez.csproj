@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="src\IInitializer.cs" />
     <Compile Include="src\Initializer.cs" />
     <Compile Include="src\ISaveGameDB.cs" />
     <Compile Include="src\IStarDataStorage.cs" />

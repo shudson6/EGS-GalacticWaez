@@ -8,12 +8,6 @@ namespace GalacticWaez
 {
     public class StarDataStorage : IStarDataStorage
     {
-        public class ChecksumException : Exception
-        {
-            public ChecksumException(int expected, int actual)
-                : base($"Expected {expected} stars but loaded {actual}") { }
-        }
-
         public const string DefaultContentDir = "Content\\Mods\\GalacticWaez";
         private const string DefaultFileName = "stardata.csv";
 
@@ -33,19 +27,6 @@ namespace GalacticWaez
             return File.Exists(FilePath);
         }
 
-        /// <summary>
-        /// Loads star positions from storage.
-        /// </summary>
-        /// <returns>
-        /// A collection of star positions as sector coordinates, 
-        /// or <c>null</c> if an error occurred.
-        /// </returns>
-        /// <exception cref="FileNotFoundException">
-        /// if the file is not found
-        /// </exception>
-        /// <exception cref="ChecksumException">
-        /// if the expected number of stars is not loaded
-        /// </exception>
         public IEnumerable<SectorCoordinates> Load()
         {
             StreamReader reader = null;
@@ -70,10 +51,11 @@ namespace GalacticWaez
                         ));
                 }
 
-                if (starPositions.Count != count)
-                    throw new ChecksumException(count, starPositions.Count);
-
-                return starPositions;
+                return (count == starPositions.Count) ? starPositions : null;
+            }
+            catch
+            {
+                return null;
             }
             finally
             {
