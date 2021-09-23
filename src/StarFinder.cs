@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace GalacticWaez
 {
-    unsafe public class StarFinder : IStarFinder
+    public unsafe class StarFinder : IStarFinder
     {
         // for the call to TryStartNoGCRegion. 2MB should be plenty of room for this op
         private const long NoGCSize = 2097152;

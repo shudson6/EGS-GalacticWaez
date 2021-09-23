@@ -32,8 +32,7 @@ namespace GalacticWaez.Navigation
             while (minheap.Count > 0)
             {
                 var current = minheap.RemoveMin();
-                PathNode existingPath;
-                if (visitedStars.TryGetValue(current.Star.Position, out existingPath)
+                if (visitedStars.TryGetValue(current.Star.Position, out PathNode existingPath)
                     && current.PathCost >= existingPath.PathCost)
                 {
                     continue;

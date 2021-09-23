@@ -246,10 +246,10 @@ namespace GalacticWaez
         SqliteConnection GetConnection(bool writeable = false)
         {
             string openMode = writeable ? "ReadWrite" : "ReadOnly";
-            var details = new SqliteConnectionStringBuilder();
-            details.DataSource = modApi.Application.GetPathFor(AppFolder.SaveGame) + "\\global.db";
-            details.Add("Mode", openMode);
-            var connection = new SqliteConnection(details.ToString());
+            string connString = "Data Source=\"" 
+                + modApi.Application.GetPathFor(AppFolder.SaveGame)
+                + "\\global.db\";Mode=" + openMode;
+            var connection = new SqliteConnection(connString);
             connection.Open();
             return connection;
         }
