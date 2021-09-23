@@ -2,8 +2,6 @@
 using System.Runtime.InteropServices;
 using static GalacticWaez.Const;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
-
-using System.IO;
 using System.Collections.Generic;
 
 namespace GalacticWaez
@@ -14,14 +12,15 @@ namespace GalacticWaez
         private const long NoGCSize = 2097152;
 
         private const int SizeOfStarData = 24;
-        private const int StarCountThreshold = 1000;
-        private const long RegionSizeThreshold = SizeOfStarData * StarCountThreshold;
+        private const int DefaultCountThreshold = 1000;
         private const int RegionListInitialCapacity = 293;
 
         private bool noResumeGC = false;
 
         private readonly Kernel32.SYSTEM_INFO sysInfo;
         private readonly int memInfoSize;
+        private uint StarCountThreshold;
+        private ulong RegionSizeThreshold;
 
         public StarFinder()
         {
@@ -30,8 +29,12 @@ namespace GalacticWaez
             memInfoSize = Marshal.SizeOf(memInfo);
         }
 
-        unsafe public SectorCoordinates[] Search(SectorCoordinates knownPosition)
+        unsafe public SectorCoordinates[] Search(
+            SectorCoordinates knownPosition, 
+            int minCount = DefaultCountThreshold)
         {
+            StarCountThreshold = (uint)minCount;
+            RegionSizeThreshold = SizeOfStarData * StarCountThreshold;
             PauseGC();
 
             var mbi = new List<Kernel32.MEMORY_BASIC_INFORMATION>(RegionListInitialCapacity);
@@ -96,7 +99,7 @@ namespace GalacticWaez
                 expected++;
                 sd++;
             }
-            if (expected > StarCountThreshold)
+            if (expected >= StarCountThreshold)
             {
                 arr = new StarDataArray(begin, expected);
                 return true;

@@ -10,6 +10,7 @@ using Eleon.Modding;
 namespace GalacticWaezTests
 {
     [TestClass]
+    [DeploymentItem("Dependencies\\stardata-test-large.csv")]
     public class GalaxyTests
     {
         private static IEnumerable<VectorInt3> positions;
@@ -17,11 +18,10 @@ namespace GalacticWaezTests
         [ClassInitialize]
         public static void SetupClass(TestContext _tc)
         {
-            positions = GalaxyDataPrep.LoadPositions(_tc.DeploymentDirectory + "\\stardata-test-large.csv");
+            positions = GalaxyTestData.LoadPositions(_tc.DeploymentDirectory + "\\stardata-test-large.csv");
         }
 
         [TestMethod]
-        [DeploymentItem("Dependencies\\stardata-test-large.csv")]
         public void Has_Expected_Count_Stars_Warplines()
         {
             var buildGalaxy = Task<Galaxy>.Factory.StartNew(() =>

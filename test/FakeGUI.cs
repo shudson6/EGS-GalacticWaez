@@ -6,7 +6,7 @@ namespace GalacticWaezTests
 {
     public class FakeGUI : IGui
     {
-        private List<(string text, int prio, float duration)> messages =
+        private readonly List<(string text, int prio, float duration)> messages =
             new List<(string text, int prio, float duration)>();
 
         public IReadOnlyList<(string text, int prio, float duration)> Messages => messages;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Timers;
 using Eleon;
 using Eleon.Modding;
 
@@ -23,12 +22,12 @@ namespace GalacticWaezTests
 
         public ulong GameTicks => throw new NotImplementedException();
 
-        public event PlayfieldDelegate OnPlayfieldLoaded;
-        public event PlayfieldDelegate OnPlayfieldUnloading;
+        public event PlayfieldDelegate OnPlayfieldLoaded { add { } remove { } }
+        public event PlayfieldDelegate OnPlayfieldUnloading { add { } remove { } }
         public event UpdateDelegate Update;
-        public event UpdateDelegate FixedUpdate;
-        public event GamEnteredEventHandler GameEntered;
-        public event ChatMessageSentEventHandler ChatMessageSent;
+        public event UpdateDelegate FixedUpdate { add { } remove { } }
+        public event GamEnteredEventHandler GameEntered { add { } remove { } }
+        public event ChatMessageSentEventHandler ChatMessageSent { add { } remove { } }
 
         public IPlayfieldDescr[] GetAllPlayfields()
         {

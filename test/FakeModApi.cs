@@ -13,8 +13,8 @@ namespace GalacticWaezTests
             Error
         }
 
-        private List<(LogType type, string message)> logs = new List<(LogType type, string message)>();
-        private IApplication app;
+        private readonly List<(LogType type, string message)> logs = new List<(LogType type, string message)>();
+        private readonly IApplication app;
 
         public FakeModApi(IApplication fakeApp)
         {
@@ -37,7 +37,7 @@ namespace GalacticWaezTests
 
         public IApplication Application => app;
 
-        public event GameEventDelegate GameEvent;
+        public event GameEventDelegate GameEvent { add { } remove { } }
 
         public void Log(string text)
         {

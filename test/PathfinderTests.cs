@@ -19,7 +19,7 @@ namespace GalacticWaezTests
         [DeploymentItem("Dependencies\\stardata-test-large.csv")]
         public static void Setup(TestContext _tc)
         {
-            positions = GalaxyDataPrep.LoadPositions(_tc.DeploymentDirectory + "\\stardata-test-large.csv");
+            positions = GalaxyTestData.LoadPositions(_tc.DeploymentDirectory + "\\stardata-test-large.csv");
             TestGalaxy = Galaxy.CreateNew(positions, Const.BaseWarpRange);
         }
         
