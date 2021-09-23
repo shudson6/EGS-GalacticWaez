@@ -9,7 +9,6 @@ namespace GalacticWaezTests
 {
     [TestClass]
     [DeploymentItem("Dependencies\\stardata-test-large.csv")]
-    [DeploymentItem("Dependencies\\stardata-test-small.csv")]
     public class StarFinderTests
     {
         private static string baseDir;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Eleon.Modding;
 using GalacticWaez.Navigation;
@@ -61,7 +62,15 @@ namespace GalacticWaez
             switch (source)
             {
                 case Source.Normal:
-                    stars = LoadStarData() ?? ScanForStarData(true);
+                    if (storage.Exists())
+                    {
+                        stars = LoadStarData();
+                    }
+                    else
+                    {
+                        modApi.Log("No saved star positions. Beginning scan...");
+                        stars = ScanForStarData(true);
+                    }
                     break;
 
                 case Source.File:
@@ -96,13 +105,17 @@ namespace GalacticWaez
         {
             if (!storage.Exists())
             {
-                modApi.Log("Stored star data not found.");
+                modApi.LogWarning("Stored star data not found.");
                 return null;
             }
             var loaded = storage.Load();
-            if (loaded == null)
+            if (loaded != null)
             {
-                modApi.Log("Failed to load star data from file.");
+                modApi.Log($"Loaded {loaded.Count()} stars from file.");
+            }
+            else
+            {
+                modApi.LogError("Failed to load star data from file.");
             }
             return loaded;
         }
@@ -133,10 +146,13 @@ namespace GalacticWaez
             modApi.Log($"Located {stars.Length} stars in {stopwatch.ElapsedMilliseconds}ms.");
             if (save)
             {
-                var storage = new StarDataStorage(modApi);
                 if (storage.Store(stars))
                 {
-                    modApi.Log("Saved star positions to " + storage.FilePath);
+                    modApi.Log("Saved star positions to file.");
+                }
+                else
+                {
+                    modApi.LogWarning("Could not save star positions to file.");
                 }
             }
             return stars;

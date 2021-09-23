@@ -54,11 +54,22 @@ namespace GalacticWaezTests
             logs.Add((LogType.Warning, text));
         }
 
-        public bool LogContains(string message, LogType type = LogType.Normal)
+        /// <summary>
+        /// Checks whether any message of 
+        /// <paramref name="type"/>
+        /// in the log starts with the specified
+        /// <paramref name="text"/>.
+        /// </summary>
+        /// <param name="text">text to search for</param>
+        /// <param name="type">type of log entry (<see cref="LogType"/>)</param>
+        /// <returns>
+        /// <c>true</c> if such an entry is found; <c>false</c> otherwise
+        /// </returns>
+        public bool LogContains(string text, LogType type = LogType.Normal)
         {
             foreach (var l in logs)
             {
-                if (l.type == type && l.message.StartsWith(message))
+                if (l.type == type && l.message.StartsWith(text))
                 {
                     return true;
                 }
