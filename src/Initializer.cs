@@ -31,16 +31,21 @@ namespace GalacticWaez
 
         private readonly IModApi modApi;
         private readonly IStarFinder starFinder;
+        private readonly IStarDataStorage storage;
+        private readonly ISaveGameDB db;
         private DoneCallback doneCallback;
         private Task<Galaxy> init;
 
         public Initializer(IModApi modApi)
-            : this(modApi, new StarFinder()) { }
+            : this(modApi, new StarDataStorage(modApi), new StarFinder(), new SaveGameDB(modApi)) { }
 
-        public Initializer(IModApi modApi, IStarFinder starFinder)
+        public Initializer(IModApi modApi, IStarDataStorage storage, 
+            IStarFinder starFinder, ISaveGameDB db)
         {
             this.modApi = modApi;
             this.starFinder = starFinder;
+            this.storage = storage;
+            this.db = db;
         }
 
         public void Initialize(Source source, DoneCallback doneCallback)
@@ -90,16 +95,15 @@ namespace GalacticWaez
 
         private IEnumerable<SectorCoordinates> LoadStarData()
         {
-            var stored = new StarDataStorage(modApi);
-            if (!stored.Exists())
+            if (!storage.Exists())
             {
                 modApi.Log("Stored star data not found.");
                 return null;
             }
-            var loaded = stored.Load();
+            var loaded = storage.Load();
             if (loaded == null)
             {
-                modApi.Log("Failed to load star data from file: " + stored.FilePath);
+                modApi.Log("Failed to load star data from file.");
             }
             return loaded;
         }
@@ -117,7 +121,7 @@ namespace GalacticWaez
         /// </returns>
         private IEnumerable<SectorCoordinates> ScanForStarData(bool save = false)
         {
-            var known = new SaveGameDB(modApi).GetFirstKnownStarPosition();
+            var known = db.GetFirstKnownStarPosition();
             var stopwatch = Stopwatch.StartNew();
             var stars = starFinder.Search(known);
             stopwatch.Stop();

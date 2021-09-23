@@ -7,7 +7,7 @@ using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
-    public class StarDataStorage
+    public class StarDataStorage : IStarDataStorage
     {
         public const string DefaultContentDir = "Content\\Mods\\GalacticWaez";
         private const string DefaultFileName = "stardata.csv";

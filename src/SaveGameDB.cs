@@ -8,10 +8,10 @@ using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
-    class SaveGameDB
+    class SaveGameDB : ISaveGameDB
     {
         private readonly IModApi modApi;
-        
+
         public SaveGameDB(IModApi modApi)
         {
             this.modApi = modApi;
