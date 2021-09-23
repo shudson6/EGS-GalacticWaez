@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +11,7 @@ namespace GalacticWaez
     /// <summary>
     /// Used by CommandHandler to build Galaxy
     /// </summary>
-    public class Initializer
+    public class Initializer : IInitializer
     {
         /// <summary>
         /// Enum that tells Initializer where it should look for star map data.
@@ -27,20 +26,20 @@ namespace GalacticWaez
             Scanner
         }
 
-        public delegate void DoneCallback(Galaxy galaxy, AggregateException ex);
-
         private readonly IModApi modApi;
         private readonly IStarFinder starFinder;
         private readonly IStarDataStorage storage;
         private readonly ISaveGameDB db;
-        private DoneCallback doneCallback;
+        private InitializerCallback doneCallback;
         private Task<Galaxy> init;
 
         public Initializer(IModApi modApi)
-            : this(modApi, new StarDataStorage(modApi.Application.GetPathFor(AppFolder.SaveGame), "stardata.csv"), 
-                  new StarFinder(), new SaveGameDB(modApi)) { }
+            : this(modApi, new StarDataStorage(modApi.Application.GetPathFor(AppFolder.SaveGame),
+                "stardata.csv"),
+                new StarFinder(), new SaveGameDB(modApi))
+        { }
 
-        public Initializer(IModApi modApi, IStarDataStorage storage, 
+        public Initializer(IModApi modApi, IStarDataStorage storage,
             IStarFinder starFinder, ISaveGameDB db)
         {
             this.modApi = modApi;
@@ -49,7 +48,7 @@ namespace GalacticWaez
             this.db = db;
         }
 
-        public void Initialize(Source source, DoneCallback doneCallback)
+        public void Initialize(Source source, InitializerCallback doneCallback)
         {
             this.doneCallback = doneCallback;
             init = Task<Galaxy>.Factory.StartNew(function: BuildGalaxyMap, state: source);
