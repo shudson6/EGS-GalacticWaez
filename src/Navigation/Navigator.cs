@@ -7,32 +7,33 @@ using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez.Navigation
 {
-    public class Navigator
+    public class Navigator : INavigator
     {
-        public delegate void DoneCallback(string message);
-
         private Task<string> navigation = null;
-        private DoneCallback doneCallback;
+        private NavigatorCallback doneCallback;
         private IPlayer player;
         private readonly IModApi modApi;
+        private readonly ISaveGameDB db;
         private readonly Galaxy galaxy;
-        private readonly SaveGameDB db;
 
         public Navigator(IModApi modApi, Galaxy galaxy)
+            : this(modApi, galaxy, new SaveGameDB(modApi)) { }
+
+        public Navigator(IModApi modApi, Galaxy galaxy, ISaveGameDB db)
         {
             this.modApi = modApi;
             this.galaxy = galaxy;
-            db = new SaveGameDB(modApi);
+            this.db = db;
         }
 
-        public void HandlePathRequest(string request, IPlayer player, DoneCallback doneCallback)
+        public void HandlePathRequest(string dest, IPlayer player, NavigatorCallback doneCallback)
         {
             this.doneCallback = doneCallback;
             this.player = player;
-            navigation = Task<string>.Factory.StartNew(Navigate, request);
+            navigation = Task<string>.Factory.StartNew(Navigate, dest);
             modApi.Application.Update += OnUpdateDuringNavigation;
         }
-        
+
         private string Navigate(Object obj)
         {
             var startCoords = StartCoords();
