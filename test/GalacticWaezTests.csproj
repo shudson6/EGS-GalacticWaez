@@ -95,8 +95,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StarFinderTests.cs" />
     <Compile Include="InitializerTests.cs" />
+    <Compile Include="StarDataStorageTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Dependencies\stardata-test-badsum.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Dependencies\stardata-test-small.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

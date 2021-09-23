@@ -37,7 +37,8 @@ namespace GalacticWaez
         private Task<Galaxy> init;
 
         public Initializer(IModApi modApi)
-            : this(modApi, new StarDataStorage(modApi), new StarFinder(), new SaveGameDB(modApi)) { }
+            : this(modApi, new StarDataStorage(modApi.Application.GetPathFor(AppFolder.SaveGame), "stardata.csv"), 
+                  new StarFinder(), new SaveGameDB(modApi)) { }
 
         public Initializer(IModApi modApi, IStarDataStorage storage, 
             IStarFinder starFinder, ISaveGameDB db)

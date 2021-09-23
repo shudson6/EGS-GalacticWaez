@@ -2,26 +2,30 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Eleon.Modding;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
     public class StarDataStorage : IStarDataStorage
     {
+        public class ChecksumException : Exception
+        {
+            public ChecksumException(int expected, int actual)
+                : base($"Expected {expected} stars but loaded {actual}") { }
+        }
+
         public const string DefaultContentDir = "Content\\Mods\\GalacticWaez";
         private const string DefaultFileName = "stardata.csv";
 
-        private readonly IModApi modApi;
-        private readonly string Dir;
-        public readonly string FilePath;
+        public string DirectoryPath { get; protected set; }
+        public string FileName { get; protected set; }
 
-        public StarDataStorage(IModApi modApi)
+        public string FilePath => $"{DirectoryPath}\\{FileName}";
+
+        public StarDataStorage(string directoryPath, string fileName = DefaultFileName)
         {
-            this.modApi = modApi;
-            Dir = modApi.Application.GetPathFor(AppFolder.SaveGame)
-                + $"\\{DefaultContentDir}";
-            FilePath = $"{Dir}\\{DefaultFileName}";
+            DirectoryPath = directoryPath;
+            FileName = fileName;
         }
 
         public bool Exists()
@@ -29,11 +33,21 @@ namespace GalacticWaez
             return File.Exists(FilePath);
         }
 
+        /// <summary>
+        /// Loads star positions from storage.
+        /// </summary>
+        /// <returns>
+        /// A collection of star positions as sector coordinates, 
+        /// or <c>null</c> if an error occurred.
+        /// </returns>
+        /// <exception cref="FileNotFoundException">
+        /// if the file is not found
+        /// </exception>
+        /// <exception cref="ChecksumException">
+        /// if the expected number of stars is not loaded
+        /// </exception>
         public IEnumerable<SectorCoordinates> Load()
         {
-            if (!Exists())
-                return null;
-
             StreamReader reader = null;
 
             try
@@ -57,14 +71,9 @@ namespace GalacticWaez
                 }
 
                 if (starPositions.Count != count)
-                    throw new Exception($"Expected {count} stars but found {starPositions.Count}");
+                    throw new ChecksumException(count, starPositions.Count);
 
                 return starPositions;
-            }
-            catch (Exception e)
-            {
-                modApi.Log($"Exception in StarDataStorage.Load: {e.Message}");
-                return null;
             }
             finally
             {
@@ -74,7 +83,7 @@ namespace GalacticWaez
 
         public bool Store(IEnumerable<SectorCoordinates> positions)
         {
-            Directory.CreateDirectory(Dir);
+            Directory.CreateDirectory(DirectoryPath);
             StreamWriter writer = null;
             int count = positions.Count();
 
@@ -91,9 +100,8 @@ namespace GalacticWaez
                 }
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                modApi.Log($"Exception in StarDataStorage.Store: {e.Message}");
                 return false;
             }
             finally
