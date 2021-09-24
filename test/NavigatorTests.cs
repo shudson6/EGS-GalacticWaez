@@ -10,23 +10,14 @@ using GalacticWaez.Navigation;
 namespace GalacticWaezTests
 {
     [TestClass]
-    [DeploymentItem("Dependencies\\stardata-test-small.csv")]
     public class NavigatorTests
     {
-        private static Galaxy galaxy;
-        [ClassInitialize]
-        public static void SetupClass(TestContext tc)
-        {
-            var pos = GalaxyTestData.LoadPositions(tc.DeploymentDirectory + "\\stardata-test-small.csv");
-            galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRange);
-        }
-
         [TestMethod]
         public void DestinationNotFound()
         {
             var app = new FakeApplication(null);
             var modApi = new FakeModApi(app);
-            var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(false, false));
+            var nav = new Navigator(modApi, null, new NavigatorTestDB(false, false));
             bool done = false;
             nav.HandlePathRequest("nonexistent",
                 new FakePlayerTracker(1, 30, default),
@@ -35,6 +26,30 @@ namespace GalacticWaezTests
                 {
                     Assert.IsNull(path);
                     Assert.IsTrue(modApi.LogContains("No bookmark or", FakeModApi.LogType.Warning));
+                    done = true;
+                });
+            while (!done)
+            {
+                Thread.Sleep(20);
+                app.FireUpdate();
+            }
+        }
+
+        [TestMethod]
+        public void Bookmark_AlreadyThere()
+        {
+            var app = new FakeApplication(null);
+            var modApi = new FakeModApi(app);
+            var galaxy = Galaxy.CreateNew(new[] { default(VectorInt3) }, Const.BaseWarpRange);
+            var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false));
+            bool done = false;
+            nav.HandlePathRequest("nonexistent",
+                new FakePlayerTracker(1, 30, default),
+                AstarPathfinder.FindPath,
+                (path) =>
+                {
+                    Assert.IsNull(path);
+                    Assert.IsTrue(modApi.LogContains("It appears you are already there."));
                     done = true;
                 });
             while (!done)
