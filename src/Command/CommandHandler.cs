@@ -133,12 +133,13 @@ namespace GalacticWaez.Command
             }
             Status = State.Busy;
             new Navigator(modApi, galaxy)
-                .HandlePathRequest(bookmarkName, modApi.Application.LocalPlayer,
+                .HandlePathRequest(bookmarkName, new LocalPlayerTracker(modApi), new AstarPathfinder(),
                 response =>
                 {
                     Status = State.Ready;
+                    // TODO: appropriate message
                     modApi.Application.SendChatMessage(
-                        new ChatMessage(response, modApi.Application.LocalPlayer));
+                        new ChatMessage("Did the thing", modApi.Application.LocalPlayer));
                 });
         }
     }

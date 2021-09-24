@@ -28,7 +28,7 @@ namespace GalacticWaezTests
         {
             var start = new LYCoordinates(134, 25, 126);
             var end = new LYCoordinates(124, 17, 132);
-            var path = AstarPathfinder.FindPath(
+            var path = new AstarPathfinder().FindPath(
                 TestGalaxy.GetNode(start),
                 TestGalaxy.GetNode(end),
                 Const.BaseWarpRange
@@ -45,7 +45,7 @@ namespace GalacticWaezTests
             {
                 int a = rand.Next(positions.Count());
                 int b = rand.Next(positions.Count());
-                AstarPathfinder.FindPath(
+                new AstarPathfinder().FindPath(
                     TestGalaxy.GetNode(new LYCoordinates(positions.ElementAt(a))),
                     TestGalaxy.GetNode(new LYCoordinates(positions.ElementAt(b))),
                     Const.BaseWarpRange

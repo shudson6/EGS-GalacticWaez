@@ -2,7 +2,7 @@
 
 namespace GalacticWaez.Navigation
 {
-    public class AstarPathfinder
+    public class AstarPathfinder : IPathfinder
     {
         class PathNode
         {
@@ -22,7 +22,7 @@ namespace GalacticWaez.Navigation
          * to limit the distance of any single jump. Values of warpRange larger
          * than the distance used to build the Galaxy have no effect.
          */
-        public static IEnumerable<LYCoordinates> 
+        public IEnumerable<LYCoordinates>
         FindPath(Galaxy.Node start, Galaxy.Node goal, float warpRange)
         {
             var visitedStars = new Dictionary<LYCoordinates, PathNode>();
@@ -40,7 +40,7 @@ namespace GalacticWaez.Navigation
                 visitedStars[current.Star.Position] = current;
                 foreach (var kv in current.Star.Neighbors)
                 {
-                    if (kv.Value > warpRange) 
+                    if (kv.Value > warpRange)
                         continue;
 
                     var neighbor = new PathNode(kv.Key, current);
@@ -56,11 +56,11 @@ namespace GalacticWaez.Navigation
             return ListifyPath(goalNode);
         }
 
-        private static IEnumerable<LYCoordinates> ListifyPath(PathNode node)
+        private IEnumerable<LYCoordinates> ListifyPath(PathNode node)
         {
             if (node == null) return null;
             var path = new List<LYCoordinates>();
-            for(; node != null; node = node.Previous)
+            for (; node != null; node = node.Previous)
             {
                 path.Add(node.Star.Position);
             }

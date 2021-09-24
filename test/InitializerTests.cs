@@ -346,16 +346,10 @@ namespace GalacticWaezTests
 
         public VectorInt3 GetFirstKnownStarPosition() => first;
 
-        public float GetLocalPlayerWarpRange()
-            => throw new NotImplementedException();
-
-        public float GetPlayerWarpRange(int playerId)
-            => throw new NotImplementedException();
-
         public bool GetSolarSystemCoordinates(string starName, out VectorInt3 coordinates)
             => throw new NotImplementedException();
 
-        public int InsertBookmarks(IEnumerable<VectorInt3> positions, IPlayer player)
+        public int InsertBookmarks(IEnumerable<VectorInt3> positions, int playerId)
             => throw new NotImplementedException();
     }
 }
