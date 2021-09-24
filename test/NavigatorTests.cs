@@ -36,7 +36,7 @@ namespace GalacticWaezTests
         }
 
         [TestMethod]
-        public void Bookmark_AlreadyThere()
+        public void BookmarkGoal_YoureAlreadyThere()
         {
             var app = new FakeApplication(null);
             var modApi = new FakeModApi(app);
@@ -58,24 +58,57 @@ namespace GalacticWaezTests
                 app.FireUpdate();
             }
         }
+
+        [TestMethod]
+        public void BookmarkGoal_YoureAlreadyInRange()
+        {
+            var pos = new[] { new VectorInt3(100000, 200000, 300000),
+                              new VectorInt3(400000, 500000, 600000)
+            };
+            var app = new FakeApplication(null);
+            var modApi = new FakeModApi(app);
+            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRange);
+            var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false, pos[1]));
+            bool done = false;
+            nav.HandlePathRequest("nonexistent",
+                new FakePlayerTracker(1, 30, pos[0]),
+                // provide a pathfinder delegate that returns a path with exactly 2 nodes in it
+                (start, end, _) => new[] { start.Position, end.Position },
+                (path) =>
+                {
+                    Assert.IsNull(path);
+                    Assert.IsTrue(modApi.LogContains("It appears you are already in warp range."));
+                    done = true;
+                });
+            while (!done)
+            {
+                Thread.Sleep(20);
+                app.FireUpdate();
+            }
+        }
     }
 
     public class NavigatorTestDB : ISaveGameDB
     {
         private readonly bool findBookmark;
         private readonly bool findSolarSystem;
+        private readonly VectorInt3 bookmarkCoordinates;
+        private readonly VectorInt3 solarSystemCoordinates;
 
-        public NavigatorTestDB(bool findBookmark, bool findSolarSystem)
+        public NavigatorTestDB(bool findBookmark, bool findSolarSystem,
+            VectorInt3 bookmark = default, VectorInt3 system = default)
         {
             this.findBookmark = findBookmark;
             this.findSolarSystem = findSolarSystem;
+            bookmarkCoordinates = bookmark;
+            solarSystemCoordinates = system;
         }
 
         public int ClearPathMarkers(int playerId) => throw new NotImplementedException();
 
         public bool GetBookmarkVector(string bookmarkName, out VectorInt3 coordinates)
         {
-            coordinates = default;
+            coordinates = bookmarkCoordinates;
             return findBookmark;
         }
 
@@ -84,7 +117,7 @@ namespace GalacticWaezTests
 
         public bool GetSolarSystemCoordinates(string starName, out VectorInt3 coordinates)
         {
-            coordinates = default;
+            coordinates = solarSystemCoordinates;
             return findSolarSystem;
         }
 
@@ -96,16 +129,16 @@ namespace GalacticWaezTests
     {
         private readonly int playerId;
         private readonly float warpRange;
-        private readonly LYCoordinates coords;
+        private readonly VectorInt3 coords;
 
-        public FakePlayerTracker(int id, float range, LYCoordinates pos)
+        public FakePlayerTracker(int id, float range, VectorInt3 pos)
         {
             playerId = id;
             warpRange = range;
             coords = pos;
         }
 
-        public LYCoordinates GetCurrentStarCoordinates() => coords;
+        public VectorInt3 GetCurrentStarCoordinates() => coords;
 
         public int GetPlayerId() => playerId;
 

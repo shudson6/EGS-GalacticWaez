@@ -43,7 +43,7 @@ namespace GalacticWaez.Navigation
 
         private IEnumerable<LYCoordinates> Navigate()
         {
-            var startCoords = playerTracker.GetCurrentStarCoordinates();
+            var startCoords = new LYCoordinates(playerTracker.GetCurrentStarCoordinates());
             if (!GoalCoordinates(destination,
                 out LYCoordinates goalCoords, 
                 out bool goalIsBookmark))

@@ -2,6 +2,7 @@
 using System.Data;
 using static GalacticWaez.Const;
 using Eleon.Modding;
+using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez.Navigation
 {
@@ -17,8 +18,8 @@ namespace GalacticWaez.Navigation
             this.modApi = modApi;
         }
 
-        public LYCoordinates GetCurrentStarCoordinates()
-            => new LYCoordinates(modApi.ClientPlayfield.SolarSystemCoordinates);
+        public SectorCoordinates GetCurrentStarCoordinates()
+            => modApi.ClientPlayfield.SolarSystemCoordinates;
 
         public float GetWarpRange()
         {
