@@ -7,11 +7,23 @@ using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez.Navigation
 {
+    // TODO: many of the logging calls (or all of them) should be chat messages
     public class Navigator : INavigator
     {
-        private Task<string> navigation = null;
+        private struct NavRequest
+        {
+            public readonly IPlayerTracker player;
+            public readonly string dest;
+
+            public NavRequest(IPlayerTracker player, string dest)
+            {
+                this.player = player;
+                this.dest = dest;
+            }
+        }
+
+        private Task<IEnumerable<LYCoordinates>> navigation = null;
         private NavigatorCallback doneCallback;
-        private IPlayer player;
         private readonly IModApi modApi;
         private readonly ISaveGameDB db;
         private readonly Galaxy galaxy;
@@ -26,66 +38,66 @@ namespace GalacticWaez.Navigation
             this.db = db;
         }
 
-        public void HandlePathRequest(string dest, IPlayer player, NavigatorCallback doneCallback)
+        public void HandlePathRequest(string dest, IPlayerTracker playerTracker, 
+            NavigatorCallback doneCallback)
         {
             this.doneCallback = doneCallback;
-            this.player = player;
-            navigation = Task<string>.Factory.StartNew(Navigate, dest);
+            navigation = Task<IEnumerable<LYCoordinates>>.Factory.StartNew(Navigate,
+                new NavRequest(playerTracker, dest));
             modApi.Application.Update += OnUpdateDuringNavigation;
         }
 
-        private string Navigate(Object obj)
+        private IEnumerable<LYCoordinates> Navigate(Object obj)
         {
-            var startCoords = StartCoords();
-            LYCoordinates goalCoords;
-            bool goalIsBookmark;
-            if (!GoalCoordinates((string)obj, out goalCoords, out goalIsBookmark))
+            var request = (NavRequest)obj;
+            var startCoords = request.player.GetCurrentStarCoordinates();
+            if (!GoalCoordinates(request.dest, 
+                out LYCoordinates goalCoords, 
+                out bool goalIsBookmark))
             {
-                return "No bookmark or known star by that name.";
+                modApi.LogWarning($"No bookmark or known star by name {request.dest}");
             }
             if (goalCoords.Equals(startCoords))
             {
-                return "It appears you are already there.";
+                modApi.Log("It appears you are already there.");
             }
-            float range = new SaveGameDB(modApi).GetLocalPlayerWarpRange();
+            float range = request.player.GetWarpRange();
             var path = GetPath(startCoords, goalCoords, range);
             if (path == null)
             {
-                return "No path found.";
+                modApi.Log("No path found.");
             }
             if (path.Count() == 1)
             {
-                return "Are you already there?";
+                modApi.Log("Are you already there?");
             }
             if (path.Count() == 2 && goalIsBookmark)
             {
-                return "It appears you are already in warp range.";
+                modApi.Log("It appears you are already in warp range.");
             }
-            return SetWaypoints(path.Skip(1), goalIsBookmark);
+            return SetWaypoints(path.Skip(1), request.player.GetPlayerId(), goalIsBookmark);
         }
 
-        private string SetWaypoints(IEnumerable<LYCoordinates> path, bool goalIsBookmark)
+        private IEnumerable<LYCoordinates>
+            SetWaypoints(IEnumerable<LYCoordinates> path, int playerId, bool goalIsBookmark)
         {
             if (goalIsBookmark)
             {
                 path = path.Take(path.Count() - 1);
             }
             var sectorsPath = path.Select(n => n.ToSectorCoordinates());
-            int added = db.InsertBookmarks(sectorsPath, player);
-            return $"Path found; {added}/{path.Count()} waypoints added.";
+            int added = db.InsertBookmarks(sectorsPath, playerId);
+            modApi.Log($"Path found; {added}/{path.Count()} waypoints added.");
+            return path;
         }
 
         private IEnumerable<LYCoordinates> GetPath(LYCoordinates start, LYCoordinates goal, float range)
             => AstarPathfinder.FindPath(galaxy.GetNode(start), galaxy.GetNode(goal), range);
 
-        private LYCoordinates StartCoords()
-            => new LYCoordinates(modApi.ClientPlayfield.SolarSystemCoordinates);
-
         private bool GoalCoordinates(string goalName, out LYCoordinates goalCoords, out bool isBookmark)
         {
             isBookmark = false;
-            SectorCoordinates sc;
-            if (db.GetBookmarkVector(goalName, out sc))
+            if (db.GetBookmarkVector(goalName, out SectorCoordinates sc))
             {
                 goalCoords = new LYCoordinates(sc);
                 isBookmark = true;
