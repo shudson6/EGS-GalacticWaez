@@ -8,7 +8,7 @@ namespace GalacticWaez.Navigation
     {
         void HandlePathRequest(string request, 
             IPlayerTracker player, 
-            PathfinderDelegate findPath,
+            Pathfinder findPath,
             NavigatorCallback doneCallback
             );
     }

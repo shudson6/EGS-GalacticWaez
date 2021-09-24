@@ -48,6 +48,14 @@ namespace GalacticWaezTests
             Assert.AreEqual(buildGalaxy.Result.StarCount, testGalaxy.Count);
             Assert.AreEqual(buildGalaxy.Result.WarpLines, edgeCount);
         }
+
+        [TestMethod]
+        public void GalaxyNodeDistanceCheck()
+        {
+            var a = new Galaxy.Node(new LYCoordinates(100, 100, 0));
+            var b = new Galaxy.Node(new LYCoordinates(400, 500, 0));
+            Assert.AreEqual(500, a.DistanceTo(b));
+        }
     }
 
     class TestNode

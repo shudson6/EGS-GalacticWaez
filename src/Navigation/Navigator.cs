@@ -18,7 +18,7 @@ namespace GalacticWaez.Navigation
 
         private string destination;
         private IPlayerTracker playerTracker;
-        private PathfinderDelegate findPath;
+        private Pathfinder findPath;
 
         public Navigator(IModApi modApi, Galaxy galaxy)
             : this(modApi, galaxy, new SaveGameDB(modApi)) { }
@@ -31,7 +31,7 @@ namespace GalacticWaez.Navigation
         }
 
         public void HandlePathRequest(string dest, IPlayerTracker playerTracker, 
-            PathfinderDelegate findPath, NavigatorCallback doneCallback)
+            Pathfinder findPath, NavigatorCallback doneCallback)
         {
             destination = dest;
             this.playerTracker = playerTracker;

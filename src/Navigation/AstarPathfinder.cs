@@ -2,7 +2,7 @@
 
 namespace GalacticWaez.Navigation
 {
-    public delegate IEnumerable<LYCoordinates> PathfinderDelegate(
+    public delegate IEnumerable<LYCoordinates> Pathfinder(
         Galaxy.Node start,
         Galaxy.Node goal,
         float warpRange

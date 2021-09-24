@@ -86,6 +86,64 @@ namespace GalacticWaezTests
                 app.FireUpdate();
             }
         }
+
+        [TestMethod]
+        public void BookmarkGoal_NoPath()
+        {
+            var pos = new[] { new VectorInt3(100000, 200000, 300000),
+                              new VectorInt3(400000, 500000, 600000)
+            };
+            var app = new FakeApplication(null);
+            var modApi = new FakeModApi(app);
+            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRange);
+            var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false, pos[1]));
+            bool done = false;
+            nav.HandlePathRequest("nonexistent",
+                new FakePlayerTracker(1, 30, pos[0]),
+                (start, end, _) => null,
+                (path) =>
+                {
+                    Assert.IsNull(path);
+                    Assert.IsTrue(modApi.LogContains("No path found."));
+                    done = true;
+                });
+            while (!done)
+            {
+                Thread.Sleep(20);
+                app.FireUpdate();
+            }
+        }
+
+        [TestMethod]
+        public void ThisSituationShouldBeImpossible()
+        {
+            // it should be impossible to get a path of length 1, because at least the start and end
+            // nodes must be present
+            // even so, let's make sure it wouldn't break anything if it happened
+            var pos = new[] { new VectorInt3(100000, 200000, 300000),
+                              new VectorInt3(400000, 500000, 600000)
+            };
+            var app = new FakeApplication(null);
+            var modApi = new FakeModApi(app);
+            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRange);
+            var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false, pos[1]));
+            bool done = false;
+            nav.HandlePathRequest("nonexistent",
+                new FakePlayerTracker(1, 30, pos[0]),
+                // provide a pathfinder delegate that returns a path with exactly 1 node in it
+                (start, end, _) => new[] { default(LYCoordinates) },
+                (path) =>
+                {
+                    Assert.IsNull(path);
+                    Assert.IsTrue(modApi.LogContains("Are you already there?"));
+                    done = true;
+                });
+            while (!done)
+            {
+                Thread.Sleep(20);
+                app.FireUpdate();
+            }
+        }
     }
 
     public class NavigatorTestDB : ISaveGameDB
