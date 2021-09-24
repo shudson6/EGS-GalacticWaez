@@ -18,7 +18,7 @@ namespace GalacticWaez.Navigation
 
         private string destination;
         private IPlayerTracker playerTracker;
-        private IPathfinder pathfinder;
+        private PathfinderDelegate findPath;
 
         public Navigator(IModApi modApi, Galaxy galaxy)
             : this(modApi, galaxy, new SaveGameDB(modApi)) { }
@@ -31,11 +31,11 @@ namespace GalacticWaez.Navigation
         }
 
         public void HandlePathRequest(string dest, IPlayerTracker playerTracker, 
-            IPathfinder pathfinder, NavigatorCallback doneCallback)
+            PathfinderDelegate findPath, NavigatorCallback doneCallback)
         {
             destination = dest;
             this.playerTracker = playerTracker;
-            this.pathfinder = pathfinder;
+            this.findPath = findPath;
             this.doneCallback = doneCallback;
             navigation = Task<IEnumerable<LYCoordinates>>.Factory.StartNew(Navigate);
             modApi.Application.Update += OnUpdateDuringNavigation;
@@ -90,7 +90,7 @@ namespace GalacticWaez.Navigation
         }
 
         private IEnumerable<LYCoordinates> GetPath(LYCoordinates start, LYCoordinates goal, float range)
-            => pathfinder.FindPath(galaxy.GetNode(start), galaxy.GetNode(goal), range);
+            => findPath(galaxy.GetNode(start), galaxy.GetNode(goal), range);
 
         private bool GoalCoordinates(string goalName, out LYCoordinates goalCoords, out bool isBookmark)
         {

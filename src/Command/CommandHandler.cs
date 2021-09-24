@@ -133,7 +133,7 @@ namespace GalacticWaez.Command
             }
             Status = State.Busy;
             new Navigator(modApi, galaxy)
-                .HandlePathRequest(bookmarkName, new LocalPlayerTracker(modApi), new AstarPathfinder(),
+                .HandlePathRequest(bookmarkName, new LocalPlayerTracker(modApi), AstarPathfinder.FindPath,
                 response =>
                 {
                     Status = State.Ready;

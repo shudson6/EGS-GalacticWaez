@@ -30,7 +30,7 @@ namespace GalacticWaezTests
             bool done = false;
             nav.HandlePathRequest("nonexistent",
                 new FakePlayerTracker(1, 30, default),
-                new AstarPathfinder(), // passing a real one b/c it will cause problems if it gets invoked
+                AstarPathfinder.FindPath,
                 (path) =>
                 {
                     Assert.IsNull(path);
