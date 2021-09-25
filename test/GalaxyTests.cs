@@ -25,7 +25,7 @@ namespace GalacticWaezTests
         public void Has_Expected_Count_Stars_Warplines()
         {
             var buildGalaxy = Task<Galaxy>.Factory.StartNew(() =>
-                Galaxy.CreateNew(positions, Const.BaseWarpRange)
+                Galaxy.CreateNew(positions, Const.BaseWarpRangeLY)
                 );
             // meanwhile, build our tedious test galaxy
             var testGalaxy = new List<TestNode>(positions.Count());
@@ -38,7 +38,7 @@ namespace GalacticWaezTests
             {
                 foreach (var p in testGalaxy)
                 {
-                    if (n == p || n.DistanceTo(p) > Const.BaseWarpRange) continue;
+                    if (n == p || n.DistanceTo(p) > Const.BaseWarpRangeLY) continue;
                     n.neighbors.Add(p);
                     edgeCount++;
                 }

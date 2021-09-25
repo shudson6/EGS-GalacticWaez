@@ -10,7 +10,13 @@ namespace GalacticWaez.Navigation
     // TODO: many of the logging calls (or all of them) should be chat messages
     public class Navigator : INavigator
     {
-        private Task<IEnumerable<LYCoordinates>> navigation = null;
+        private struct NavResult
+        {
+            public IEnumerable<LYCoordinates> path;
+            public string message;
+        }
+
+        private Task<NavResult> navigation = null;
         private NavigatorCallback doneCallback;
         private readonly IModApi modApi;
         private readonly ISaveGameDB db;
@@ -37,46 +43,56 @@ namespace GalacticWaez.Navigation
             this.playerTracker = playerTracker;
             this.findPath = findPath;
             this.doneCallback = doneCallback;
-            navigation = Task<IEnumerable<LYCoordinates>>.Factory.StartNew(Navigate);
+            navigation = Task<NavResult>.Factory.StartNew(Navigate);
             modApi.Application.Update += OnUpdateDuringNavigation;
         }
 
-        private IEnumerable<LYCoordinates> Navigate()
+        private NavResult Navigate()
         {
+            string text;
             var startCoords = new LYCoordinates(playerTracker.GetCurrentStarCoordinates());
             if (!GoalCoordinates(destination,
                 out LYCoordinates goalCoords, 
                 out bool goalIsBookmark))
             {
-                modApi.LogWarning($"No bookmark or known star by name {destination}");
-                return null;
+                text = $"No bookmark or known star by name {destination}";
+                modApi.LogWarning(text);
+                return new NavResult { path = null, message = text };
             }
             if (goalCoords.Equals(startCoords))
             {
-                modApi.Log("It appears you are already there.");
-                return null;
+                text = "It appears you are already there.";
+                modApi.Log(text);
+                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
+                return new NavResult { path = null, message = text };
             }
             float range = playerTracker.GetWarpRange();
             var path = GetPath(startCoords, goalCoords, range);
             if (path == null)
             {
-                modApi.Log("No path found.");
-                return null;
+                text = "No path found.";
+                modApi.Log(text);
+                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
+                return new NavResult { path = null, message = text };
             }
             if (path.Count() == 1)
             {
-                modApi.Log("Are you already there?");
-                return null;
+                text = "Are you already there?";
+                modApi.Log(text);
+                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
+                return new NavResult { path = null, message = text };
             }
             if (path.Count() == 2 && goalIsBookmark)
             {
-                modApi.Log("It appears you are already in warp range.");
-                return null;
+                text = "It appears you are already in warp range.";
+                modApi.Log(text);
+                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
+                return new NavResult { path = null, message = text };
             }
             return SetWaypoints(path.Skip(1), playerTracker.GetPlayerId(), goalIsBookmark);
         }
 
-        private IEnumerable<LYCoordinates>
+        private NavResult
             SetWaypoints(IEnumerable<LYCoordinates> path, int playerId, bool goalIsBookmark)
         {
             if (goalIsBookmark)
@@ -85,8 +101,9 @@ namespace GalacticWaez.Navigation
             }
             var sectorsPath = path.Select(n => n.ToSectorCoordinates());
             int added = db.InsertBookmarks(sectorsPath, playerId);
-            modApi.Log($"Path found; {added}/{path.Count()} waypoints added.");
-            return path;
+            string text = $"Path found; {added}/{path.Count()} waypoints added.";
+            modApi.Log(text);
+            return new NavResult { path = path, message = text };
         }
 
         private IEnumerable<LYCoordinates> GetPath(LYCoordinates start, LYCoordinates goal, float range)
@@ -115,7 +132,7 @@ namespace GalacticWaez.Navigation
             if (!navigation.IsCompleted) return;
 
             modApi.Application.Update -= OnUpdateDuringNavigation;
-            doneCallback(navigation.Result);
+            doneCallback(navigation.Result.path, navigation.Result.message);
         }
     }
 }

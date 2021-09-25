@@ -22,7 +22,7 @@ namespace GalacticWaezTests
             nav.HandlePathRequest("nonexistent",
                 new FakePlayerTracker(1, 30, default),
                 AstarPathfinder.FindPath,
-                (path) =>
+                (path, message) =>
                 {
                     Assert.IsNull(path);
                     Assert.IsTrue(modApi.LogContains("No bookmark or", FakeModApi.LogType.Warning));
@@ -40,13 +40,13 @@ namespace GalacticWaezTests
         {
             var app = new FakeApplication(null);
             var modApi = new FakeModApi(app);
-            var galaxy = Galaxy.CreateNew(new[] { default(VectorInt3) }, Const.BaseWarpRange);
+            var galaxy = Galaxy.CreateNew(new[] { default(VectorInt3) }, Const.BaseWarpRangeLY);
             var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false));
             bool done = false;
             nav.HandlePathRequest("nonexistent",
                 new FakePlayerTracker(1, 30, default),
                 AstarPathfinder.FindPath,
-                (path) =>
+                (path, message) =>
                 {
                     Assert.IsNull(path);
                     Assert.IsTrue(modApi.LogContains("It appears you are already there."));
@@ -67,14 +67,14 @@ namespace GalacticWaezTests
             };
             var app = new FakeApplication(null);
             var modApi = new FakeModApi(app);
-            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRange);
+            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRangeLY);
             var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false, pos[1]));
             bool done = false;
             nav.HandlePathRequest("nonexistent",
                 new FakePlayerTracker(1, 30, pos[0]),
                 // provide a pathfinder delegate that returns a path with exactly 2 nodes in it
                 (start, end, _) => new[] { start.Position, end.Position },
-                (path) =>
+                (path, message) =>
                 {
                     Assert.IsNull(path);
                     Assert.IsTrue(modApi.LogContains("It appears you are already in warp range."));
@@ -95,13 +95,13 @@ namespace GalacticWaezTests
             };
             var app = new FakeApplication(null);
             var modApi = new FakeModApi(app);
-            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRange);
+            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRangeLY);
             var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false, pos[1]));
             bool done = false;
             nav.HandlePathRequest("nonexistent",
                 new FakePlayerTracker(1, 30, pos[0]),
                 (start, end, _) => null,
-                (path) =>
+                (path, message) =>
                 {
                     Assert.IsNull(path);
                     Assert.IsTrue(modApi.LogContains("No path found."));
@@ -125,14 +125,14 @@ namespace GalacticWaezTests
             };
             var app = new FakeApplication(null);
             var modApi = new FakeModApi(app);
-            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRange);
+            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRangeLY);
             var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false, pos[1]));
             bool done = false;
             nav.HandlePathRequest("nonexistent",
                 new FakePlayerTracker(1, 30, pos[0]),
                 // provide a pathfinder delegate that returns a path with exactly 1 node in it
                 (start, end, _) => new[] { default(LYCoordinates) },
-                (path) =>
+                (path, message) =>
                 {
                     Assert.IsNull(path);
                     Assert.IsTrue(modApi.LogContains("Are you already there?"));

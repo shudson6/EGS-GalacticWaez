@@ -14,9 +14,12 @@ namespace GalacticWaez
 
         protected SqliteConnection GetConnection(bool writeable = false)
         {
-            string openMode = writeable ? "ReadWrite" : "ReadOnly";
-            string connString = $"Data Source=\"{PathToDB}\"Mode={openMode}";
-            var connection = new SqliteConnection(connString);
+            var connection = new SqliteConnection(new SqliteConnectionStringBuilder()
+                {
+                    DataSource = PathToDB,
+                    Version = 3,
+                    ReadOnly = !writeable
+                }.ToString());
             connection.Open();
             return connection;
         }

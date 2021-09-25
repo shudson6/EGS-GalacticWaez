@@ -2,7 +2,7 @@
 
 namespace GalacticWaez.Navigation
 {
-    public delegate void NavigatorCallback(IEnumerable<LYCoordinates> path);
+    public delegate void NavigatorCallback(IEnumerable<LYCoordinates> path, string message);
 
     public interface INavigator
     {

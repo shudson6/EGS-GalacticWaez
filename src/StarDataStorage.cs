@@ -18,7 +18,9 @@ namespace GalacticWaez
 
         public StarDataStorage(string directoryPath, string fileName = DefaultFileName)
         {
-            DirectoryPath = directoryPath;
+            DirectoryPath = (directoryPath == null || directoryPath.Equals(string.Empty))
+                ? DefaultContentDir
+                : $"{directoryPath}\\{DefaultContentDir}";
             FileName = fileName;
         }
 

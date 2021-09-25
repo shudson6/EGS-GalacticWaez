@@ -23,7 +23,7 @@ namespace GalacticWaez.Navigation
 
         public float GetWarpRange()
         {
-            float warpRange = BaseWarpRange;
+            float warpRange = BaseWarpRangeLY;
             int playerId = modApi.Application.LocalPlayer.Id;
 
             SqliteConnection connection = null;
@@ -45,7 +45,7 @@ namespace GalacticWaez.Navigation
             catch (SqliteException ex)
             {
                 modApi.Log($"SqliteException in GetPlayerData: {ex.Message}");
-                modApi.Log($"Using base warp range ({BaseWarpRange}LY) for player {playerId}");
+                modApi.Log($"Using base warp range ({BaseWarpRangeLY}LY) for player {playerId}");
             }
             finally
             {

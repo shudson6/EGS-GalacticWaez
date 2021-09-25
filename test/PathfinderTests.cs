@@ -20,7 +20,7 @@ namespace GalacticWaezTests
         public static void Setup(TestContext _tc)
         {
             positions = GalaxyTestData.LoadPositions(_tc.DeploymentDirectory + "\\stardata-test-large.csv");
-            TestGalaxy = Galaxy.CreateNew(positions, Const.BaseWarpRange);
+            TestGalaxy = Galaxy.CreateNew(positions, Const.BaseWarpRangeLY);
         }
         
         [TestMethod]
@@ -31,7 +31,7 @@ namespace GalacticWaezTests
             var path = AstarPathfinder.FindPath(
                 TestGalaxy.GetNode(start),
                 TestGalaxy.GetNode(end),
-                Const.BaseWarpRange
+                Const.BaseWarpRangeLY
                 );
             Assert.IsNotNull(path);
             Assert.AreEqual(2, path.Count());
@@ -48,7 +48,7 @@ namespace GalacticWaezTests
                 AstarPathfinder.FindPath(
                     TestGalaxy.GetNode(new LYCoordinates(positions.ElementAt(a))),
                     TestGalaxy.GetNode(new LYCoordinates(positions.ElementAt(b))),
-                    Const.BaseWarpRange
+                    Const.BaseWarpRangeLY
                     );
             }
         }

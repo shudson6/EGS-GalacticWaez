@@ -7,11 +7,12 @@ using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
-    class SaveGameDB : ISaveGameDB
+    class SaveGameDB : SaveGameDBBase, ISaveGameDB
     {
         private readonly IModApi modApi;
 
         public SaveGameDB(IModApi modApi)
+            : base(modApi.Application.GetPathFor(AppFolder.SaveGame) + "\\global.db")
         {
             this.modApi = modApi;
         }
@@ -200,17 +201,6 @@ namespace GalacticWaez
             }
             coordinates = default;
             return false;
-        }
-
-        SqliteConnection GetConnection(bool writeable = false)
-        {
-            string openMode = writeable ? "ReadWrite" : "ReadOnly";
-            string connString = "Data Source=\"" 
-                + modApi.Application.GetPathFor(AppFolder.SaveGame)
-                + "\\global.db\";Mode=" + openMode;
-            var connection = new SqliteConnection(connString);
-            connection.Open();
-            return connection;
         }
     }
 }

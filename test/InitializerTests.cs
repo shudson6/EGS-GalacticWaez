@@ -316,14 +316,14 @@ namespace GalacticWaezTests
             {
                 if (checkedNodes.Add(n.Key))
                 {
-                    Assert.AreEqual(distance(node.Position, n.Key.Position), n.Value);
+                    Assert.AreEqual(Distance(node.Position, n.Key.Position), n.Value);
                     Assert.IsTrue(n.Value <= MaxDistance, "{0} -> {1} = {2} > {3}", 
                         node.Position, n.Key.Position, n.Value, MaxDistance);
                     CheckNeighborDistances(n.Key, checkedNodes, MaxDistance);
                 }
             }
         }
-        private float distance(LYCoordinates a, LYCoordinates b)
+        private float Distance(LYCoordinates a, LYCoordinates b)
         {
             float dx = a.x - b.x;
             float dy = a.y - b.y;
