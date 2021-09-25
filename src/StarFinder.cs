@@ -3,34 +3,120 @@ using System.Runtime.InteropServices;
 using static GalacticWaez.Const;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
+using System.IO;
+using System.Collections.Generic;
+
 namespace GalacticWaez
 {
-    public class StarFinder
+    public unsafe class StarFinder : IStarFinder
     {
         // for the call to TryStartNoGCRegion. 2MB should be plenty of room for this op
         private const long NoGCSize = 2097152;
 
         private const int SizeOfStarData = 24;
         private const int StarCountThreshold = 1000;
+        private const long RegionSizeThreshold = SizeOfStarData * StarCountThreshold;
+        private const int RegionListInitialCapacity = 293;
 
-        private SectorCoordinates soughtVector;
         private bool noResumeGC = false;
+
+        private readonly Kernel32.SYSTEM_INFO sysInfo;
+        private readonly int memInfoSize;
+
+        public StarFinder()
+        {
+            Kernel32.GetSystemInfo(out sysInfo);
+            Kernel32.MEMORY_BASIC_INFORMATION memInfo = default;
+            memInfoSize = Marshal.SizeOf(memInfo);
+        }
 
         unsafe public SectorCoordinates[] Search(SectorCoordinates knownPosition)
         {
-            soughtVector = knownPosition;
             PauseGC();
-            // need to get system info for page size and valid address range
-            Kernel32.SYSTEM_INFO sysInfo;
-            Kernel32.GetSystemInfo(out sysInfo);
 
-            byte* baseAddress = sysInfo.lpMinimumApplicationAddress;
-            byte* maxAddress = sysInfo.lpMaximumApplicationAddress;
-            Kernel32.MEMORY_BASIC_INFORMATION memInfo;
-            while (baseAddress < maxAddress)
+            var mbi = new List<Kernel32.MEMORY_BASIC_INFORMATION>(RegionListInitialCapacity);
+            Kernel32.MEMORY_BASIC_INFORMATION memInfo = default;
+            // have to go bottom to top to get the regions
+            // bc VirtualQuery only rounds down to the page boundary, not the region boundary
+            // so counting backward is a nightmare
+            while (NextRegion(ref memInfo))
             {
-                if (Kernel32.VirtualQuery(baseAddress, out memInfo, 
-                    Marshal.SizeOf<Kernel32.MEMORY_BASIC_INFORMATION>()) == 0)
+                if (memInfo.RegionSize >= RegionSizeThreshold)
+                {
+                    mbi.Add(memInfo);
+                }
+            }
+            mbi.Reverse();
+
+            var arr = default(StarDataArray);
+            foreach (var mem in mbi)
+            {
+                void* limit = mem.BaseAddress + mem.RegionSize - SizeOfStarData;
+
+                // assumption: the star data are 32-bit aligned
+                int* addr = (int*)mem.BaseAddress;
+
+                while (addr < limit)
+                {
+                    if (CouldBeStarData((StarData*)addr, knownPosition)
+                        && TryVerifyArrayFound(mem, (StarData*)addr, ref arr))
+                    {
+                        ResumeGC();
+                        return ExtractStarPositions(arr);
+                    }
+                    addr++;
+                }
+            }
+
+            ResumeGC();
+            return null;
+        }
+
+        unsafe private bool CouldBeStarData(StarData* sd, SectorCoordinates sc)
+        {
+            return (sd->x == sc.x) && (sd->y == sc.y) && (sd->z == sc.z);
+        }
+
+
+        unsafe private bool TryVerifyArrayFound(Kernel32.MEMORY_BASIC_INFORMATION memInfo,
+            StarData* sd, ref StarDataArray arr)
+        {
+            if (sd->id < 0)
+                return false;
+
+            sd -= sd->id;
+            if (sd < memInfo.BaseAddress)
+                return false;
+
+            StarData* begin = sd;
+            void* limit = memInfo.BaseAddress + memInfo.RegionSize - SizeOfStarData;
+            int expected = 0;
+            while (sd <= limit && sd->id == expected)
+            {
+                expected++;
+                sd++;
+            }
+            if (expected > StarCountThreshold)
+            {
+                arr = new StarDataArray(begin, expected);
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Returns true if memInfo describes a valid region for searching.
+         */
+        unsafe private bool NextRegion(ref Kernel32.MEMORY_BASIC_INFORMATION memInfo)
+        {
+            byte* baseAddress = (memInfo.BaseAddress != null) 
+                ? memInfo.BaseAddress 
+                : sysInfo.lpMinimumApplicationAddress;
+
+            while (baseAddress < sysInfo.lpMaximumApplicationAddress)
+            {
+                baseAddress += memInfo.RegionSize;
+                if (Kernel32.VirtualQuery(baseAddress, out memInfo, memInfoSize) == 0)
                 {
                     // ignore the error and move on to the next page
                     baseAddress += sysInfo.dwPageSize;
@@ -41,18 +127,10 @@ namespace GalacticWaez
                     && memInfo.State == Kernel32.DesiredPageState
                     && memInfo.Type == Kernel32.DesiredPageType
                 ) {
-                    var starDataArray = ScanRegion(memInfo.BaseAddress, memInfo.RegionSize);
-                    if (starDataArray.baseAddress != null)
-                    {
-                        ResumeGC();
-                        return ExtractStarPositions(starDataArray);
-                    }
+                    return true;
                 }
-
-                baseAddress += memInfo.RegionSize;
             }
-            ResumeGC();
-            return null;
+            return false;
         }
 
         private void PauseGC()
@@ -89,66 +167,6 @@ namespace GalacticWaez
                 // TODO: provide a way to log this?
                 // nothing to do; just move on
             }
-        }
-
-        unsafe private StarDataArray ScanRegion(byte* baseAddress, ulong size)
-        {
-            int* region = (int*)baseAddress;
-            size /= sizeof(int);
-            // we're looking for 3 vector members plus an ordinal, 4 ints total
-            ulong limit = size - 4 * sizeof(int);
-            for (ulong i = 0; i < limit; i++)
-            {
-                if (region[i] == soughtVector.x
-                    && region[i + 1] == soughtVector.y
-                    && region[i + 2] == soughtVector.z
-                ) {
-                    var starDataArray = LocateStarDataArray(region, size, i);
-                    if (starDataArray.baseAddress != null)
-                    {
-                        return starDataArray;
-                    }
-                }
-            }
-            return default;
-        }
-
-        unsafe private StarDataArray LocateStarDataArray(int* baseAddress, ulong size, ulong vectorIndex)
-        {
-            // we have found our vector. might we have found the star data array?
-            // vectorIndex locates StarData.x so back it up to the start of the struct
-            StarData* instance = (StarData*)(baseAddress + vectorIndex - 2);
-            if (instance->id < 0)
-            {
-                return default;
-            }
-            instance -= instance->id;
-            if (instance < baseAddress)
-            {
-                return default;
-            }
-            // now instanceAddress points to the first element of the StarData array,
-            // IF we have found it. let's find out
-            int count = CountStarDataElements(instance, baseAddress + size);
-            if (count > StarCountThreshold)
-            {
-                return new StarDataArray(instance, count);
-            }
-            return default;
-        }
-
-        unsafe private int CountStarDataElements(StarData* starData, void* pastEnd)
-        {
-            int id = 0;
-            while (starData < pastEnd
-                && starData->id == id
-                && LooksLikeStarPosition(starData->x, starData->y, starData->z))
-            {
-                id++;
-                starData++;
-            }
-
-            return id;
         }
 
         unsafe private SectorCoordinates[] ExtractStarPositions(StarDataArray starDataArray)

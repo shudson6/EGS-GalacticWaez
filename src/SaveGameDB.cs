@@ -3,58 +3,18 @@ using System.Text;
 using Eleon.Modding;
 using Mono.Data.Sqlite;
 using System.Data;
-using static GalacticWaez.Const;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
-    class SaveGameDB
+    class SaveGameDB : SaveGameDBBase, ISaveGameDB
     {
         private readonly IModApi modApi;
-        
+
         public SaveGameDB(IModApi modApi)
+            : base(modApi.Application.GetPathFor(AppFolder.SaveGame) + "\\global.db")
         {
             this.modApi = modApi;
-        }
-
-        public float GetPlayerWarpRange(int playerId)
-        {
-            float warpRange = BaseWarpRange;
-
-            SqliteConnection connection = null;
-            SqliteCommand command = null;
-            IDataReader reader = null;
-
-            try
-            {
-                connection = GetConnection();
-                command = connection.CreateCommand();
-                command.CommandText = "select value from PlayerSkillValues where "
-                    + $"entityid='{playerId}' and name='PilotLYRange';";
-                reader = command.ExecuteReader();
-                if (reader.Read())
-                {
-                    warpRange += reader.GetFloat(0);
-                }
-            }
-            catch (SqliteException ex)
-            {
-                modApi.Log($"SqliteException in GetPlayerData: {ex.Message}");
-                modApi.Log($"Using base warp range ({BaseWarpRange}LY) for player {playerId}");
-            }
-            finally
-            {
-                reader?.Dispose();
-                command?.Dispose();
-                connection?.Dispose();
-            }
-
-            return warpRange;
-        }
-
-        public float GetLocalPlayerWarpRange()
-        {
-            return GetPlayerWarpRange(modApi.Application.LocalPlayer.Id);
         }
 
         public SectorCoordinates GetFirstKnownStarPosition()
@@ -124,7 +84,7 @@ namespace GalacticWaez
         }
 
         // returns the number of bookmarks added
-        public int InsertBookmarks(IEnumerable<SectorCoordinates> positions, IPlayer player)
+        public int InsertBookmarks(IEnumerable<SectorCoordinates> positions, int playerId)
         {
             SqliteConnection connection = null;
             SqliteCommand command = null;
@@ -145,7 +105,7 @@ namespace GalacticWaez
                 foreach (var p in positions)
                 {
                     sql.Append($"({bid},0,0,1,");
-                    sql.Append($"{player.Faction.Id},{player.Id},");
+                    sql.Append($"{playerId},{playerId},");
                     sql.Append($"'Waez_{stepNo}',{p.x},{p.y},{p.z},0,0,0,2,0,1,1,0,0,");
                     sql.Append($"{ticks},0,0,0),");
                     stepNo++;
@@ -241,17 +201,6 @@ namespace GalacticWaez
             }
             coordinates = default;
             return false;
-        }
-
-        SqliteConnection GetConnection(bool writeable = false)
-        {
-            string openMode = writeable ? "ReadWrite" : "ReadOnly";
-            var details = new SqliteConnectionStringBuilder();
-            details.DataSource = modApi.Application.GetPathFor(AppFolder.SaveGame) + "\\global.db";
-            details.Add("Mode", openMode);
-            var connection = new SqliteConnection(details.ToString());
-            connection.Open();
-            return connection;
         }
     }
 }

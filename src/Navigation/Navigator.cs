@@ -7,84 +7,112 @@ using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez.Navigation
 {
-    public class Navigator
+    // TODO: many of the logging calls (or all of them) should be chat messages
+    public class Navigator : INavigator
     {
-        public delegate void DoneCallback(string message);
+        private struct NavResult
+        {
+            public IEnumerable<LYCoordinates> path;
+            public string message;
+        }
 
-        private Task<string> navigation = null;
-        private DoneCallback doneCallback;
-        private IPlayer player;
+        private Task<NavResult> navigation = null;
+        private NavigatorCallback doneCallback;
         private readonly IModApi modApi;
+        private readonly ISaveGameDB db;
         private readonly Galaxy galaxy;
-        private readonly SaveGameDB db;
+
+        private string destination;
+        private IPlayerTracker playerTracker;
+        private Pathfinder findPath;
 
         public Navigator(IModApi modApi, Galaxy galaxy)
+            : this(modApi, galaxy, new SaveGameDB(modApi)) { }
+
+        public Navigator(IModApi modApi, Galaxy galaxy, ISaveGameDB db)
         {
             this.modApi = modApi;
             this.galaxy = galaxy;
-            db = new SaveGameDB(modApi);
+            this.db = db;
         }
 
-        public void HandlePathRequest(string request, IPlayer player, DoneCallback doneCallback)
+        public void HandlePathRequest(string dest, IPlayerTracker playerTracker, 
+            Pathfinder findPath, NavigatorCallback doneCallback)
         {
+            destination = dest;
+            this.playerTracker = playerTracker;
+            this.findPath = findPath;
             this.doneCallback = doneCallback;
-            this.player = player;
-            navigation = Task<string>.Factory.StartNew(Navigate, request);
+            navigation = Task<NavResult>.Factory.StartNew(Navigate);
             modApi.Application.Update += OnUpdateDuringNavigation;
         }
-        
-        private string Navigate(Object obj)
+
+        private NavResult Navigate()
         {
-            var startCoords = StartCoords();
-            LYCoordinates goalCoords;
-            bool goalIsBookmark;
-            if (!GoalCoordinates((string)obj, out goalCoords, out goalIsBookmark))
+            string text;
+            var startCoords = new LYCoordinates(playerTracker.GetCurrentStarCoordinates());
+            if (!GoalCoordinates(destination,
+                out LYCoordinates goalCoords, 
+                out bool goalIsBookmark))
             {
-                return "No bookmark or known star by that name.";
+                text = $"No bookmark or known star by name {destination}";
+                modApi.LogWarning(text);
+                return new NavResult { path = null, message = text };
             }
             if (goalCoords.Equals(startCoords))
             {
-                return "It appears you are already there.";
+                text = "It appears you are already there.";
+                modApi.Log(text);
+                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
+                return new NavResult { path = null, message = text };
             }
-            float range = new SaveGameDB(modApi).GetLocalPlayerWarpRange();
+            float range = playerTracker.GetWarpRange();
             var path = GetPath(startCoords, goalCoords, range);
             if (path == null)
             {
-                return "No path found.";
+                text = "No path found.";
+                modApi.Log(text);
+                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
+                return new NavResult { path = null, message = text };
             }
             if (path.Count() == 1)
             {
-                return "Are you already there?";
+                text = "Are you already there?";
+                modApi.Log(text);
+                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
+                return new NavResult { path = null, message = text };
             }
             if (path.Count() == 2 && goalIsBookmark)
             {
-                return "It appears you are already in warp range.";
+                text = "It appears you are already in warp range.";
+                modApi.Log(text);
+                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
+                return new NavResult { path = null, message = text };
             }
-            return SetWaypoints(path.Skip(1), goalIsBookmark);
+            return SetWaypoints(path.Skip(1), playerTracker.GetPlayerId(), goalIsBookmark);
         }
 
-        private string SetWaypoints(IEnumerable<LYCoordinates> path, bool goalIsBookmark)
+        private NavResult
+            SetWaypoints(IEnumerable<LYCoordinates> path, int playerId, bool goalIsBookmark)
         {
             if (goalIsBookmark)
             {
                 path = path.Take(path.Count() - 1);
             }
             var sectorsPath = path.Select(n => n.ToSectorCoordinates());
-            int added = db.InsertBookmarks(sectorsPath, player);
-            return $"Path found; {added}/{path.Count()} waypoints added.";
+            int added = db.InsertBookmarks(sectorsPath, playerId);
+            string text = $"Path found; {added}/{path.Count()} waypoints added.";
+            modApi.Log(text);
+            return new NavResult { path = path, message = text };
         }
 
         private IEnumerable<LYCoordinates> GetPath(LYCoordinates start, LYCoordinates goal, float range)
-            => AstarPathfinder.FindPath(galaxy.GetNode(start), galaxy.GetNode(goal), range);
-
-        private LYCoordinates StartCoords()
-            => new LYCoordinates(modApi.ClientPlayfield.SolarSystemCoordinates);
+            => findPath(galaxy.GetNode(start), galaxy.GetNode(goal), range);
 
         private bool GoalCoordinates(string goalName, out LYCoordinates goalCoords, out bool isBookmark)
         {
             isBookmark = false;
-            SectorCoordinates sc;
-            if (db.GetBookmarkVector(goalName, out sc))
+            if (db.GetBookmarkVector(goalName, out SectorCoordinates sc))
             {
                 goalCoords = new LYCoordinates(sc);
                 isBookmark = true;
@@ -104,7 +132,7 @@ namespace GalacticWaez.Navigation
             if (!navigation.IsCompleted) return;
 
             modApi.Application.Update -= OnUpdateDuringNavigation;
-            doneCallback(navigation.Result);
+            doneCallback(navigation.Result.path, navigation.Result.message);
         }
     }
 }

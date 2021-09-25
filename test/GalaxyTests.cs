@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using GalacticWaez;
 using GalacticWaez.Navigation;
@@ -11,17 +10,26 @@ using Eleon.Modding;
 namespace GalacticWaezTests
 {
     [TestClass]
+    [DeploymentItem("Dependencies\\stardata-test-large.csv")]
     public class GalaxyTests
     {
+        private static IEnumerable<VectorInt3> positions;
+
+        [ClassInitialize]
+        public static void SetupClass(TestContext _tc)
+        {
+            positions = GalaxyTestData.LoadPositions(_tc.DeploymentDirectory + "\\stardata-test-large.csv");
+        }
+
         [TestMethod]
         public void Has_Expected_Count_Stars_Warplines()
         {
             var buildGalaxy = Task<Galaxy>.Factory.StartNew(() =>
-                Galaxy.CreateNew(GalaxyDataPrep.Locations, Const.BaseWarpRange)
+                Galaxy.CreateNew(positions, Const.BaseWarpRangeLY)
                 );
             // meanwhile, build our tedious test galaxy
-            var testGalaxy = new List<TestNode>(GalaxyDataPrep.Locations.Count);
-            foreach (var p in GalaxyDataPrep.Locations)
+            var testGalaxy = new List<TestNode>(positions.Count());
+            foreach (var p in positions)
             {
                 testGalaxy.Add(new TestNode(TestNode.LightYearify(p)));
             }
@@ -30,7 +38,7 @@ namespace GalacticWaezTests
             {
                 foreach (var p in testGalaxy)
                 {
-                    if (n == p || n.DistanceTo(p) > Const.BaseWarpRange) continue;
+                    if (n == p || n.DistanceTo(p) > Const.BaseWarpRangeLY) continue;
                     n.neighbors.Add(p);
                     edgeCount++;
                 }
@@ -39,6 +47,14 @@ namespace GalacticWaezTests
             buildGalaxy.Wait();
             Assert.AreEqual(buildGalaxy.Result.StarCount, testGalaxy.Count);
             Assert.AreEqual(buildGalaxy.Result.WarpLines, edgeCount);
+        }
+
+        [TestMethod]
+        public void GalaxyNodeDistanceCheck()
+        {
+            var a = new Galaxy.Node(new LYCoordinates(100, 100, 0));
+            var b = new Galaxy.Node(new LYCoordinates(400, 500, 0));
+            Assert.AreEqual(500, a.DistanceTo(b));
         }
     }
 

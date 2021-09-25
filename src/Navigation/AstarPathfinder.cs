@@ -2,6 +2,12 @@
 
 namespace GalacticWaez.Navigation
 {
+    public delegate IEnumerable<LYCoordinates> Pathfinder(
+        Galaxy.Node start,
+        Galaxy.Node goal,
+        float warpRange
+        );
+
     public class AstarPathfinder
     {
         class PathNode
@@ -32,8 +38,7 @@ namespace GalacticWaez.Navigation
             while (minheap.Count > 0)
             {
                 var current = minheap.RemoveMin();
-                PathNode existingPath;
-                if (visitedStars.TryGetValue(current.Star.Position, out existingPath)
+                if (visitedStars.TryGetValue(current.Star.Position, out PathNode existingPath)
                     && current.PathCost >= existingPath.PathCost)
                 {
                     continue;

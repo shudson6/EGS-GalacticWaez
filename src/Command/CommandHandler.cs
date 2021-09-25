@@ -11,21 +11,20 @@ namespace GalacticWaez.Command
             Uninitialized,
             Initializing,
             Ready,
-            Busy
+            Busy,
+            InitFailed
         }
 
         private readonly IModApi modApi;
         private readonly SaveGameDB saveGameDB;
         private Galaxy galaxy = null;
 
-        private State status;
-
-        public State Status { get => status; }
+        public State Status { get; private set; }
 
         public CommandHandler(IModApi modApi)
         {
             this.modApi = modApi;
-            status = State.Uninitialized;
+            Status = State.Uninitialized;
             saveGameDB = new SaveGameDB(modApi);
         }
 
@@ -54,11 +53,6 @@ namespace GalacticWaez.Command
                     HandleClearRequest();
                     return;
                 }
-                if (commandText.Equals(CommandToken.Restart))
-                {
-                    HandleRestartRequest();
-                    return;
-                }
                 string[] tokens = commandText.Split(separator: new[] { ' ' }, count: 2);
                 if (tokens.Length == 2 && tokens[0].Equals(CommandToken.To))
                 {
@@ -72,7 +66,7 @@ namespace GalacticWaez.Command
 
         private void HandleStatusRequest()
         {
-            string message = status.ToString();
+            string message = Status.ToString();
             modApi.Application.SendChatMessage(new ChatMessage(message, 
                 modApi.Application.LocalPlayer));
         }
@@ -98,55 +92,52 @@ namespace GalacticWaez.Command
 
         public void Initialize()
         {
-            if (status != State.Uninitialized)
+            if (Status != State.Uninitialized)
             {
-                string message = "Cannot init because Waez is " + status.ToString();
+                string message = "Cannot init because Waez is " + Status.ToString();
                 modApi.Application.SendChatMessage(new ChatMessage(message, 
                     modApi.Application.LocalPlayer));
                 return;
             }
-            DoInit();
-        }
-
-        private void HandleRestartRequest()
-        {
-            if (status != State.Ready)
+            Status = State.Initializing;
+            new Initializer(modApi).Initialize(Initializer.Source.Normal, 
+                (galaxy, exception) =>
             {
-                string message = "Cannot restart because Waez is " + status.ToString();
-                modApi.Application.SendChatMessage(new ChatMessage(message, 
-                    modApi.Application.LocalPlayer));
-                return;
-            }
-            DoInit();
-        }
-
-        private void DoInit()
-        {
-            status = State.Initializing;
-            new Initializer(modApi).Initialize((galaxy, response) =>
-            {
-                this.galaxy = galaxy;
-                status = State.Ready;
-                modApi.Log(response);
-                modApi.GUI.ShowGameMessage("Waez is ready.");
+                if (galaxy != null)
+                {
+                    this.galaxy = galaxy;
+                    Status = State.Ready;
+                    modApi.GUI.ShowGameMessage("Waez is ready.");
+                    return;
+                }
+                if (exception != null)
+                {
+                    foreach (var ex in exception.InnerExceptions)
+                    {
+                        modApi.LogError(ex.Message);
+                    }
+                }
+                Status = State.InitFailed;
+                modApi.Log("Initialization failed.");
             });
         }
 
         private void HandleNavRequest(string bookmarkName)
         {
-            if (status != State.Ready)
+            if (Status != State.Ready)
             {
-                string message = "Unable: Waez is " + status.ToString();
+                string message = "Unable: Waez is " + Status.ToString();
                 modApi.Application.SendChatMessage(new ChatMessage(message, 
                     modApi.Application.LocalPlayer));
                 return;
             }
-            status = State.Busy;
+            Status = State.Busy;
             new Navigator(modApi, galaxy)
-                .HandlePathRequest(bookmarkName, modApi.Application.LocalPlayer,
-                response =>
+                .HandlePathRequest(bookmarkName, new LocalPlayerTracker(modApi), AstarPathfinder.FindPath,
+                (path, response) =>
                 {
-                    status = State.Ready;
+                    Status = State.Ready;
+                    // TODO: appropriate message
                     modApi.Application.SendChatMessage(
                         new ChatMessage(response, modApi.Application.LocalPlayer));
                 });

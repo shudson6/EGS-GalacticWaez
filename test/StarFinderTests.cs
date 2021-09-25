@@ -1,29 +1,40 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using GalacticWaez;
-using SectorCoordinates = Eleon.Modding.VectorInt3;
+using Eleon.Modding;
 
 namespace GalacticWaezTests
 {
     [TestClass]
+    [DeploymentItem("Dependencies\\stardata-test-large.csv")]
     public class StarFinderTests
     {
-        [TestMethod]
-        public void DoesItWork()
+        private static string baseDir;
+
+        [ClassInitialize]
+        public static void SetupClass(TestContext _tc)
         {
-            var loaded = new List<StarFinder.StarData>(GalaxyDataPrep.Locations.Count);
+            baseDir = _tc.DeploymentDirectory;
+        }
+
+        [TestMethod]
+        public void FindBigData()
+        {
+            var positions = GalaxyTestData.LoadPositions(
+                baseDir + "\\stardata-test-large.csv");
+            var loaded = new List<StarFinder.StarData>(positions.Count);
             int i = 0;
-            foreach (var p in GalaxyDataPrep.Locations)
+            foreach (var p in positions)
             {
                 loaded.Add(new StarFinder.StarData(0, -1, p.x, p.y, p.z, i));
                 i++;
             }
-            var found = new StarFinder().Search(new SectorCoordinates(
+            var found = new StarFinder().Search(new VectorInt3(
                 loaded[0].x, loaded[0].y, loaded[0].z));
             i = 0;
-            foreach (var p in GalaxyDataPrep.Locations)
+            foreach (var p in positions)
             {
                 Assert.AreEqual(p, found[i]);
                 i++;

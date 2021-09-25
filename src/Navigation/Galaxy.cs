@@ -81,8 +81,9 @@ namespace GalacticWaez.Navigation
             WarpLines = warpLines;
         }
 
-        // finds the node that matches the coordinates.
-        // provide sector coordinates
+        /// <summary>
+        /// Finds the node that matches the coordinates.
+        /// </summary>
         public Node GetNode(LYCoordinates coords)
         {
             foreach (var n in nodes)
