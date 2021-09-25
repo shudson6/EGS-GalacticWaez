@@ -5,6 +5,7 @@ using System.Threading;
 using GalacticWaez;
 using Eleon.Modding;
 using System.Collections.Generic;
+using GalacticWaez.Navigation;
 
 namespace GalacticWaezTests
 {
@@ -277,7 +278,60 @@ namespace GalacticWaezTests
                 fakeApp.FireUpdate();
             }
         }
+        
+        [TestMethod]
+        public void Verify_GalaxyMap_Edges_Leq_MaxWarpRange()
+        {
+            var data = GalaxyTestData.LoadPositions(DataFilePath).ToArray();
+            var fakeApp = new FakeApplication(null);
+            var modApi = new FakeModApi(fakeApp);
+            var init = new Initializer(modApi, new SuccessfulStorage(data), null, null);
+            bool done = false;
+            Galaxy galaxy = null;
+            init.Initialize(Initializer.Source.Normal,
+                (result, ex) =>
+                {
+                    galaxy = result;
+                    Assert.AreEqual(data.Length, galaxy.StarCount);
+                    done = true;
+                });
+            while (!done)
+            {
+                Thread.Sleep(20);
+                fakeApp.FireUpdate();
+            }
+            Assert.IsNotNull(galaxy);
+            // check all neighbors in galaxy are w/in 60LY
+            var node = galaxy.GetNode(new LYCoordinates(data[0]));
+            var checkedNodes = new HashSet<Galaxy.Node>();
+            CheckNeighborDistances(node, checkedNodes, 60);
+            // can't guarantee all the stars were w/in warp range of another, but we can
+            // at least assert a decent sample size
+            Assert.IsTrue(checkedNodes.Count > galaxy.StarCount * 3 / 4);
+        }
+
+        private void CheckNeighborDistances(Galaxy.Node node, HashSet<Galaxy.Node> checkedNodes, float MaxDistance)
+        {
+            foreach (var n in node.Neighbors)
+            {
+                if (checkedNodes.Add(n.Key))
+                {
+                    Assert.AreEqual(distance(node.Position, n.Key.Position), n.Value);
+                    Assert.IsTrue(n.Value <= MaxDistance, "{0} -> {1} = {2} > {3}", 
+                        node.Position, n.Key.Position, n.Value, MaxDistance);
+                    CheckNeighborDistances(n.Key, checkedNodes, MaxDistance);
+                }
+            }
+        }
+        private float distance(LYCoordinates a, LYCoordinates b)
+        {
+            float dx = a.x - b.x;
+            float dy = a.y - b.y;
+            float dz = a.z - b.z;
+            return (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
+        }
     }
+
 
     public class FakeStarFinder : IStarFinder
     {

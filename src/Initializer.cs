@@ -81,7 +81,7 @@ namespace GalacticWaez
                     stars = ScanForStarData();
                     break;
             }
-            return CreateGalaxy(stars, Const.BaseWarpRange);
+            return CreateGalaxy(stars, Const.DefaultMaxWarpRangeLY);
         }
 
         private Galaxy CreateGalaxy(IEnumerable<SectorCoordinates> locations, float range)
