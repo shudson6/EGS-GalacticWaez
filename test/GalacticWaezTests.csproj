@@ -92,6 +92,7 @@
     <Compile Include="FakeApplication.cs" />
     <Compile Include="FakeGUI.cs" />
     <Compile Include="FakeModApi.cs" />
+    <Compile Include="FakePlayer.cs" />
     <Compile Include="GalaxyTestData.cs" />
     <Compile Include="GalaxyTests.cs" />
     <Compile Include="MinheapTests.cs" />

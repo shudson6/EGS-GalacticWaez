@@ -183,22 +183,21 @@ namespace GalacticWaezTests
             => positions.Count();
     }
 
-    public class FakePlayerTracker : IPlayerTracker
+    public class FakePlayerTracker : IPlayerInfo
     {
-        private readonly int playerId;
         private readonly float warpRange;
         private readonly VectorInt3 coords;
 
+        public IPlayer Player { get; private set; }
+
         public FakePlayerTracker(int id, float range, VectorInt3 pos)
         {
-            playerId = id;
+            Player = new FakePlayer(id);
             warpRange = range;
             coords = pos;
         }
 
         public VectorInt3 GetCurrentStarCoordinates() => coords;
-
-        public int GetPlayerId() => playerId;
 
         public float GetWarpRange() => warpRange;
     }

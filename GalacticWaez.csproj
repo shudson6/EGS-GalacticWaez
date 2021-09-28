@@ -86,7 +86,7 @@
     <Compile Include="src\Command\CommandHandler.cs" />
     <Compile Include="src\Navigation\Galaxy.cs" />
     <Compile Include="src\Navigation\INavigator.cs" />
-    <Compile Include="src\Navigation\IPlayerTracker.cs" />
+    <Compile Include="src\Navigation\IPlayerInfo.cs" />
     <Compile Include="src\Navigation\Minheap.cs" />
     <Compile Include="src\Navigation\Navigator.cs" />
     <Compile Include="src\Navigation\LocalPlayerTracker.cs" />

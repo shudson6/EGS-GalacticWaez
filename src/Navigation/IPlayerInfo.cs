@@ -1,4 +1,5 @@
-﻿using SectorCoordinates = Eleon.Modding.VectorInt3;
+﻿using Eleon.Modding;
+using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez.Navigation
 {
@@ -6,9 +7,9 @@ namespace GalacticWaez.Navigation
     /// Provides ID and Position information about a player.
     /// TODO: create an implementation that can provide this information in a multiplayer setting
     /// </summary>
-    public interface IPlayerTracker
+    public interface IPlayerInfo
     {
-        int GetPlayerId();
+        IPlayer Player { get; }
 
         SectorCoordinates GetCurrentStarCoordinates();
 

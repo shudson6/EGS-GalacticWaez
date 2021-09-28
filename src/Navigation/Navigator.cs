@@ -23,7 +23,7 @@ namespace GalacticWaez.Navigation
         private readonly Galaxy galaxy;
 
         private string destination;
-        private IPlayerTracker playerTracker;
+        private IPlayerInfo playerInfo;
         private Pathfinder findPath;
 
         public Navigator(IModApi modApi, Galaxy galaxy)
@@ -36,11 +36,11 @@ namespace GalacticWaez.Navigation
             this.db = db;
         }
 
-        public void HandlePathRequest(string dest, IPlayerTracker playerTracker, 
+        public void HandlePathRequest(string dest, IPlayerInfo playerTracker, 
             Pathfinder findPath, NavigatorCallback doneCallback)
         {
             destination = dest;
-            this.playerTracker = playerTracker;
+            this.playerInfo = playerTracker;
             this.findPath = findPath;
             this.doneCallback = doneCallback;
             navigation = Task<NavResult>.Factory.StartNew(Navigate);
@@ -50,7 +50,7 @@ namespace GalacticWaez.Navigation
         private NavResult Navigate()
         {
             string text;
-            var startCoords = new LYCoordinates(playerTracker.GetCurrentStarCoordinates());
+            var startCoords = new LYCoordinates(playerInfo.GetCurrentStarCoordinates());
             if (!GoalCoordinates(destination,
                 out LYCoordinates goalCoords, 
                 out bool goalIsBookmark))
@@ -66,7 +66,7 @@ namespace GalacticWaez.Navigation
                 modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
                 return new NavResult { path = null, message = text };
             }
-            float range = playerTracker.GetWarpRange();
+            float range = playerInfo.GetWarpRange();
             var path = GetPath(startCoords, goalCoords, range);
             if (path == null)
             {
@@ -89,7 +89,7 @@ namespace GalacticWaez.Navigation
                 modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
                 return new NavResult { path = null, message = text };
             }
-            return SetWaypoints(path.Skip(1), playerTracker.GetPlayerId(), goalIsBookmark);
+            return SetWaypoints(path.Skip(1), playerInfo.Player.Id, goalIsBookmark);
         }
 
         private NavResult

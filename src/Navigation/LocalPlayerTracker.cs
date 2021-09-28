@@ -6,12 +6,12 @@ using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez.Navigation
 {
-    public sealed class LocalPlayerTracker : SaveGameDBBase, IPlayerTracker
+    public sealed class LocalPlayerTracker : SaveGameDBBase, IPlayerInfo
     {
         private readonly IModApi modApi;
         private readonly float warpRangeOverride;
 
-        public int GetPlayerId() => modApi.Application.LocalPlayer.Id;
+        public IPlayer Player => modApi.Application.LocalPlayer;
 
         public LocalPlayerTracker(IModApi modApi) : this(modApi, 0) { }
         public LocalPlayerTracker(IModApi modApi, float warpRangeOverride)

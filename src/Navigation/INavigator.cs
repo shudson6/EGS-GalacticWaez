@@ -7,7 +7,7 @@ namespace GalacticWaez.Navigation
     public interface INavigator
     {
         void HandlePathRequest(string request, 
-            IPlayerTracker player, 
+            IPlayerInfo player, 
             Pathfinder findPath,
             NavigatorCallback doneCallback
             );
