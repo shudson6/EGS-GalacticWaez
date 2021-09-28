@@ -132,8 +132,17 @@ namespace GalacticWaez.Command
                 return;
             }
             Status = State.Busy;
+            // see if there's a range param in there
+            float rangeOverride = 0;
+            if (bookmarkName.StartsWith("--range="))
+            {
+                var tokens = bookmarkName.Split(new[] { ' ' }, 2);
+                bookmarkName = tokens[1];
+                rangeOverride = int.Parse(tokens[0].Substring("--range=".Length));
+            }
             new Navigator(modApi, galaxy)
-                .HandlePathRequest(bookmarkName, new LocalPlayerTracker(modApi), AstarPathfinder.FindPath,
+                .HandlePathRequest(bookmarkName, new LocalPlayerTracker(modApi, rangeOverride), 
+                AstarPathfinder.FindPath,
                 (path, response) =>
                 {
                     Status = State.Ready;

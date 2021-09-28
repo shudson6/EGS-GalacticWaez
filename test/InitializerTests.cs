@@ -304,7 +304,7 @@ namespace GalacticWaezTests
             // check all neighbors in galaxy are w/in 60LY
             var node = galaxy.GetNode(new LYCoordinates(data[0]));
             var checkedNodes = new HashSet<Galaxy.Node>();
-            CheckNeighborDistances(node, checkedNodes, 60);
+            CheckNeighborDistances(node, checkedNodes, Const.DefaultMaxWarpRangeLY);
             // can't guarantee all the stars were w/in warp range of another, but we can
             // at least assert a decent sample size
             Assert.IsTrue(checkedNodes.Count > galaxy.StarCount * 3 / 4);

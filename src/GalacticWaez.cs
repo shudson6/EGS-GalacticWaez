@@ -13,7 +13,7 @@ namespace GalacticWaez
         /// <summary> Base value of player warp range, in LY, to which bonuses are added </summary>
         public const float BaseWarpRangeLY = 30;
         /// <summary> Default maximum distance between stars to be considered neighbors, in LY</summary>
-        public const float DefaultMaxWarpRangeLY = 60;
+        public const float DefaultMaxWarpRangeLY = 110;
         /// <summary> Constant for converting between sectors and light-years </summary>
         public const int SectorsPerLY = 100000;
     }

@@ -9,13 +9,16 @@ namespace GalacticWaez.Navigation
     public sealed class LocalPlayerTracker : SaveGameDBBase, IPlayerTracker
     {
         private readonly IModApi modApi;
+        private readonly float warpRangeOverride;
 
         public int GetPlayerId() => modApi.Application.LocalPlayer.Id;
 
-        public LocalPlayerTracker(IModApi modApi)
+        public LocalPlayerTracker(IModApi modApi) : this(modApi, 0) { }
+        public LocalPlayerTracker(IModApi modApi, float warpRangeOverride)
             : base(modApi.Application.GetPathFor(AppFolder.SaveGame) + "\\global.db") 
         {
             this.modApi = modApi;
+            this.warpRangeOverride = warpRangeOverride;
         }
 
         public SectorCoordinates GetCurrentStarCoordinates()
@@ -23,6 +26,9 @@ namespace GalacticWaez.Navigation
 
         public float GetWarpRange()
         {
+            if (warpRangeOverride > 0)
+                return warpRangeOverride;
+
             float warpRange = BaseWarpRangeLY;
             int playerId = modApi.Application.LocalPlayer.Id;
 
