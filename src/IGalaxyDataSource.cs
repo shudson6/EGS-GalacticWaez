@@ -3,8 +3,8 @@ using Eleon.Modding;
 
 namespace GalacticWaez
 {
-    interface IGalaxyDataSource
+    public interface IGalaxyDataSource
     {
-        ICollection<VectorInt3> GetGalaxyData();
+        IEnumerable<VectorInt3> GetGalaxyData();
     }
 }

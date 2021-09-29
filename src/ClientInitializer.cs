@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Eleon.Modding;
 using GalacticWaez.Command;
-using GalacticWaez.Navigation;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez

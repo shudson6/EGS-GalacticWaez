@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics;
 
 namespace GalacticWaez
 {
-    class GalaxyMapBuilder
+    public class GalaxyMapBuilder
     {
         private LoggingDelegate Log;
 
@@ -18,7 +19,7 @@ namespace GalacticWaez
                 Log("Galaxy data not available. Cannot create Galaxy Map.");
                 return null;
             }
-            var nodes = new List<GalaxyMap.Node>(positions.Count);
+            var nodes = new List<GalaxyMap.Node>(positions.Count());
             var sw = Stopwatch.StartNew();
             foreach (var p in positions)
             {
@@ -31,6 +32,7 @@ namespace GalacticWaez
                     n.Neighbors.Add(current, dist);
                     current.Neighbors.Add(n, dist);
                 }
+                nodes.Add(current);
             }
             var g = new GalaxyMap(nodes);
             sw.Stop();
