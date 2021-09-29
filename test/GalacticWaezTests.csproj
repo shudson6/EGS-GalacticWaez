@@ -94,14 +94,10 @@
     <Compile Include="FakeModApi.cs" />
     <Compile Include="FakePlayer.cs" />
     <Compile Include="GalaxyTestData.cs" />
-    <Compile Include="GalaxyTests.cs" />
     <Compile Include="MinheapTests.cs" />
-    <Compile Include="PathfinderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StarFinderTests.cs" />
-    <Compile Include="InitializerTests.cs" />
     <Compile Include="StarDataStorageTests.cs" />
-    <Compile Include="NavigatorTests.cs" />
     <Compile Include="CommandHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
