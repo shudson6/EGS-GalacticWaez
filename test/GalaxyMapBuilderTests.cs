@@ -41,6 +41,14 @@ namespace GalacticWaezTests
             Assert.IsNull(shouldBeNull);
         }
 
+        [TestMethod]
+        public void DataEmpty_ReturnsNull()
+        {
+            var shouldBeNull = new GalaxyMapBuilder((_) => { })
+                .BuildGalaxyMap(new Fakes.EmptyCollectionDataSource(), 30);
+            Assert.IsNull(shouldBeNull);
+        }
+
         private void VerifyGalaxyMap(string filename, GalaxyMap testGalaxy, float testRange)
         {
             var positions = GalaxyTestData.LoadPositions(filename);
