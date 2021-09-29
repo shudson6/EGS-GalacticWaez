@@ -36,11 +36,15 @@ namespace GalacticWaez
             }
         }
 
-        public IReadOnlyCollection<Node> Nodes { get; }
-        public int Stars => Nodes.Count;
+        public IEnumerable<Node> Nodes { get; }
+        public int Stars => Nodes.Count();
+
+        /// <summary>
+        /// 
+        /// </summary>
         public int WarpLines => Nodes.Aggregate(0, (acc, n) => acc + n.Neighbors.Count);
 
-        public GalaxyMap(ICollection<Node> nodes) { Nodes = (IReadOnlyCollection<Node>)nodes; }
+        public GalaxyMap(IEnumerable<Node> nodes) { Nodes = nodes; }
 
         /// <summary>
         /// Finds the node that matches the coordinates.
