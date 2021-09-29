@@ -4,6 +4,8 @@ using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez
 {
+    public delegate void LoggingDelegate(string text);
+
     public class Const
     {
         /// <summary> Base value of player warp range, to which bonuses are added </summary>

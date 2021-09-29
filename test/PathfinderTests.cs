@@ -12,7 +12,7 @@ namespace GalacticWaezTests
     public class PathfinderTests
     {
         const int RandomTestIterations = 100;
-        static Galaxy TestGalaxy;
+        static GalaxyMap TestGalaxy;
         private static IEnumerable<VectorInt3> positions;
 
         [ClassInitialize]
@@ -20,7 +20,7 @@ namespace GalacticWaezTests
         public static void Setup(TestContext _tc)
         {
             positions = GalaxyTestData.LoadPositions(_tc.DeploymentDirectory + "\\stardata-test-large.csv");
-            TestGalaxy = Galaxy.CreateNew(positions, Const.BaseWarpRangeLY);
+            TestGalaxy = GalaxyMap.CreateNew(positions, Const.BaseWarpRangeLY);
         }
         
         [TestMethod]

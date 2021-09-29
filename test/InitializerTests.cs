@@ -179,7 +179,7 @@ namespace GalacticWaezTests
             }
         }
 
-        private void CheckNeighborDistances(Galaxy.Node node, HashSet<Galaxy.Node> checkedNodes, float MaxDistance)
+        private void CheckNeighborDistances(GalaxyMap.Node node, HashSet<GalaxyMap.Node> checkedNodes, float MaxDistance)
         {
             foreach (var n in node.Neighbors)
             {

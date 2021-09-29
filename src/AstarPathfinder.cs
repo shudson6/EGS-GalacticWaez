@@ -3,8 +3,8 @@
 namespace GalacticWaez.Navigation
 {
     public delegate IEnumerable<LYCoordinates> Pathfinder(
-        Galaxy.Node start,
-        Galaxy.Node goal,
+        GalaxyMap.Node start,
+        GalaxyMap.Node goal,
         float warpRange
         );
 
@@ -12,10 +12,10 @@ namespace GalacticWaez.Navigation
     {
         class PathNode
         {
-            public Galaxy.Node Star { get; }
+            public GalaxyMap.Node Star { get; }
             public PathNode Previous { get; }
             public float PathCost { get; }
-            public PathNode(Galaxy.Node star, PathNode previous)
+            public PathNode(GalaxyMap.Node star, PathNode previous)
             {
                 Star = star;
                 Previous = previous;
@@ -29,7 +29,7 @@ namespace GalacticWaez.Navigation
          * than the distance used to build the Galaxy have no effect.
          */
         public static IEnumerable<LYCoordinates> 
-        FindPath(Galaxy.Node start, Galaxy.Node goal, float warpRange)
+        FindPath(GalaxyMap.Node start, GalaxyMap.Node goal, float warpRange)
         {
             var visitedStars = new Dictionary<LYCoordinates, PathNode>();
             var minheap = new Minheap<PathNode>();

@@ -20,16 +20,16 @@ namespace GalacticWaez.Navigation
         private NavigatorCallback doneCallback;
         private readonly IModApi modApi;
         private readonly ISaveGameDB db;
-        private readonly Galaxy galaxy;
+        private readonly GalaxyMap galaxy;
 
         private string destination;
         private IPlayerInfo playerInfo;
         private Pathfinder findPath;
 
-        public Navigator(IModApi modApi, Galaxy galaxy)
+        public Navigator(IModApi modApi, GalaxyMap galaxy)
             : this(modApi, galaxy, new SaveGameDB(modApi)) { }
 
-        public Navigator(IModApi modApi, Galaxy galaxy, ISaveGameDB db)
+        public Navigator(IModApi modApi, GalaxyMap galaxy, ISaveGameDB db)
         {
             this.modApi = modApi;
             this.galaxy = galaxy;

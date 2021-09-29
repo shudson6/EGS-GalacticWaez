@@ -38,7 +38,7 @@ namespace GalacticWaez
                     if (ModApi.Application.Mode == ApplicationMode.SinglePlayer)
                     {
                         initializer = new ClientInitializer(ModApi);
-                        initializer.Initialize(StarDataSource.Normal, InitializerCallback);
+                        initializer.Initialize(InitializerType.Normal, InitializerCallback);
                     }
                     break;
 

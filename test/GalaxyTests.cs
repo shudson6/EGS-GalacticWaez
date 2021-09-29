@@ -24,8 +24,8 @@ namespace GalacticWaezTests
         [TestMethod]
         public void Has_Expected_Count_Stars_Warplines()
         {
-            var buildGalaxy = Task<Galaxy>.Factory.StartNew(() =>
-                Galaxy.CreateNew(positions, Const.BaseWarpRangeLY)
+            var buildGalaxy = Task<GalaxyMap>.Factory.StartNew(() =>
+                GalaxyMap.CreateNew(positions, Const.BaseWarpRangeLY)
                 );
             // meanwhile, build our tedious test galaxy
             var testGalaxy = new List<TestNode>(positions.Count());
@@ -52,8 +52,8 @@ namespace GalacticWaezTests
         [TestMethod]
         public void GalaxyNodeDistanceCheck()
         {
-            var a = new Galaxy.Node(new LYCoordinates(100, 100, 0));
-            var b = new Galaxy.Node(new LYCoordinates(400, 500, 0));
+            var a = new GalaxyMap.Node(new LYCoordinates(100, 100, 0));
+            var b = new GalaxyMap.Node(new LYCoordinates(400, 500, 0));
             Assert.AreEqual(500, a.DistanceTo(b));
         }
     }
