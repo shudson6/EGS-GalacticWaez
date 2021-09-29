@@ -25,4 +25,9 @@ namespace GalacticWaezTests.Fakes
     {
         public IEnumerable<VectorInt3> GetGalaxyData() => null;
     }
+
+    class EmptyCollectionDataSource : IGalaxyDataSource
+    {
+        public IEnumerable<VectorInt3> GetGalaxyData() => new List<VectorInt3>();
+    }
 }

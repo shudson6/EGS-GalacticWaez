@@ -14,7 +14,7 @@ namespace GalacticWaez
         public GalaxyMap BuildGalaxyMap(IGalaxyDataSource source, float maxWarpRange)
         {
             var positions = source.GetGalaxyData();
-            if (positions == null)
+            if (positions == null || !positions.Any())
             {
                 Log("Galaxy data not available. Cannot create Galaxy Map.");
                 return null;
