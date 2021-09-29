@@ -20,7 +20,7 @@ namespace GalacticWaez
         private readonly IStarDataStorage storage;
         private readonly ISaveGameDB db;
         private InitializerCallback doneCallback;
-        private Task<Galaxy> init;
+        private Task<GalaxyMap> init;
 
         public ClientInitializer(IModApi modApi)
             : this(modApi, new StarDataStorage(modApi.Application.GetPathFor(AppFolder.SaveGame),
@@ -40,11 +40,11 @@ namespace GalacticWaez
         public void Initialize(StarDataSource source, InitializerCallback doneCallback)
         {
             this.doneCallback = doneCallback;
-            init = Task<Galaxy>.Factory.StartNew(function: BuildGalaxyMap, state: source);
+            init = Task<GalaxyMap>.Factory.StartNew(function: BuildGalaxyMap, state: source);
             modApi.Application.Update += OnUpdateDuringInit;
         }
 
-        private Galaxy BuildGalaxyMap(object obj)
+        private GalaxyMap BuildGalaxyMap(object obj)
         {
             IEnumerable<SectorCoordinates> stars = null;
             var source = (StarDataSource)obj;
@@ -71,23 +71,6 @@ namespace GalacticWaez
                     break;
             }
             return CreateGalaxy(stars, Const.DefaultMaxWarpRangeLY);
-        }
-
-        private Galaxy CreateGalaxy(IEnumerable<SectorCoordinates> locations, float range)
-        {
-            if (locations == null)
-            {
-                modApi.LogWarning("No star positions. Can't create galactic highway map.");
-                return null;
-            }
-            var stopwatch = Stopwatch.StartNew();
-            var g = Galaxy.CreateNew(locations, range);
-            stopwatch.Stop();
-            float time = (float)stopwatch.ElapsedMilliseconds / 1000;
-            modApi.Log("Constructed galactic highway map: "
-                + $"{g.StarCount} stars, {g.WarpLines} warp lines. "
-                + $"Took {time}s.");
-            return g;
         }
 
         private IEnumerable<SectorCoordinates> LoadStarData()

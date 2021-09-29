@@ -8,9 +8,9 @@ namespace GalacticWaez.Command
     {
         private readonly IModApi modApi;
         private readonly SaveGameDB saveGameDB;
-        private Galaxy galaxy = null;
+        private GalaxyMap galaxy = null;
 
-        public CommandHandler(IModApi modApi, Galaxy galaxy)
+        public CommandHandler(IModApi modApi, GalaxyMap galaxy)
         {
             this.modApi = modApi;
             this.galaxy = galaxy;

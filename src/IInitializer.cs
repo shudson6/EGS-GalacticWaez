@@ -8,19 +8,19 @@ namespace GalacticWaez
     /// <summary>
     /// Enum that tells Initializer where it should look for star map data.
     /// </summary>
-    public enum StarDataSource
+    public enum InitializerType
     {
         /// <summary>Look for stored data first; scan memory if not found.</summary>
         Normal,
         /// <summary>Look for file only; don't fall back to memory scan.</summary>
-        File,
+        FileOnly,
         /// <summary>Scan memory only.</summary>
-        Scanner
+        ScanOnly
     }
 
 
     public interface IInitializer
     {
-        void Initialize(StarDataSource source, InitializerCallback doneCallback);
+        void Initialize(InitializerType source, InitializerCallback doneCallback);
     }
 }

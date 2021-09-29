@@ -40,7 +40,7 @@ namespace GalacticWaezTests
         {
             var app = new FakeApplication(null);
             var modApi = new FakeModApi(app);
-            var galaxy = Galaxy.CreateNew(new[] { default(VectorInt3) }, Const.BaseWarpRangeLY);
+            var galaxy = GalaxyMap.CreateNew(new[] { default(VectorInt3) }, Const.BaseWarpRangeLY);
             var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false));
             bool done = false;
             nav.HandlePathRequest("nonexistent",
@@ -67,7 +67,7 @@ namespace GalacticWaezTests
             };
             var app = new FakeApplication(null);
             var modApi = new FakeModApi(app);
-            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRangeLY);
+            var galaxy = GalaxyMap.CreateNew(pos, Const.BaseWarpRangeLY);
             var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false, pos[1]));
             bool done = false;
             nav.HandlePathRequest("nonexistent",
@@ -95,7 +95,7 @@ namespace GalacticWaezTests
             };
             var app = new FakeApplication(null);
             var modApi = new FakeModApi(app);
-            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRangeLY);
+            var galaxy = GalaxyMap.CreateNew(pos, Const.BaseWarpRangeLY);
             var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false, pos[1]));
             bool done = false;
             nav.HandlePathRequest("nonexistent",
@@ -125,7 +125,7 @@ namespace GalacticWaezTests
             };
             var app = new FakeApplication(null);
             var modApi = new FakeModApi(app);
-            var galaxy = Galaxy.CreateNew(pos, Const.BaseWarpRangeLY);
+            var galaxy = GalaxyMap.CreateNew(pos, Const.BaseWarpRangeLY);
             var nav = new Navigator(modApi, galaxy, new NavigatorTestDB(true, false, pos[1]));
             bool done = false;
             nav.HandlePathRequest("nonexistent",

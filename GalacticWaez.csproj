@@ -72,6 +72,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\IGalaxyDataSource.cs" />
+    <Compile Include="src\GalaxyMapBuilder.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="src\IMessenger.cs" />
     <Compile Include="src\Messenger.cs" />
@@ -87,7 +89,7 @@
     <Compile Include="src\GalacticWaezClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\CommandHandler.cs" />
-    <Compile Include="src\Galaxy.cs" />
+    <Compile Include="src\GalaxyMap.cs" />
     <Compile Include="src\INavigator.cs" />
     <Compile Include="src\IPlayerInfo.cs" />
     <Compile Include="src\Minheap.cs" />
