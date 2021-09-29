@@ -1,11 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Eleon.Modding;
+using GalacticWaez;
+using GalacticWaez.Navigation;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using GalacticWaez;
-using Eleon.Modding;
-using System.Collections.Generic;
-using GalacticWaez.Navigation;
 
 namespace GalacticWaezTests
 {
@@ -28,9 +28,9 @@ namespace GalacticWaezTests
         {
             var fakeApp = new FakeApplication(null);
             var modApi = new FakeModApi(fakeApp);
-            var init = new Initializer(modApi, new NotFoundStorage(), null, null);
+            var init = new ClientInitializer(modApi, new NotFoundStorage(), null, null);
             bool done = false;
-            init.Initialize(Initializer.Source.File,
+            init.Initialize(StarDataSource.File,
                 (galaxy, ex) =>
                 {
                     Assert.IsNull(galaxy);
@@ -51,9 +51,9 @@ namespace GalacticWaezTests
         {
             var fakeApp = new FakeApplication(null);
             var modApi = new FakeModApi(fakeApp);
-            var init = new Initializer(modApi, new CorruptedStorage(), null, null);
+            var init = new ClientInitializer(modApi, new CorruptedStorage(), null, null);
             bool done = false;
-            init.Initialize(Initializer.Source.File,
+            init.Initialize(StarDataSource.File,
                 (galaxy, ex) =>
                 {
                     Assert.IsNull(galaxy);
@@ -70,36 +70,14 @@ namespace GalacticWaezTests
         }
 
         [TestMethod]
-        public void FileInit_Success()
-        {
-            var data = GalaxyTestData.LoadPositions(DataFilePath);
-            var fakeApp = new FakeApplication(null);
-            var modApi = new FakeModApi(fakeApp);
-            var init = new Initializer(modApi, new SuccessfulStorage(data), null, null);
-            bool done = false;
-            init.Initialize(Initializer.Source.File,
-                (galaxy, ex) =>
-                {
-                    Assert.AreEqual(data.Count(), galaxy.StarCount);
-                    Assert.IsTrue(modApi.LogContains($"Loaded {data.Count()} stars"));
-                    done = true;
-                });
-            while (!done)
-            {
-                Thread.Sleep(20);
-                fakeApp.FireUpdate();
-            }
-        }
-
-        [TestMethod]
         public void ScannerInit_NotFound()
         {
             var fakeApp = new FakeApplication(null);
             var modApi = new FakeModApi(fakeApp);
-            var init = new Initializer(modApi, null, new FakeStarFinder(null),
+            var init = new ClientInitializer(modApi, null, new FakeStarFinder(null),
                 new InitializationDB(default));
             bool done = false;
-            init.Initialize(Initializer.Source.Scanner,
+            init.Initialize(StarDataSource.Scanner,
                 (galaxy, ex) =>
                 {
                     Assert.IsNull(galaxy);
@@ -121,10 +99,10 @@ namespace GalacticWaezTests
             var data = GalaxyTestData.LoadPositions(DataFilePath).ToArray();
             var fakeApp = new FakeApplication(tc.DeploymentDirectory);
             var modApi = new FakeModApi(fakeApp);
-            var init = new Initializer(modApi, null, new FakeStarFinder(data), 
+            var init = new ClientInitializer(modApi, null, new FakeStarFinder(data), 
                 new InitializationDB(data.First()));
             bool done = false;
-            init.Initialize(Initializer.Source.Scanner,
+            init.Initialize(StarDataSource.Scanner,
                 (galaxy, ex) =>
                 {
                     Assert.IsNull(ex);
@@ -150,10 +128,10 @@ namespace GalacticWaezTests
         {
             var fakeApp = new FakeApplication(null);
             var modApi = new FakeModApi(fakeApp);
-            var init = new Initializer(modApi, new CorruptedStorage(), new FakeStarFinder(null),
+            var init = new ClientInitializer(modApi, new CorruptedStorage(), new FakeStarFinder(null),
                 new InitializationDB(default));
             bool done = false;
-            init.Initialize(Initializer.Source.Normal,
+            init.Initialize(StarDataSource.Normal,
                 (galaxy, ex) =>
                 {
                     Assert.IsNull(galaxy);
@@ -179,10 +157,10 @@ namespace GalacticWaezTests
         {
             var fakeApp = new FakeApplication(null);
             var modApi = new FakeModApi(fakeApp);
-            var init = new Initializer(modApi, new NotFoundStorage(), new FakeStarFinder(null),
+            var init = new ClientInitializer(modApi, new NotFoundStorage(), new FakeStarFinder(null),
                 new InitializationDB(default));
             bool done = false;
-            init.Initialize(Initializer.Source.Normal,
+            init.Initialize(StarDataSource.Normal,
                 (galaxy, ex) =>
                 {
                     Assert.IsNull(galaxy);
@@ -199,115 +177,6 @@ namespace GalacticWaezTests
                 Thread.Sleep(20);
                 fakeApp.FireUpdate();
             }
-        }
-
-        [TestMethod]
-        public void NormalInit_NoFile_ScanSuccess_SaveSuccess()
-        {
-            var data = GalaxyTestData.LoadPositions(DataFilePath).ToArray();
-            var fakeApp = new FakeApplication(null);
-            var modApi = new FakeModApi(fakeApp);
-            var init = new Initializer(modApi, new NotFoundStorage(true), 
-                new FakeStarFinder(data),
-                new InitializationDB(data[0])
-                );
-            bool done = false;
-            init.Initialize(Initializer.Source.Normal,
-                (galaxy, ex) =>
-                {
-                    Assert.AreEqual(data.Length, galaxy.StarCount);
-                    Assert.IsTrue(modApi.LogContains("No saved star positions."));
-                    Assert.IsTrue(modApi.LogContains($"Located {data.Length} stars"));
-                    Assert.IsTrue(modApi.LogContains("Saved star positions"));
-                    done = true;
-                });
-            while (!done)
-            {
-                Thread.Sleep(20);
-                fakeApp.FireUpdate();
-            }
-        }
-
-        [TestMethod]
-        public void NormalInit_NoFile_ScanSuccess_SaveFail()
-        {
-            var data = GalaxyTestData.LoadPositions(DataFilePath).ToArray();
-            var fakeApp = new FakeApplication(null);
-            var modApi = new FakeModApi(fakeApp);
-            var init = new Initializer(modApi, new NotFoundStorage(false), 
-                new FakeStarFinder(data),
-                new InitializationDB(data[0])
-                );
-            bool done = false;
-            init.Initialize(Initializer.Source.Normal,
-                (galaxy, ex) =>
-                {
-                    Assert.AreEqual(data.Length, galaxy.StarCount);
-                    Assert.IsTrue(modApi.LogContains("No saved star positions."));
-                    Assert.IsTrue(modApi.LogContains($"Located {data.Length} stars"));
-                    Assert.IsTrue(modApi.LogContains("Could not save",
-                        FakeModApi.LogType.Warning
-                        ));
-                    done = true;
-                });
-            while (!done)
-            {
-                Thread.Sleep(20);
-                fakeApp.FireUpdate();
-            }
-        }
-
-        [TestMethod]
-        public void NormalInit_FileSuccess()
-        {
-            var data = GalaxyTestData.LoadPositions(DataFilePath).ToArray();
-            var fakeApp = new FakeApplication(null);
-            var modApi = new FakeModApi(fakeApp);
-            var init = new Initializer(modApi, new SuccessfulStorage(data), null, null);
-            bool done = false;
-            init.Initialize(Initializer.Source.Normal,
-                (galaxy, ex) =>
-                {
-                    Assert.AreEqual(data.Length, galaxy.StarCount);
-                    Assert.IsTrue(modApi.LogContains($"Loaded {data.Length} stars"));
-                    done = true;
-                });
-            while (!done)
-            {
-                Thread.Sleep(20);
-                fakeApp.FireUpdate();
-            }
-        }
-        
-        [TestMethod]
-        public void Verify_GalaxyMap_Edges_Leq_MaxWarpRange()
-        {
-            var data = GalaxyTestData.LoadPositions(DataFilePath).ToArray();
-            var fakeApp = new FakeApplication(null);
-            var modApi = new FakeModApi(fakeApp);
-            var init = new Initializer(modApi, new SuccessfulStorage(data), null, null);
-            bool done = false;
-            Galaxy galaxy = null;
-            init.Initialize(Initializer.Source.Normal,
-                (result, ex) =>
-                {
-                    galaxy = result;
-                    Assert.AreEqual(data.Length, galaxy.StarCount);
-                    done = true;
-                });
-            while (!done)
-            {
-                Thread.Sleep(20);
-                fakeApp.FireUpdate();
-            }
-            Assert.IsNotNull(galaxy);
-            // check all neighbors in galaxy are w/in 60LY
-            var node = galaxy.GetNode(new LYCoordinates(data[0]));
-            var checkedNodes = new HashSet<Galaxy.Node>();
-            CheckNeighborDistances(node, checkedNodes, Const.DefaultMaxWarpRangeLY);
-            // can't guarantee all the stars were w/in warp range of another, but we can
-            // at least assert a decent sample size
-            Assert.IsTrue(checkedNodes.Count > galaxy.StarCount * 3 / 4);
         }
 
         private void CheckNeighborDistances(Galaxy.Node node, HashSet<Galaxy.Node> checkedNodes, float MaxDistance)

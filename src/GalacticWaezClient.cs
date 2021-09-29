@@ -1,24 +1,27 @@
 ﻿using Eleon.Modding;
 using GalacticWaez.Command;
+using System;
 
 namespace GalacticWaez
 {
     public class GalacticWaezClient : IMod
     {
-        IModApi modApi;
-        CommandHandler commandHandler = null;
+        public IModApi ModApi { get; private set; }
+
+        private ICommandHandler commandHandler = null;
+        private IInitializer initializer = null;
 
         public void Init(IModApi modApi)
         {
-            this.modApi = modApi;
-            modApi.GameEvent += OnGameEvent;
-            modApi.Log("GalacticWaezClient attached.");
+            ModApi = modApi;
+            ModApi.GameEvent += OnGameEvent;
+            ModApi.Log("GalacticWaezClient attached.");
         }
 
         public void Shutdown()
         {
-            modApi.GameEvent -= OnGameEvent;
-            modApi.Log("GalacticWaezClient detached.");
+            ModApi.GameEvent -= OnGameEvent;
+            ModApi.Log("GalacticWaezClient detached.");
         }
 
         void OnGameEvent(GameEventType type,
@@ -31,31 +34,37 @@ namespace GalacticWaez
             switch (type)
             {
                 case GameEventType.GameStarted:
-                    if (modApi.Application.Mode == ApplicationMode.SinglePlayer)
+                    if (ModApi.Application.Mode == ApplicationMode.SinglePlayer)
                     {
-                        commandHandler = new CommandHandler(modApi);
-                        modApi.Application.ChatMessageSent += commandHandler.HandleChatCommand;
-                        modApi.Application.Update += OnWorldVisibleOnce;
-                        modApi.Log("Listening for commands.");
+                        initializer = new ClientInitializer(ModApi);
+                        initializer.Initialize(StarDataSource.Normal, InitializerCallback);
                     }
                     break;
 
                 case GameEventType.GameEnded:
-                    modApi.Application.ChatMessageSent -= commandHandler.HandleChatCommand;
-                    modApi.Application.Update -= OnWorldVisibleOnce;
-                    commandHandler = null;
-                    modApi.Log("Stopped listening for commands.");
+                    if (commandHandler != null)
+                    {
+                        ModApi.Application.ChatMessageSent -= commandHandler.HandleChatCommand;
+                        commandHandler = null;
+                    }
+                    ModApi.Log("Stopped listening for commands.");
                     break;
             }
         }
 
-        void OnWorldVisibleOnce()
+        private void InitializerCallback(ICommandHandler icmd, AggregateException ex)
         {
-            if (modApi.GUI.IsWorldVisible
-                && commandHandler.Status.Equals(CommandHandler.State.Uninitialized))
+            if (icmd != null)
             {
-                commandHandler.Initialize();
-                modApi.Application.Update -= OnWorldVisibleOnce;
+                commandHandler = icmd;
+                ModApi.Application.ChatMessageSent += commandHandler.HandleChatCommand;
+            }
+            else
+            {
+                foreach (var e in ex.InnerExceptions)
+                {
+                    ModApi.LogError(e.Message);
+                }
             }
         }
     }
