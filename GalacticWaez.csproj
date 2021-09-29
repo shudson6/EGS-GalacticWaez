@@ -73,8 +73,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="src\Command\ICommandHandler.cs" />
     <Compile Include="src\IInitializer.cs" />
-    <Compile Include="src\Initializer.cs" />
+    <Compile Include="src\ClientInitializer.cs" />
     <Compile Include="src\ISaveGameDB.cs" />
     <Compile Include="src\IStarDataStorage.cs" />
     <Compile Include="src\IStarFinder.cs" />

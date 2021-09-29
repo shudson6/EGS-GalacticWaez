@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Eleon.Modding;
+using GalacticWaez.Command;
 using GalacticWaez.Navigation;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 
@@ -11,20 +12,8 @@ namespace GalacticWaez
     /// <summary>
     /// Used by CommandHandler to build Galaxy
     /// </summary>
-    public class Initializer : IInitializer
+    public class ClientInitializer : IInitializer
     {
-        /// <summary>
-        /// Enum that tells Initializer where it should look for star map data.
-        /// </summary>
-        public enum Source
-        {
-            /// <summary>Look for stored data first; scan memory if not found.</summary>
-            Normal,
-            /// <summary>Look for file only; don't fall back to memory scan.</summary>
-            File,
-            /// <summary>Scan memory only.</summary>
-            Scanner
-        }
 
         private readonly IModApi modApi;
         private readonly IStarFinder starFinder;
@@ -33,13 +22,13 @@ namespace GalacticWaez
         private InitializerCallback doneCallback;
         private Task<Galaxy> init;
 
-        public Initializer(IModApi modApi)
+        public ClientInitializer(IModApi modApi)
             : this(modApi, new StarDataStorage(modApi.Application.GetPathFor(AppFolder.SaveGame),
                 "stardata.csv"),
                 new StarFinder(), new SaveGameDB(modApi))
         { }
 
-        public Initializer(IModApi modApi, IStarDataStorage storage,
+        public ClientInitializer(IModApi modApi, IStarDataStorage storage,
             IStarFinder starFinder, ISaveGameDB db)
         {
             this.modApi = modApi;
@@ -48,7 +37,7 @@ namespace GalacticWaez
             this.db = db;
         }
 
-        public void Initialize(Source source, InitializerCallback doneCallback)
+        public void Initialize(StarDataSource source, InitializerCallback doneCallback)
         {
             this.doneCallback = doneCallback;
             init = Task<Galaxy>.Factory.StartNew(function: BuildGalaxyMap, state: source);
@@ -58,10 +47,10 @@ namespace GalacticWaez
         private Galaxy BuildGalaxyMap(object obj)
         {
             IEnumerable<SectorCoordinates> stars = null;
-            var source = (Source)obj;
+            var source = (StarDataSource)obj;
             switch (source)
             {
-                case Source.Normal:
+                case StarDataSource.Normal:
                     if (storage.Exists())
                     {
                         stars = LoadStarData();
@@ -73,11 +62,11 @@ namespace GalacticWaez
                     }
                     break;
 
-                case Source.File:
+                case StarDataSource.File:
                     stars = LoadStarData();
                     break;
 
-                case Source.Scanner:
+                case StarDataSource.Scanner:
                     stars = ScanForStarData();
                     break;
             }
@@ -165,7 +154,7 @@ namespace GalacticWaez
 
             modApi.Application.Update -= OnUpdateDuringInit;
             doneCallback(
-                init.IsCompleted ? init.Result : null,
+                init.IsCompleted ? new CommandHandler(modApi, init.Result) : null,
                 init.Exception
                 );
         }
