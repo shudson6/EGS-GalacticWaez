@@ -37,7 +37,7 @@ namespace GalacticWaez
             this.db = db;
         }
 
-        public void Initialize(StarDataSource source, InitializerCallback doneCallback)
+        public void Initialize(InitializerType source, InitializerCallback doneCallback)
         {
             this.doneCallback = doneCallback;
             init = Task<GalaxyMap>.Factory.StartNew(function: BuildGalaxyMap, state: source);
@@ -47,10 +47,10 @@ namespace GalacticWaez
         private GalaxyMap BuildGalaxyMap(object obj)
         {
             IEnumerable<SectorCoordinates> stars = null;
-            var source = (StarDataSource)obj;
+            var source = (InitializerType)obj;
             switch (source)
             {
-                case StarDataSource.Normal:
+                case InitializerType.Normal:
                     if (storage.Exists())
                     {
                         stars = LoadStarData();
@@ -62,15 +62,15 @@ namespace GalacticWaez
                     }
                     break;
 
-                case StarDataSource.File:
+                case InitializerType.FileOnly:
                     stars = LoadStarData();
                     break;
 
-                case StarDataSource.Scanner:
+                case InitializerType.ScanOnly:
                     stars = ScanForStarData();
                     break;
             }
-            return CreateGalaxy(stars, Const.DefaultMaxWarpRangeLY);
+            return null;
         }
 
         private IEnumerable<SectorCoordinates> LoadStarData()
