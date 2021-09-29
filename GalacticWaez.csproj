@@ -101,6 +101,7 @@
     <Compile Include="src\StarDataStorage.cs" />
     <Compile Include="src\StarFinder.cs" />
     <Compile Include="src\ChatMessage.cs" />
+    <Compile Include="src\StarFinderDataSource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
