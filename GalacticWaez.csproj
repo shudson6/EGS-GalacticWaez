@@ -73,24 +73,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="src\Command\ICommandHandler.cs" />
+    <Compile Include="src\IMessenger.cs" />
+    <Compile Include="src\Messenger.cs" />
+    <Compile Include="src\ICommandHandler.cs" />
     <Compile Include="src\IInitializer.cs" />
     <Compile Include="src\ClientInitializer.cs" />
     <Compile Include="src\ISaveGameDB.cs" />
     <Compile Include="src\IStarDataStorage.cs" />
     <Compile Include="src\IStarFinder.cs" />
-    <Compile Include="src\Navigation\AstarPathfinder.cs" />
-    <Compile Include="src\Command\CommandToken.cs" />
+    <Compile Include="src\AstarPathfinder.cs" />
+    <Compile Include="src\CommandToken.cs" />
     <Compile Include="src\GalacticWaez.cs" />
     <Compile Include="src\GalacticWaezClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\Command\CommandHandler.cs" />
-    <Compile Include="src\Navigation\Galaxy.cs" />
-    <Compile Include="src\Navigation\INavigator.cs" />
-    <Compile Include="src\Navigation\IPlayerInfo.cs" />
-    <Compile Include="src\Navigation\Minheap.cs" />
-    <Compile Include="src\Navigation\Navigator.cs" />
-    <Compile Include="src\Navigation\LocalPlayerTracker.cs" />
+    <Compile Include="src\CommandHandler.cs" />
+    <Compile Include="src\Galaxy.cs" />
+    <Compile Include="src\INavigator.cs" />
+    <Compile Include="src\IPlayerInfo.cs" />
+    <Compile Include="src\Minheap.cs" />
+    <Compile Include="src\Navigator.cs" />
+    <Compile Include="src\LocalPlayerTracker.cs" />
     <Compile Include="src\SaveGameDB.cs" />
     <Compile Include="src\SaveGameDBBase.cs" />
     <Compile Include="src\StarDataStorage.cs" />
