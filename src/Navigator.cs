@@ -27,7 +27,7 @@ namespace GalacticWaez.Navigation
         private Pathfinder findPath;
 
         public Navigator(IModApi modApi, GalaxyMap galaxy)
-            : this(modApi, galaxy, new SaveGameDB(modApi)) { }
+            : this(modApi, galaxy, new SaveGameDB(modApi.Application.GetPathFor(AppFolder.SaveGame), modApi.Log)) { }
 
         public Navigator(IModApi modApi, GalaxyMap galaxy, ISaveGameDB db)
         {
@@ -100,7 +100,7 @@ namespace GalacticWaez.Navigation
                 path = path.Take(path.Count() - 1);
             }
             var sectorsPath = path.Select(n => n.ToSectorCoordinates());
-            int added = db.InsertBookmarks(sectorsPath, playerId);
+            int added = db.InsertBookmarks(sectorsPath, playerId, modApi.Application.GameTicks);
             string text = $"Path found; {added}/{path.Count()} waypoints added.";
             modApi.Log(text);
             return new NavResult { path = path, message = text };
@@ -112,7 +112,7 @@ namespace GalacticWaez.Navigation
         private bool GoalCoordinates(string goalName, out LYCoordinates goalCoords, out bool isBookmark)
         {
             isBookmark = false;
-            if (db.GetBookmarkVector(goalName, out SectorCoordinates sc))
+            if (db.GetBookmarkVector(modApi.Application.LocalPlayer.Id, goalName, out SectorCoordinates sc))
             {
                 goalCoords = new LYCoordinates(sc);
                 isBookmark = true;

@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\FileDataSource.cs" />
+    <Compile Include="src\IFileDataSource.cs" />
     <Compile Include="src\IGalaxyDataSource.cs" />
     <Compile Include="src\GalaxyMapBuilder.cs" />
     <Compile Include="GlobalSuppressions.cs" />

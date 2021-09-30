@@ -8,16 +8,16 @@ using GalacticWaez;
 
 namespace GalacticWaezTests.Fakes
 {
-    class FakeDataSource : IGalaxyDataSource
+    class FakeDataSource : IFileDataSource
     {
-        private readonly string filename;
+        public string PathToFile { get; }
 
-        public FakeDataSource(string filename) { this.filename = filename; }
+        public FakeDataSource(string filename) { PathToFile = filename; }
 
 
         public IEnumerable<VectorInt3> GetGalaxyData()
         {
-            return GalaxyTestData.LoadPositions(filename);
+            return GalaxyTestData.LoadPositions(PathToFile);
         }
     }
 
