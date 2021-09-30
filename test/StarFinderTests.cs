@@ -8,7 +8,7 @@ using Eleon.Modding;
 namespace GalacticWaezTests
 {
     [TestClass]
-    [DeploymentItem("Dependencies\\stardata-test-large.csv")]
+    [DeploymentItem("Dependencies\\stardata-test-vanilla.csv")]
     public class StarFinderTests
     {
         private static string baseDir;
@@ -23,7 +23,7 @@ namespace GalacticWaezTests
         public void FindBigData()
         {
             var positions = GalaxyTestData.LoadPositions(
-                baseDir + "\\stardata-test-large.csv");
+                baseDir + "\\stardata-test-vanilla.csv");
             var loaded = new List<StarFinder.StarData>(positions.Count);
             int i = 0;
             foreach (var p in positions)

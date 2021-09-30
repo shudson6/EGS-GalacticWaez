@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GalacticWaez
 {
-    class StarFinderDataSource : IGalaxyDataSource
+    public class StarFinderDataSource : IGalaxyDataSource
     {
         private readonly ISaveGameDB db;
 

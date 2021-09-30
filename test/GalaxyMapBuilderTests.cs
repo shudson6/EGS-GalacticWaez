@@ -6,7 +6,7 @@ using GalacticWaez;
 namespace GalacticWaezTests
 {
     [TestClass]
-    [DeploymentItem("Dependencies\\stardata-test-large.csv")]
+    [DeploymentItem("Dependencies\\stardata-test-vanilla.csv")]
     [DeploymentItem("Dependencies\\stardata-test-small.csv")]
 
     public class GalaxyMapBuilderTests
@@ -26,7 +26,7 @@ namespace GalacticWaezTests
         public void LargeGalaxyMap_HasAllExpectedWarpLines()
         {
             const float Range = 30;
-            const string filename = "stardata-test-large.csv";
+            const string filename = "stardata-test-vanilla.csv";
             VerifyGalaxyMap(filename,
                 new GalaxyMapBuilder((_) => { })
                     .BuildGalaxyMap(new Fakes.FakeDataSource(filename), Range),
