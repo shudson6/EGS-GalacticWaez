@@ -11,12 +11,12 @@ namespace GalacticWaez
         public StarFinderDataSource(IKnownStarProvider db, LoggingDelegate log) 
         { 
             this.db = db;
-            Log = log;
+            Log = log ?? delegate { };
         }
 
         public IEnumerable<VectorInt3> GetGalaxyData()
         {
-            if (db.GetFirstKnownStarPosition(out VectorInt3 known))
+            if (db != null && db.GetFirstKnownStarPosition(out VectorInt3 known))
             {
                 Log("Performing memory scan...");
                 return new StarFinder().Search(known);
