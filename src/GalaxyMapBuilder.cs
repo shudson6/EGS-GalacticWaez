@@ -9,10 +9,14 @@ namespace GalacticWaez
     {
         private readonly LoggingDelegate Log;
 
-        public GalaxyMapBuilder(LoggingDelegate Log) { this.Log = Log; }
+        public GalaxyMapBuilder(LoggingDelegate Log) 
+        { 
+            this.Log = Log ?? delegate { }; 
+        }
 
         public GalaxyMap BuildGalaxyMap(IGalaxyDataSource source, float maxWarpRange)
         {
+            CheckParams(source, maxWarpRange);
             var positions = source.GetGalaxyData();
             if (positions == null || !positions.Any())
             {
@@ -41,6 +45,14 @@ namespace GalacticWaez
                 + $"{g.Stars} stars, {g.WarpLines} warp lines. "
                 + $"Took {time}s.");
             return g;
+        }
+
+        private void CheckParams(IGalaxyDataSource source, float maxWarpRange)
+        {
+            if (source == null) throw new ArgumentNullException("IGalaxyDataSource cannot be null.");
+            if (maxWarpRange < Const.BaseWarpRangeLY)
+                throw new ArgumentOutOfRangeException("MaxWarpRange may not be less than "
+                    + $"{Const.BaseWarpRangeLY}LY.");
         }
 
         // checks the difference in a and b coordinates on each separate

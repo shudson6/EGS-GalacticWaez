@@ -49,6 +49,20 @@ namespace GalacticWaezTests
             Assert.IsNull(shouldBeNull);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Throws_WhenSourceNull()
+        {
+            new GalaxyMapBuilder(delegate { }).BuildGalaxyMap(null, 30);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void Throws_WhenWarpNegative()
+        {
+            new GalaxyMapBuilder(delegate { }).BuildGalaxyMap(new Fakes.EmptyDataSource(), -1);
+        }
+
         private void VerifyGalaxyMap(string filename, GalaxyMap testGalaxy, float testRange)
         {
             var positions = GalaxyTestData.LoadPositions(filename);
@@ -79,6 +93,12 @@ namespace GalacticWaezTests
                 i++;
             }
             Assert.AreEqual(warpLines, testGalaxy.WarpLines);
+        }
+
+        [TestMethod]
+        public void NoThrow_WhenLoggerNull()
+        {
+            Assert.IsNotNull(new GalaxyMapBuilder(null));
         }
 
         private float Distance(GalaxyMap.Node a, GalaxyMap.Node b)
