@@ -15,7 +15,7 @@ namespace GalacticWaez
 
         public FileDataSource(string saveGameDir, LoggingDelegate logger)
         {
-            Log = logger;
+            Log = logger ?? delegate { };
             PathToFile = $"{saveGameDir}\\{ModContentDir}\\{FileName}";
         }
 

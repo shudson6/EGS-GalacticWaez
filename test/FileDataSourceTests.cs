@@ -53,5 +53,23 @@ namespace GalacticWaezTests
                 overwrite: true);
             Assert.IsNull(new FileDataSource(tc.DeploymentDirectory, (_) => { }).GetGalaxyData());
         }
+
+        [TestMethod]
+        public void NoException_NullSaveGameDir()
+        {
+            Assert.IsNull(new FileDataSource(null, (_) => { }).GetGalaxyData());
+        }
+
+        [TestMethod]
+        public void  ReturnsExpected_WhenLogNull()
+        {
+            File.Copy(tc.DeploymentDirectory + "\\stardata-test-small.csv",
+                tc.DeploymentDirectory + "\\Content\\Mods\\GalacticWaez\\stardata.csv",
+                overwrite: true);
+            var expected = GalaxyTestData.LoadPositions("stardata-test-small.csv");
+            var actual = new FileDataSource(tc.DeploymentDirectory, null).GetGalaxyData();
+            Assert.AreEqual(expected.Count(), actual.Count());
+            Assert.IsFalse(expected.Except(actual).Any());
+        }
     }
 }
