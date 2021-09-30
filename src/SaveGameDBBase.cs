@@ -5,6 +5,8 @@ namespace GalacticWaez
 {
     public class SaveGameDBBase
     {
+        public const string DbFileName = "global.db";
+
         public string PathToDB { get; protected set; }
 
         protected SaveGameDBBase(string pathToDbFile)

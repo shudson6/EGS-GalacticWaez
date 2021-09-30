@@ -5,11 +5,17 @@ namespace GalacticWaez
 {
     public class StarFinderDataSource : IGalaxyDataSource
     {
-        private readonly ISaveGameDB db;
+        private readonly IKnownStarProvider db;
 
-        public StarFinderDataSource(ISaveGameDB db) { this.db = db; }
+        public StarFinderDataSource(IKnownStarProvider db) { this.db = db; }
 
         public IEnumerable<VectorInt3> GetGalaxyData()
-            => new StarFinder().Search(db.GetFirstKnownStarPosition());
+        {
+            if (db.GetFirstKnownStarPosition(out VectorInt3 known))
+            {
+                return new StarFinder().Search(known);
+            }
+            return null;
+        }
     }
 }

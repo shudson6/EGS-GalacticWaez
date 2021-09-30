@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using Eleon.Modding;
 using Mono.Data.Sqlite;
 using System.Data;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
@@ -9,43 +8,16 @@ namespace GalacticWaez
 {
     class SaveGameDB : SaveGameDBBase, ISaveGameDB
     {
-        private readonly IModApi modApi;
+        private readonly LoggingDelegate Log;
 
-        public SaveGameDB(IModApi modApi)
-            : base(modApi.Application.GetPathFor(AppFolder.SaveGame) + "\\global.db")
+        public SaveGameDB(string saveGameDir, LoggingDelegate log)
+            : base($"{saveGameDir}\\{DbFileName}")
         {
-            this.modApi = modApi;
+            Log = log;
         }
 
-        public SectorCoordinates GetFirstKnownStarPosition()
-        {
-            SqliteConnection connection = null;
-            SqliteCommand command = null;
-            IDataReader reader = null;
-
-            try
-            {
-                connection = GetConnection();
-                command = connection.CreateCommand();
-                // players have to start somewhere; there will always be at least one entry
-                command.CommandText = "select sectorx, sectory, sectorz from SolarSystems limit 1;";
-                reader = command.ExecuteReader();
-                reader.Read();
-                return new SectorCoordinates(
-                    reader.GetInt32(0),
-                    reader.GetInt32(1),
-                    reader.GetInt32(2)
-                );
-            }
-            finally
-            {
-                reader?.Dispose();
-                command?.Dispose();
-                connection?.Dispose();
-            }
-        }
-
-        public bool GetBookmarkVector(string bookmarkName, out SectorCoordinates coordinates)
+        public bool GetBookmarkVector(int playerId, string bookmarkName, 
+            out SectorCoordinates coordinates)
         {
             SqliteConnection connection = null;
             SqliteCommand command = null;
@@ -57,7 +29,7 @@ namespace GalacticWaez
                 command = connection.CreateCommand();
                 command.CommandText = "select sectorx, sectory, sectorz from Bookmarks "
                         + $"where type='0' and name='{bookmarkName}' and entityid="
-                        + $"'{modApi.Application.LocalPlayer.Id}';";
+                        + $"'{playerId}';";
                 reader = command.ExecuteReader();
                 if (reader.Read())
                 {
@@ -71,7 +43,7 @@ namespace GalacticWaez
             }
             catch (SqliteException ex)
             {
-                modApi.Log($"SqliteException in GetBookmarkVector: {ex.Message}");
+                Log($"SqliteException in GetBookmarkVector: {ex.Message}");
             }
             finally
             {
@@ -84,7 +56,8 @@ namespace GalacticWaez
         }
 
         // returns the number of bookmarks added
-        public int InsertBookmarks(IEnumerable<SectorCoordinates> positions, int playerId)
+        public int InsertBookmarks(IEnumerable<SectorCoordinates> positions, 
+            int playerId, ulong gameTime)
         {
             SqliteConnection connection = null;
             SqliteCommand command = null;
@@ -101,13 +74,12 @@ namespace GalacticWaez
                     + "'expireafterticks','mindistance','maxdistance') values "
                     );
                 int stepNo = 1;
-                ulong ticks = modApi.Application.GameTicks;
                 foreach (var p in positions)
                 {
                     sql.Append($"({bid},0,0,1,");
                     sql.Append($"{playerId},{playerId},");
                     sql.Append($"'Waez_{stepNo}',{p.x},{p.y},{p.z},0,0,0,2,0,1,1,0,0,");
-                    sql.Append($"{ticks},0,0,0),");
+                    sql.Append($"{gameTime},0,0,0),");
                     stepNo++;
                     bid++;
                 }
@@ -117,7 +89,7 @@ namespace GalacticWaez
             }
             catch (SqliteException ex)
             {
-                modApi.Log($"SqliteException in InsertBookmarks: {ex.Message}");
+                Log($"SqliteException in InsertBookmarks: {ex.Message}");
             }
             finally
             {
@@ -157,7 +129,7 @@ namespace GalacticWaez
             }
             catch (SqliteException ex)
             {
-                modApi.Log($"SqliteException in ClearPathMarkers: {ex.Message}");
+                Log($"SqliteException in ClearPathMarkers: {ex.Message}");
                 return 0;
             }
             finally
@@ -234,7 +206,7 @@ namespace GalacticWaez
             }
             catch (SqliteException ex)
             {
-                modApi.Log($"SqliteException in GetSolarSystemCoordinates: {ex.Message}");
+                Log($"SqliteException in GetSolarSystemCoordinates: {ex.Message}");
             }
             finally
             {

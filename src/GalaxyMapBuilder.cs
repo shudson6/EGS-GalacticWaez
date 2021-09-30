@@ -7,7 +7,7 @@ namespace GalacticWaez
 {
     public class GalaxyMapBuilder
     {
-        private LoggingDelegate Log;
+        private readonly LoggingDelegate Log;
 
         public GalaxyMapBuilder(LoggingDelegate Log) { this.Log = Log; }
 
