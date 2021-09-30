@@ -18,7 +18,7 @@ namespace GalacticWaezTests
             const string filename = "stardata-test-small.csv";
             VerifyGalaxyMap(filename,
                 new GalaxyMapBuilder((_) => { })
-                    .BuildGalaxyMap(new Fakes.FakeDataSource(filename), Range),
+                    .BuildGalaxyMap(new Fakes.FileDataSource(filename), Range),
                 Range);
         }
 
@@ -29,7 +29,7 @@ namespace GalacticWaezTests
             const string filename = "stardata-test-vanilla.csv";
             VerifyGalaxyMap(filename,
                 new GalaxyMapBuilder((_) => { })
-                    .BuildGalaxyMap(new Fakes.FakeDataSource(filename), Range),
+                    .BuildGalaxyMap(new Fakes.FileDataSource(filename), Range),
                 Range);
         }
 
@@ -37,7 +37,7 @@ namespace GalacticWaezTests
         public void DataNotFound_ReturnsNull()
         {
             var shouldBeNull = new GalaxyMapBuilder((_) => { })
-                .BuildGalaxyMap(new Fakes.NotFoundDataSource(), 30);
+                .BuildGalaxyMap(new Fakes.NullDataSource(), 30);
             Assert.IsNull(shouldBeNull);
         }
 
@@ -45,7 +45,7 @@ namespace GalacticWaezTests
         public void DataEmpty_ReturnsNull()
         {
             var shouldBeNull = new GalaxyMapBuilder((_) => { })
-                .BuildGalaxyMap(new Fakes.EmptyCollectionDataSource(), 30);
+                .BuildGalaxyMap(new Fakes.EmptyDataSource(), 30);
             Assert.IsNull(shouldBeNull);
         }
 
