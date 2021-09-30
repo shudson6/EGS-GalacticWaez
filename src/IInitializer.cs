@@ -21,6 +21,6 @@ namespace GalacticWaez
 
     public interface IInitializer
     {
-        void Initialize(InitializerType source, InitializerCallback doneCallback);
+        void Initialize(InitializerCallback doneCallback);
     }
 }

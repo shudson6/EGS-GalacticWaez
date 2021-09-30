@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace GalacticWaez
 {
-    public class GalaxyMapBuilder
+    public class GalaxyMapBuilder : IGalaxyMapBuilder
     {
         private readonly LoggingDelegate Log;
 
@@ -55,5 +55,5 @@ namespace GalacticWaez
                 && Math.Abs(a.Position.y - b.Position.y) <= range
                 && Math.Abs(a.Position.z - b.Position.z) <= range;
         }
-}
+    }
 }
