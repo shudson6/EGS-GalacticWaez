@@ -109,6 +109,9 @@
     <None Include="Dependencies\stardata-test-badsum.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Dependencies\stardata-test-large.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Dependencies\stardata-test-small.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
