@@ -14,7 +14,7 @@ namespace GalacticWaez.Command
         {
             this.modApi = modApi;
             this.galaxy = galaxy;
-            saveGameDB = new SaveGameDB(modApi);
+            saveGameDB = new SaveGameDB(modApi.Application.GetPathFor(AppFolder.SaveGame), modApi.Log);
         }
 
         public void HandleChatCommand(MessageData messageData)

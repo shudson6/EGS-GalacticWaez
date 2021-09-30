@@ -103,6 +103,7 @@
     <Compile Include="GalaxyMapBuilderTests.cs" />
     <Compile Include="FileDataSourceTests.cs" />
     <Compile Include="StarFinderDataSourceTests.cs" />
+    <Compile Include="NormalDataSourceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Dependencies\stardata-test-badsum.csv">

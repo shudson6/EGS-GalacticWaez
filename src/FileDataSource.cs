@@ -5,12 +5,12 @@ using System.IO;
 
 namespace GalacticWaez
 {
-    public class FileDataSource : IGalaxyDataSource
+    public class FileDataSource : IFileDataSource
     {
         public const string ModContentDir = "Content\\Mods\\GalacticWaez";
         private const string FileName = "stardata.csv";
 
-        public readonly string PathToFile;
+        public string PathToFile { get; }
         private readonly LoggingDelegate Log;
 
         public FileDataSource(string saveGameDir, LoggingDelegate logger)
