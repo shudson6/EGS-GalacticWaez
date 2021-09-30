@@ -37,8 +37,8 @@ namespace GalacticWaez
                 case GameEventType.GameStarted:
                     if (ModApi.Application.Mode == ApplicationMode.SinglePlayer)
                     {
-                        initializer = new ClientInitializer(ModApi);
-                        initializer.Initialize(InitializerType.Normal, InitializerCallback);
+                        //initializer = new ClientInitializer(ModApi);
+                        //initializer.Initialize(InitializerType.Normal, InitializerCallback);
                     }
                     break;
 
