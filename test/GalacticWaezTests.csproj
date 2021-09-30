@@ -102,6 +102,7 @@
     <Compile Include="CommandHandlerTests.cs" />
     <Compile Include="GalaxyMapBuilderTests.cs" />
     <Compile Include="FileDataSourceTests.cs" />
+    <Compile Include="StarFinderDataSourceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Dependencies\stardata-test-badsum.csv">
@@ -111,7 +112,7 @@
     <None Include="Dependencies\stardata-test-small.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Dependencies\stardata-test-large.csv">
+    <None Include="Dependencies\stardata-test-vanilla.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
