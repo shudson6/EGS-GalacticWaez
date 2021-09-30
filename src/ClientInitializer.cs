@@ -14,122 +14,34 @@ namespace GalacticWaez
     /// </summary>
     public class ClientInitializer : IInitializer
     {
+        private readonly string SaveGameDir;
+        private readonly IGalaxyDataSource DataSource;
+        private readonly LoggingDelegate Log;
 
-        private readonly IModApi modApi;
-        private readonly IStarFinder starFinder;
-        private readonly IStarDataStorage storage;
-        private readonly ISaveGameDB db;
+        private UpdateDelegate appUpdate;
         private InitializerCallback doneCallback;
-        private Task<GalaxyMap> init;
+        private Task<ICommandHandler> init;
 
-        public ClientInitializer(IModApi modApi)
-            : this(modApi, new StarDataStorage(modApi.Application.GetPathFor(AppFolder.SaveGame),
-                "stardata.csv"),
-                new StarFinder(), 
-                new SaveGameDB(modApi.Application.GetPathFor(AppFolder.SaveGame), modApi.Log))
-        { }
-
-        public ClientInitializer(IModApi modApi, IStarDataStorage storage,
-            IStarFinder starFinder, ISaveGameDB db)
+        public ClientInitializer(string saveGameDir, InitializerType type, 
+            UpdateDelegate appUpdate, LoggingDelegate log)
         {
-            this.modApi = modApi;
-            this.starFinder = starFinder;
-            this.storage = storage;
-            this.db = db;
+            Log = log;
+            this.appUpdate = appUpdate;
+            SaveGameDir = saveGameDir;
+            DataSource = CreateDataSource(type);
         }
 
-        public void Initialize(InitializerType source, InitializerCallback doneCallback)
+        public void Initialize(InitializerCallback doneCallback)
         {
             this.doneCallback = doneCallback;
-            init = Task<GalaxyMap>.Factory.StartNew(function: BuildGalaxyMap, state: source);
-            modApi.Application.Update += OnUpdateDuringInit;
+            init = Task<ICommandHandler>.Factory.StartNew(Setup);
+            appUpdate += OnUpdateDuringInit;
         }
 
-        private GalaxyMap BuildGalaxyMap(object obj)
+        private ICommandHandler Setup()
         {
-            IEnumerable<SectorCoordinates> stars = null;
-            var source = (InitializerType)obj;
-            switch (source)
-            {
-                case InitializerType.Normal:
-                    if (storage.Exists())
-                    {
-                        stars = LoadStarData();
-                    }
-                    else
-                    {
-                        modApi.Log("No saved star positions. Beginning scan...");
-                        stars = ScanForStarData(true);
-                    }
-                    break;
-
-                case InitializerType.FileOnly:
-                    stars = LoadStarData();
-                    break;
-
-                case InitializerType.ScanOnly:
-                    stars = ScanForStarData();
-                    break;
-            }
+            var galaxy = new GalaxyMapBuilder(Log).BuildGalaxyMap(DataSource, Const.DefaultMaxWarpRangeLY);
             return null;
-        }
-
-        private IEnumerable<SectorCoordinates> LoadStarData()
-        {
-            if (!storage.Exists())
-            {
-                modApi.LogWarning("Stored star data not found.");
-                return null;
-            }
-            var loaded = storage.Load();
-            if (loaded != null)
-            {
-                modApi.Log($"Loaded {loaded.Count()} stars from file.");
-            }
-            else
-            {
-                modApi.LogError("Failed to load star data from file.");
-            }
-            return loaded;
-        }
-
-        /// <summary>
-        /// Uses StarFinder to scan memory for star position data.
-        /// If save == true, saves the found data.
-        /// </summary>
-        /// <param name="save">
-        /// Set to true to save the found star data.
-        /// Defaults to false.
-        /// </param>
-        /// <returns>
-        /// A collection containing the positions of the stars.
-        /// </returns>
-        private IEnumerable<SectorCoordinates> ScanForStarData(bool save = false)
-        {
-            new KnownStarProvider(modApi.Application.GetPathFor(AppFolder.SaveGame), modApi.Log)
-                        .GetFirstKnownStarPosition(out SectorCoordinates known);
-            var stopwatch = Stopwatch.StartNew();
-            var stars = starFinder.Search(known);
-            stopwatch.Stop();
-            if (stars == null)
-            {
-                modApi.LogWarning("Failed to locate star position data. "
-                    + $"Scan took {stopwatch.ElapsedMilliseconds}ms.");
-                return null;
-            }
-            modApi.Log($"Located {stars.Length} stars in {stopwatch.ElapsedMilliseconds}ms.");
-            if (save)
-            {
-                if (storage.Store(stars))
-                {
-                    modApi.Log("Saved star positions to file.");
-                }
-                else
-                {
-                    modApi.LogWarning("Could not save star positions to file.");
-                }
-            }
-            return stars;
         }
 
         private void OnUpdateDuringInit()
@@ -137,11 +49,31 @@ namespace GalacticWaez
             if (init.Status < TaskStatus.RanToCompletion)
                 return;
 
-            modApi.Application.Update -= OnUpdateDuringInit;
+            appUpdate -= OnUpdateDuringInit;
             doneCallback(
-                init.IsCompleted ? new CommandHandler(modApi, init.Result) : null,
+                init.IsCompleted ? init.Result : null,
                 init.Exception
                 );
+        }
+
+        private IGalaxyDataSource CreateDataSource(InitializerType type)
+        {
+            switch (type)
+            {
+                case InitializerType.Normal:
+                    return new NormalDataSource(
+                        new FileDataSource(SaveGameDir, Log),
+                        new StarFinderDataSource(new KnownStarProvider(SaveGameDir, Log), Log));
+
+                case InitializerType.FileOnly:
+                    return new FileDataSource(SaveGameDir, Log);
+
+                case InitializerType.ScanOnly:
+                    return new StarFinderDataSource(new KnownStarProvider(SaveGameDir, Log), Log);
+
+                default:
+                    return null;
+            }
         }
     }
 }
