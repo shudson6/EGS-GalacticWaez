@@ -76,7 +76,9 @@
     <Compile Include="src\IGalaxyDataSource.cs" />
     <Compile Include="src\GalaxyMapBuilder.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="src\IKnownStarProvider.cs" />
     <Compile Include="src\IMessenger.cs" />
+    <Compile Include="src\KnownStarProvider.cs" />
     <Compile Include="src\Messenger.cs" />
     <Compile Include="src\ICommandHandler.cs" />
     <Compile Include="src\IInitializer.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="src\Minheap.cs" />
     <Compile Include="src\Navigator.cs" />
     <Compile Include="src\LocalPlayerTracker.cs" />
+    <Compile Include="src\NormalDataSource.cs" />
     <Compile Include="src\SaveGameDB.cs" />
     <Compile Include="src\SaveGameDBBase.cs" />
     <Compile Include="src\StarDataStorage.cs" />

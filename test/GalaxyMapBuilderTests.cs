@@ -65,8 +65,7 @@ namespace GalacticWaezTests
                     {
                         // lines are directional; checking 2 at a time
                         warpLines += 2;
-                        float test;
-                        Assert.IsTrue(p.Neighbors.TryGetValue(n, out test));
+                        Assert.IsTrue(p.Neighbors.TryGetValue(n, out float test));
                         Assert.AreEqual(dist, test);
                         Assert.IsTrue(n.Neighbors.TryGetValue(p, out test));
                         Assert.AreEqual(dist, test);

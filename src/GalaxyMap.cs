@@ -37,10 +37,14 @@ namespace GalacticWaez
         }
 
         public IEnumerable<Node> Nodes { get; }
+
+        /// <summary>
+        /// Number of stars in the galaxy.
+        /// </summary>
         public int Stars => Nodes.Count();
 
         /// <summary>
-        /// 
+        /// Count of directed connections between stars, i.e. total possible warp jumps.
         /// </summary>
         public int WarpLines => Nodes.Aggregate(0, (acc, n) => acc + n.Neighbors.Count);
 

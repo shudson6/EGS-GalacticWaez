@@ -9,7 +9,8 @@ using SectorCoordinates = Eleon.Modding.VectorInt3;
 namespace GalacticWaez
 {
     /// <summary>
-    /// Used by CommandHandler to build Galaxy
+    /// Creates the galactic highway map and assembles the necessary objects to get
+    /// Waez up and running happily.
     /// </summary>
     public class ClientInitializer : IInitializer
     {
@@ -24,7 +25,8 @@ namespace GalacticWaez
         public ClientInitializer(IModApi modApi)
             : this(modApi, new StarDataStorage(modApi.Application.GetPathFor(AppFolder.SaveGame),
                 "stardata.csv"),
-                new StarFinder(), new SaveGameDB(modApi))
+                new StarFinder(), 
+                new SaveGameDB(modApi.Application.GetPathFor(AppFolder.SaveGame), modApi.Log))
         { }
 
         public ClientInitializer(IModApi modApi, IStarDataStorage storage,
@@ -104,7 +106,8 @@ namespace GalacticWaez
         /// </returns>
         private IEnumerable<SectorCoordinates> ScanForStarData(bool save = false)
         {
-            var known = db.GetFirstKnownStarPosition();
+            new KnownStarProvider(modApi.Application.GetPathFor(AppFolder.SaveGame), modApi.Log)
+                        .GetFirstKnownStarPosition(out SectorCoordinates known);
             var stopwatch = Stopwatch.StartNew();
             var stars = starFinder.Search(known);
             stopwatch.Stop();
