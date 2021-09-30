@@ -8,7 +8,7 @@ namespace GalacticWaez
     /// Provides star positions by first checking for a save file and, failing
     /// that, scanning memory for them.
     /// </summary>
-    class NormalDataSource : IGalaxyDataSource
+    public class NormalDataSource : IGalaxyDataSource
     {
         private readonly IFileDataSource fileSource;
         private readonly IGalaxyDataSource scanSource;
@@ -21,10 +21,14 @@ namespace GalacticWaez
 
         public IEnumerable<VectorInt3> GetGalaxyData()
         {
-            var positions = fileSource.GetGalaxyData();
+            var positions = fileSource?.GetGalaxyData() ?? null;
             if (positions == null || !positions.Any())
             {
-                positions = scanSource.GetGalaxyData();
+                positions = scanSource?.GetGalaxyData() ?? null;
+                if (positions != null && !positions.Any())
+                {
+                    positions = null;
+                }
             }
             return positions;
         }

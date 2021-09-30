@@ -93,7 +93,7 @@
     <Compile Include="FakeGUI.cs" />
     <Compile Include="FakeModApi.cs" />
     <Compile Include="FakePlayer.cs" />
-    <Compile Include="Fakes\FakeDataSource.cs" />
+    <Compile Include="Fakes\FileDataSource.cs" />
     <Compile Include="GalaxyTestData.cs" />
     <Compile Include="MinheapTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
