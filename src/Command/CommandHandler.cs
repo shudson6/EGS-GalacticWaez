@@ -59,6 +59,11 @@ namespace GalacticWaez.Command
                     HandleNavRequest(tokens[1]);
                     return;
                 }
+                if (tokens.Length == 2 && tokens[0].Equals(CommandToken.Bookmarks))
+                {
+                    HandleBookmarkRequest(tokens[1]);
+                    return;
+                }
                 modApi.Application.SendChatMessage(new ChatMessage("Invalid Command", 
                     modApi.Application.LocalPlayer));
             }
@@ -76,6 +81,7 @@ namespace GalacticWaez.Command
             + "status: find out what Waez is up to\n"
             + "init: initialize Waez. this should happen automatically\n"
             + "clear: remove all map markers that start with Waez_\n"
+            + "bookmarks [clear|hide|show]: remove Waez_ bookmarks or hide/show them in HUD (requires exit/resume)\n"
             + "help: get this help message\n";
 
         private void HandleHelpRequest() => modApi.Application
@@ -151,5 +157,16 @@ namespace GalacticWaez.Command
                         new ChatMessage(response, modApi.Application.LocalPlayer));
                 });
         }
+
+        private void HandleBookmarkRequest(string operation)
+        {
+            string message = $"Modified "
+                + saveGameDB.ModifyPathMarkers(modApi.Application.LocalPlayer.Id, operation)
+                + " map markers.";
+            modApi.Application.SendChatMessage(new ChatMessage(message,
+                modApi.Application.LocalPlayer));
+            return;
+        }
+
     }
 }
