@@ -83,9 +83,9 @@
     <Compile Include="src\IGalaxyMapBuilder.cs" />
     <Compile Include="src\IKnownStarProvider.cs" />
     <Compile Include="src\IPathfinder.cs" />
-    <Compile Include="src\IResponse.cs" />
+    <Compile Include="src\IResponder.cs" />
     <Compile Include="src\KnownStarProvider.cs" />
-    <Compile Include="src\Messenger.cs" />
+    <Compile Include="src\ChatResponder.cs" />
     <Compile Include="src\ICommandHandler.cs" />
     <Compile Include="src\IInitializer.cs" />
     <Compile Include="src\ClientInitializer.cs" />

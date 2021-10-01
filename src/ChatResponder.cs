@@ -7,11 +7,11 @@ using Eleon;
 
 namespace GalacticWaez
 {
-    class Messenger : IResponse
+    class ChatResponder : IResponder
     {
-        public void SendMessage(string text, MessageData request)
+        public void Send(string text)
         {
-
+            throw new NotImplementedException();
         }
     }
 }

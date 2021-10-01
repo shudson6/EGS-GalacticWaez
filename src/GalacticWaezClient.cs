@@ -7,7 +7,7 @@ namespace GalacticWaez
     public class GalacticWaezClient : IMod
     {
         public IModApi ModApi { get; private set; }
-        public IResponse Messenger { get; private set; }
+        public IResponder Messenger { get; private set; }
 
         private ICommandHandler commandHandler = null;
         private IInitializer initializer = null;

@@ -7,6 +7,6 @@ namespace GalacticWaez.Navigation
 
     public interface INavigator
     { 
-        void Navigate(IPlayerInfo player, string destination, float playerRange, IResponse response);
+        void Navigate(IPlayerInfo player, string destination, float playerRange, IResponder response);
     }
 }
