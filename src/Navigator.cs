@@ -28,7 +28,7 @@ namespace GalacticWaez.Navigation
             KnownStars = starProvider;
         }
 
-        public void Navigate(IPlayerInfo player, string destination, float playerRange, IResponse response)
+        public void Navigate(IPlayerInfo player, string destination, float playerRange, IResponder response)
         {
             var start = Galaxy.GetNode(player.GetCurrentStarCoordinates());
             var goal = GoalNode(player.Player.Id, player.Player.Faction.Id, destination, out bool isBookmark);

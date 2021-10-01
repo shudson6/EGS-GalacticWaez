@@ -2,7 +2,7 @@
 
 namespace GalacticWaez
 {
-    public interface IResponse
+    public interface IResponder
     {
         void Send(string text);
     }

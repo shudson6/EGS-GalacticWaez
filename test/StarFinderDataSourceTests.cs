@@ -110,5 +110,10 @@ namespace GalacticWaezTests
             known = knownVector;
             return true;
         }
+
+        public bool GetPosition(string name, out VectorInt3 pos)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
