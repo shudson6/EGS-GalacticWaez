@@ -72,14 +72,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\IBookmarkManager.cs" />
+    <Compile Include="src\INavigationHandler.cs" />
     <Compile Include="src\FileDataSource.cs" />
+    <Compile Include="src\IChatResponder.cs" />
     <Compile Include="src\IFileDataSource.cs" />
     <Compile Include="src\IGalaxyDataSource.cs" />
     <Compile Include="src\GalaxyMapBuilder.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="src\IGalaxyMapBuilder.cs" />
     <Compile Include="src\IKnownStarProvider.cs" />
-    <Compile Include="src\IMessenger.cs" />
+    <Compile Include="src\IPathfinder.cs" />
+    <Compile Include="src\IResponse.cs" />
     <Compile Include="src\KnownStarProvider.cs" />
     <Compile Include="src\Messenger.cs" />
     <Compile Include="src\ICommandHandler.cs" />

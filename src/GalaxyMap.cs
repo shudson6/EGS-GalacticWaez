@@ -53,8 +53,9 @@ namespace GalacticWaez
         /// <summary>
         /// Finds the node that matches the coordinates.
         /// </summary>
-        public Node GetNode(LYCoordinates coords)
+        public Node GetNode(SectorCoordinates coordinates)
         {
+            var coords = new LYCoordinates(coordinates);
             foreach (var n in Nodes)
             {
                 if (n.Position.Equals(coords))
