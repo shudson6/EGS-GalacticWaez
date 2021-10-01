@@ -163,15 +163,14 @@ namespace GalacticWaez
                             + $"where entityid ='{playerId}' and name like 'Waez\\_%' escape '\\';";
                         break;
                     default:
-                        modApi.Application.SendChatMessage(new ChatMessage($"Invalid Command 'bookmarks {action}', use clear|hide|show",
-                            modApi.Application.LocalPlayer));
+                        Log($"Invalid Command 'bookmarks {action}', use clear|hide|show");
                         return 0;
                 }
                 return command.ExecuteNonQuery();
             }
             catch (SqliteException ex)
             {
-                modApi.Log($"SqliteException in ModifyPathMarkers: {ex.Message}");
+                Log($"SqliteException in ModifyPathMarkers: {ex.Message}");
                 return 0;
             }
             finally
