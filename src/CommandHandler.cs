@@ -78,15 +78,6 @@ namespace GalacticWaez.Command
                 bookmarkName = tokens[1];
                 rangeOverride = int.Parse(tokens[0].Substring("--range=".Length));
             }
-            new Navigator(modApi, galaxy)
-                .HandlePathRequest(bookmarkName, new LocalPlayerTracker(modApi, rangeOverride),
-                AstarPathfinder.FindPath,
-                (path, response) =>
-                {
-                    // TODO: appropriate message
-                    modApi.Application.SendChatMessage(
-                        new ChatMessage(response, modApi.Application.LocalPlayer));
-                });
         }
 
         private void HandleBookmarkRequest(string operation)

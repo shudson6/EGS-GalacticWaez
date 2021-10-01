@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Eleon.Modding;
-using SectorCoordinates = Eleon.Modding.VectorInt3;
 
 namespace GalacticWaez.Navigation
 {
@@ -16,123 +12,78 @@ namespace GalacticWaez.Navigation
             public string message;
         }
 
-        private Task<NavResult> navigation = null;
-        private NavigatorCallback doneCallback;
-        private readonly IModApi modApi;
-        private readonly ISaveGameDB db;
-        private readonly GalaxyMap galaxy;
+        private readonly GalaxyMap Galaxy;
+        private readonly IPathfinder Pathfinder;
+        private readonly IBookmarkManager Bookmarks;
+        private readonly IKnownStarProvider KnownStars;
+        private readonly LoggingDelegate Log;
 
-        private string destination;
-        private IPlayerInfo playerInfo;
-        private Pathfinder findPath;
-
-        public Navigator(IModApi modApi, GalaxyMap galaxy)
-            : this(modApi, galaxy, new SaveGameDB(modApi.Application.GetPathFor(AppFolder.SaveGame), modApi.Log)) { }
-
-        public Navigator(IModApi modApi, GalaxyMap galaxy, ISaveGameDB db)
+        public Navigator(GalaxyMap galaxy, IPathfinder pathfinder, 
+            IBookmarkManager bookmarkManager, IKnownStarProvider starProvider, LoggingDelegate log)
         {
-            this.modApi = modApi;
-            this.galaxy = galaxy;
-            this.db = db;
+            Pathfinder = pathfinder;
+            Log = log;
+            Galaxy = galaxy;
+            Bookmarks = bookmarkManager;
+            KnownStars = starProvider;
         }
 
-        public void HandlePathRequest(string dest, IPlayerInfo playerTracker, 
-            Pathfinder findPath, NavigatorCallback doneCallback)
+        public void Navigate(IPlayerInfo player, string destination, float playerRange, IResponse response)
         {
-            destination = dest;
-            this.playerInfo = playerTracker;
-            this.findPath = findPath;
-            this.doneCallback = doneCallback;
-            navigation = Task<NavResult>.Factory.StartNew(Navigate);
-            modApi.Application.Update += OnUpdateDuringNavigation;
-        }
-
-        private NavResult Navigate()
-        {
-            string text;
-            var startCoords = new LYCoordinates(playerInfo.GetCurrentStarCoordinates());
-            if (!GoalCoordinates(destination,
-                out LYCoordinates goalCoords, 
-                out bool goalIsBookmark))
+            var start = Galaxy.GetNode(player.GetCurrentStarCoordinates());
+            var goal = GoalNode(player.Player.Id, player.Player.Faction.Id, destination, out bool isBookmark);
+            if (goal == null)
             {
-                text = $"No bookmark or known star by name {destination}";
-                modApi.LogWarning(text);
-                return new NavResult { path = null, message = text };
+                response?.Send($"No bookmark or known star by name {destination}");
+                return;
             }
-            if (goalCoords.Equals(startCoords))
+            if (start.Equals(goal))
             {
-                text = "It appears you are already there.";
-                modApi.Log(text);
-                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
-                return new NavResult { path = null, message = text };
+                response?.Send("It appears you are already there.");
+                return;
             }
-            float range = playerInfo.GetWarpRange();
-            var path = GetPath(startCoords, goalCoords, range);
+            var path = Pathfinder.FindPath(start, goal, playerRange);
             if (path == null)
             {
-                text = "No path found.";
-                modApi.Log(text);
-                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
-                return new NavResult { path = null, message = text };
+                response?.Send("No path found.");
+                return;
             }
             if (path.Count() == 1)
             {
-                text = "Are you already there?";
-                modApi.Log(text);
-                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
-                return new NavResult { path = null, message = text };
+                // this is impossible, i think
+                response?.Send("Are you already there?");
+                return;
             }
-            if (path.Count() == 2 && goalIsBookmark)
+            if (path.Count() == 2 && isBookmark)
             {
-                text = "It appears you are already in warp range.";
-                modApi.Log(text);
-                modApi.Application.SendChatMessage(new ChatMessage(text, modApi.Application.LocalPlayer));
-                return new NavResult { path = null, message = text };
+                response?.Send("It appears you are already in warp range.");
+                return;
             }
-            return SetWaypoints(path.Skip(1), playerInfo.Player.Id, goalIsBookmark);
+            int set = SetWaypoints(path.Skip(1), player.Player.Id, isBookmark);
         }
 
-        private NavResult
-            SetWaypoints(IEnumerable<LYCoordinates> path, int playerId, bool goalIsBookmark)
+        private int SetWaypoints(IEnumerable<LYCoordinates> path, int playerId, bool goalIsBookmark)
         {
-            if (goalIsBookmark)
-            {
-                path = path.Take(path.Count() - 1);
-            }
-            var sectorsPath = path.Select(n => n.ToSectorCoordinates());
-            int added = db.InsertBookmarks(sectorsPath, playerId, modApi.Application.GameTicks);
-            string text = $"Path found; {added}/{path.Count()} waypoints added.";
-            modApi.Log(text);
-            return new NavResult { path = path, message = text };
+            return 0;
+            //if (goalIsBookmark)
+            //{
+            //    path = path.Take(path.Count() - 1);
+            //}
+            //var sectorsPath = path.Select(n => n.ToSectorCoordinates());
+            //int added = db.InsertBookmarks(sectorsPath, playerId, modApi.Application.GameTicks);
+            //string text = $"Path found; {added}/{path.Count()} waypoints added.";
+            //modApi.Log(text);
+            //return new NavResult { path = path, message = text };
         }
 
-        private IEnumerable<LYCoordinates> GetPath(LYCoordinates start, LYCoordinates goal, float range)
-            => findPath(galaxy.GetNode(start), galaxy.GetNode(goal), range);
-
-        private bool GoalCoordinates(string goalName, out LYCoordinates goalCoords, out bool isBookmark)
+        private GalaxyMap.Node GoalNode(int playerId, int playerFacId, string goalName, out bool isBookmark)
         {
-            isBookmark = false;
-            if (db.GetBookmarkVector(modApi.Application.LocalPlayer.Id, goalName, out SectorCoordinates sc))
+            isBookmark = Bookmarks.GetCoordinates(playerId, playerFacId, goalName, out var coords);
+            if (!isBookmark && !KnownStars.GetPosition(goalName, out coords))
             {
-                goalCoords = new LYCoordinates(sc);
-                isBookmark = true;
-                return true;
+                return null;
             }
-            if (db.GetSolarSystemCoordinates(goalName, out sc))
-            {
-                goalCoords = new LYCoordinates(sc);
-                return true;
-            }
-            goalCoords = default;
-            return false;
-        }
-
-        private void OnUpdateDuringNavigation()
-        {
-            if (!navigation.IsCompleted) return;
-
-            modApi.Application.Update -= OnUpdateDuringNavigation;
-            doneCallback(navigation.Result.path, navigation.Result.message);
+            return Galaxy.GetNode(coords);
         }
     }
 }

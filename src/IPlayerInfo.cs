@@ -1,7 +1,4 @@
-﻿using Eleon.Modding;
-using SectorCoordinates = Eleon.Modding.VectorInt3;
-
-namespace GalacticWaez.Navigation
+﻿namespace GalacticWaez.Navigation
 {
     /// <summary>
     /// Provides ID and Position information about a player.
@@ -9,9 +6,9 @@ namespace GalacticWaez.Navigation
     /// </summary>
     public interface IPlayerInfo
     {
-        IPlayer Player { get; }
+        Eleon.Modding.IPlayer Player { get; }
 
-        SectorCoordinates GetCurrentStarCoordinates();
+        Eleon.Modding.VectorInt3 GetCurrentStarCoordinates();
 
         float GetWarpRange();
     }
