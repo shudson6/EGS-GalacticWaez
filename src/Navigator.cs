@@ -78,7 +78,7 @@ namespace GalacticWaez.Navigation
 
         private GalaxyMap.Node GoalNode(int playerId, int playerFacId, string goalName, out bool isBookmark)
         {
-            isBookmark = Bookmarks.GetCoordinates(playerId, playerFacId, goalName, out var coords);
+            isBookmark = Bookmarks.TryGetVector(playerId, playerFacId, goalName, out var coords);
             if (!isBookmark && !KnownStars.GetPosition(goalName, out coords))
             {
                 return null;

@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\BookmarkManager.cs" />
     <Compile Include="src\IBookmarkManager.cs" />
     <Compile Include="src\INavigationHandler.cs" />
     <Compile Include="src\FileDataSource.cs" />

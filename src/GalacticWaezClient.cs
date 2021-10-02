@@ -7,7 +7,6 @@ namespace GalacticWaez
     public class GalacticWaezClient : IMod
     {
         public IModApi ModApi { get; private set; }
-        public IResponder Messenger { get; private set; }
 
         private ICommandHandler commandHandler = null;
         private IInitializer initializer = null;
@@ -37,8 +36,6 @@ namespace GalacticWaez
                 case GameEventType.GameStarted:
                     if (ModApi.Application.Mode == ApplicationMode.SinglePlayer)
                     {
-                        //initializer = new ClientInitializer(ModApi);
-                        //initializer.Initialize(InitializerType.Normal, InitializerCallback);
                     }
                     break;
 
