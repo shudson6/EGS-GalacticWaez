@@ -22,7 +22,7 @@ namespace GalacticWaezTests.Fakes
     public class HappyBookmarkManager : IBookmarkManager
     {
         private readonly VectorInt3 bookmarkVector;
-        public int Inserted { get; private set; }
+        public int Inserted { get; private set; } = 0;
 
         public HappyBookmarkManager(VectorInt3 forBookmark) => bookmarkVector = forBookmark;
 
