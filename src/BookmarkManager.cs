@@ -1,7 +1,9 @@
 ﻿using Eleon.Modding;
 using Mono.Data.Sqlite;
-using System.Data;
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
 
 namespace GalacticWaez
 {
@@ -15,7 +17,7 @@ namespace GalacticWaez
         public bool TryGetVector(int playerId, int playerFacId, string bookmarkName, out VectorInt3 coordinates)
         {
             if (bookmarkName == null)
-                throw new ArgumentNullException("bookmarkName must not be null");
+                throw new ArgumentNullException("TryGetVector: bookmarkName must not be null");
 
             SqliteConnection connection = null;
             SqliteCommand command = null;
@@ -53,5 +55,73 @@ namespace GalacticWaez
             coordinates = default;
             return false;
         }
+
+        public int InsertBookmarks(IEnumerable<VectorInt3> coordinates, BookmarkData data)
+        {
+            if (coordinates == null)
+                throw new ArgumentNullException("InsertBookmarks: coordinates must not be null");
+
+            SqliteConnection connection = null;
+            SqliteCommand command = null;
+            try
+            {
+                connection = GetConnection(writeable: true);
+                command = connection.CreateCommand();
+                int bid = GetStartingBookmarkId(command);
+                command.CommandText = BuildInsertBookmarks(coordinates, data, bid);
+                return command.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Log("SqliteException in InsertBookmarks: " + ex.Message);
+            }
+            finally
+            {
+                command?.Dispose();
+                connection?.Dispose();
+            }
+            return 0;
+        }
+
+        private string BuildInsertBookmarks(IEnumerable<VectorInt3> coordinates, BookmarkData data, int bid0)
+        {
+            var sql = new StringBuilder(
+                "insert into Bookmarks "
+                + "('bid', 'type', 'refid', 'facgroup', 'facid', 'entityid', 'name',"
+                + "'sectorx', 'sectory', 'sectorz', 'posx', 'posy', 'posz',"
+                + "'icon', 'isshared', 'iswaypoint', 'isremove', 'isshowhud', 'iscallback',"
+                + "'createdticks', 'maxdistance') "
+                + "values "
+                );
+            int bid = bid0;
+            int step = 1;
+            foreach (var p in coordinates)
+            {
+                sql.Append($"({bid}, 0, 0, {data.FacGroup}, {data.PlayerFacId}, {data.PlayerId},");
+                sql.Append($"'Waez_{step}', {p.x}, {p.y}, {p.z}, 0, 0, 0,");
+                sql.Append($"{data.Icon}, {data.IsShared}, {data.IsWaypoint}, {data.IsRemove},");
+                sql.Append($"{data.IsShowHud}, 0, {data.GameTime}, {data.MaxDistance}),");
+                step++;
+                bid++;
+            }
+            sql.Replace(',', ';', sql.Length - 1, 1);
+            return sql.ToString();
+        }
+
+        private int GetStartingBookmarkId(SqliteCommand command)
+        {
+            IDataReader reader = null;
+            try
+            {
+                command.CommandText = "select coalesce(max(bid), 1) from Bookmarks;";
+                reader = command.ExecuteReader();
+                return reader.Read() ? reader.GetInt32(0) + 1 : 1;
+            }
+            finally
+            {
+                reader?.Dispose();
+            }
+        }
+
     }
 }
