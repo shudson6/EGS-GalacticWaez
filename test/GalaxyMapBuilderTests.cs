@@ -71,7 +71,7 @@ namespace GalacticWaezTests
             int warpLines = 0;
             foreach (var n in testGalaxy.Nodes)
             {
-                Assert.IsTrue(positions.Contains(n.Position.ToSectorCoordinates()));
+                Assert.IsTrue(positions.Contains(n.Position));
                 foreach (var p in testGalaxy.Nodes.Take(i))
                 {
                     float dist = Distance(n, p);

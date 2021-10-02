@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Eleon.Modding;
 
 namespace GalacticWaez
 {
@@ -84,7 +85,7 @@ namespace GalacticWaez
             return;
         }
 
-        private int SetWaypoints(IEnumerable<LYCoordinates> path, int playerId, int playerFacId)
+        private int SetWaypoints(IEnumerable<VectorInt3> path, int playerId, int playerFacId)
         {
             var bmdata = new BookmarkData
             {
@@ -99,7 +100,7 @@ namespace GalacticWaez
                 GameTime = GetTicks(),
                 MaxDistance = -1
             };
-            return Bookmarks.InsertBookmarks(path.Select(p => p.ToSectorCoordinates()), bmdata);
+            return Bookmarks.InsertBookmarks(path, bmdata);
         }
 
         private GalaxyMap.Node GoalNode(int playerId, int playerFacId, string goalName, out bool isBookmark)
