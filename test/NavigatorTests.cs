@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using GalacticWaez;
+using Eleon.Modding;
 
 namespace GalacticWaezTests
 {
@@ -10,12 +12,14 @@ namespace GalacticWaezTests
     {
         private static Func<ulong> TestTicks = () => 7231013;
         private static GalaxyMap galaxy;
+        private static IEnumerable<VectorInt3> positions;
 
         [ClassInitialize]
         public static void SetupClass(TestContext tc)
         {
-            galaxy = GalaxyTestData.BuildTestGalaxy(tc.DeploymentDirectory 
-                + "\\stardata-test-small.csv", 30);
+            string file = tc.DeploymentDirectory + "\\stardata-test-small.csv";
+            positions = GalaxyTestData.LoadPositions(file);
+            galaxy = GalaxyTestData.BuildTestGalaxy(file, 30);
         }
 
         [TestMethod]
@@ -63,6 +67,42 @@ namespace GalacticWaezTests
         {
             Assert.IsNotNull(new Navigator(galaxy, new Fakes.FakePathfinder(), new Fakes.FakeBookmarkManager(),
                 new Fakes.FakeStarProvider(), null, TestTicks));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Navigate_Throw_NullPlayer()
+        {
+            new Navigator(galaxy, new Fakes.FakePathfinder(), new Fakes.FakeBookmarkManager(),
+                new Fakes.FakeStarProvider(), delegate { }, TestTicks)
+                .Navigate(null, "foo", 30, new Fakes.FakeResponder());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Navigate_Throw_NullDestination()
+        {
+            new Navigator(galaxy, new Fakes.FakePathfinder(), new Fakes.FakeBookmarkManager(),
+                new Fakes.FakeStarProvider(), delegate { }, TestTicks)
+                .Navigate(new Fakes.FakePlayerInfo(), null, 30, new Fakes.FakeResponder());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void Navigate_Throw_NegativeRange()
+        {
+            new Navigator(galaxy, new Fakes.FakePathfinder(), new Fakes.FakeBookmarkManager(),
+                new Fakes.FakeStarProvider(), delegate { }, TestTicks)
+                .Navigate(new Fakes.FakePlayerInfo(), "foo", -30, new Fakes.FakeResponder());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void Navigate_Throw_ZeroRange()
+        {
+            new Navigator(galaxy, new Fakes.FakePathfinder(), new Fakes.FakeBookmarkManager(),
+                new Fakes.FakeStarProvider(), delegate { }, TestTicks)
+                .Navigate(new Fakes.FakePlayerInfo(), "foo", 0, new Fakes.FakeResponder());
         }
     }
 }

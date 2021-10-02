@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Eleon.Modding;
 
-namespace GalacticWaezTests
+namespace GalacticWaezTests.Fakes
 {
     public class FakePlayer : IPlayer
     {

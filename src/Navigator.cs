@@ -19,20 +19,27 @@ namespace GalacticWaez
             LoggingDelegate log, Func<ulong> getTicks)
         {
             Galaxy = galaxy ??
-                throw new ArgumentNullException("Navigator: Galaxy may not be null.");
+                throw new ArgumentNullException("Navigator: Galaxy");
             Pathfinder = pathfinder ??
-                throw new ArgumentNullException("Navigator: Pathfinder may not be null.");
+                throw new ArgumentNullException("Navigator: Pathfinder");
             Log = log ?? delegate { };
             Bookmarks = bookmarkManager ??
-                throw new ArgumentNullException("Navigator: BookmarkManager may not be null.");
+                throw new ArgumentNullException("Navigator: BookmarkManager");
             KnownStars = starProvider ??
-                throw new ArgumentNullException("Navigator: KnownStarProvider may not be null.");
+                throw new ArgumentNullException("Navigator: KnownStarProvider");
             GetTicks = getTicks ??
-                throw new ArgumentNullException("Navigator: GetTicks may not be null.");
+                throw new ArgumentNullException("Navigator: GetTicks");
         }
 
         public void Navigate(IPlayerInfo player, string destination, float playerRange, IResponder response)
         {
+            if (player == null)
+                throw new ArgumentNullException("Navigate: player");
+            if (destination == null)
+                throw new ArgumentNullException("Navigate: destination");
+            if (playerRange <= 0)
+                throw new ArgumentOutOfRangeException("Navigate: playerRange must be positive");
+
             var start = Galaxy.GetNode(player.GetCurrentStarCoordinates());
             var goal = GoalNode(player.Player.Id, player.Player.Faction.Id, destination, out bool isBookmark);
             if (goal == null)
@@ -70,7 +77,10 @@ namespace GalacticWaez
             // respond with how many bookmarks got added vs expected
             int expected = path.Count();
             int actual = SetWaypoints(path, player.Player.Id, player.Player.Faction.Id);
-            response?.Send($"Path found; {actual}/{expected} waypoints added.");
+            string message = $"Path found; {actual}/{expected} waypoints added.";
+            response?.Send(message);
+            if (response == null)
+                Log(message);
             return;
         }
 

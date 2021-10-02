@@ -18,7 +18,7 @@ namespace GalacticWaezTests
 
         public ApplicationMode Mode => throw new NotImplementedException();
 
-        public IPlayer LocalPlayer => new FakePlayer(1337);
+        public IPlayer LocalPlayer => new Fakes.FakePlayer(1337);
 
         public ulong GameTicks => throw new NotImplementedException();
 
