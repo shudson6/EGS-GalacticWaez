@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GalacticWaez;
 using Eleon.Modding;
 
@@ -8,7 +9,7 @@ namespace GalacticWaezTests
 {
     [TestClass]
     [DeploymentItem("Dependencies\\stardata-test-small.csv")]
-    public class NavigatorTests
+    public partial class NavigatorTests
     {
         private static Func<ulong> TestTicks = () => 7231013;
         private static GalaxyMap galaxy;
@@ -103,6 +104,52 @@ namespace GalacticWaezTests
             new Navigator(galaxy, new Fakes.FakePathfinder(), new Fakes.FakeBookmarkManager(),
                 new Fakes.FakeStarProvider(), delegate { }, TestTicks)
                 .Navigate(new Fakes.FakePlayerInfo(), "foo", 0, new Fakes.FakeResponder());
+        }
+
+        [TestMethod]
+        public void Navigate_BookmarkFound_7StepPath()
+        {
+            var path = positions.Take(7);
+            var pathfinder = new Fakes.FakePathfinder(path);
+            var bm = new Fakes.HappyBookmarkManager(path.Last());
+            string logged = null;
+            var nav = new Navigator(galaxy, pathfinder, bm, new Fakes.FakeStarProvider(), 
+                (text) => logged = text, TestTicks);
+            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), path.First(), 30);
+            nav.Navigate(player, "foo", 30, null);
+            Assert.AreEqual(5, bm.Inserted);
+            Assert.AreEqual("Path found; 5/5 waypoints added.", logged);
+        }
+
+        [TestMethod]
+        public void Navigate_StarFound_7StepPath()
+        {
+            var path = positions.Take(7);
+            var pathfinder = new Fakes.FakePathfinder(path);
+            var bm = new Fakes.NotFoundBookmarkManager();
+            string logged = null;
+            var nav = new Navigator(galaxy, pathfinder, bm, new Fakes.FakeStarProvider(path.Last()), 
+                (text) => logged = text, TestTicks);
+            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), path.First(), 30);
+            nav.Navigate(player, "foo", 30, null);
+            Assert.AreEqual(6, bm.Inserted);
+            Assert.AreEqual("Path found; 6/6 waypoints added.", logged);
+        }
+
+        [TestMethod]
+        public void Navigate_DestinationNotFound()
+        {
+            var pathfinder = new Fakes.FakePathfinder();
+            var bm = new Fakes.NotFoundBookmarkManager();
+            var stars = new Fakes.NotFoundStarProvider();
+            string logged = null;
+            var nav = new Navigator(galaxy, pathfinder, bm, stars,
+                (text) => logged = text, TestTicks);
+            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), default, 30);
+            var response = new Fakes.TestResponder();
+            nav.Navigate(player, "foo", 30, response);
+            Assert.AreEqual(1, response.Messages.Count);
+            Assert.IsTrue(response.Messages[0].StartsWith("No bookmark or known star"));
         }
     }
 }
