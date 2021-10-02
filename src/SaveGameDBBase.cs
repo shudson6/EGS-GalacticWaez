@@ -1,4 +1,5 @@
 ﻿using Mono.Data.Sqlite;
+using System;
 using Eleon.Modding;
 
 namespace GalacticWaez
@@ -9,9 +10,13 @@ namespace GalacticWaez
 
         public string PathToDB { get; protected set; }
 
-        protected SaveGameDBBase(string pathToDbFile)
+        protected SaveGameDBBase(string saveGameDir, string file = DbFileName)
         {
-            PathToDB = pathToDbFile;
+            if (saveGameDir == null) 
+            { 
+                throw new ArgumentNullException("Path to DB must be provided.");
+            }
+            PathToDB = $"{saveGameDir}\\{file}";
         }
 
         protected SqliteConnection GetConnection(bool writeable = false)

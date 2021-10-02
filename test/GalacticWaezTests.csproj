@@ -104,6 +104,7 @@
     <Compile Include="FileDataSourceTests.cs" />
     <Compile Include="StarFinderDataSourceTests.cs" />
     <Compile Include="NormalDataSourceTests.cs" />
+    <Compile Include="BookmarkManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Dependencies\stardata-test-badsum.csv">
