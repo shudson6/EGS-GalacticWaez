@@ -7,7 +7,6 @@ using GalacticWaez;
 
 namespace GalacticWaezTests
 {
-    [TestClass]
     public class GalaxyTestData
     {
         public static List<VectorInt3> LoadPositions(string starDataFile)
@@ -40,6 +39,17 @@ namespace GalacticWaezTests
                 i++;
             }
             return data;
+        }
+
+        public static GalaxyMap BuildTestGalaxy(string starDataFile, float range)
+            => new GalaxyMapBuilder(null).BuildGalaxyMap(new TestGalaxySource(starDataFile), range);
+
+        private class TestGalaxySource : IGalaxyDataSource
+        {
+            private readonly string file;
+            public TestGalaxySource(string starDataFile) => file = starDataFile;
+
+            public IEnumerable<VectorInt3> GetGalaxyData() => LoadPositions(file);
         }
     }
 }
