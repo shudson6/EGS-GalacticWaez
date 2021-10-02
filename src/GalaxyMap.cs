@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SectorCoordinates = Eleon.Modding.VectorInt3;
+using Eleon.Modding;
 
 namespace GalacticWaez
 {
@@ -15,23 +15,21 @@ namespace GalacticWaez
             // needs to populate tens of thousands of them quickly
             // also, msdn says the capacity should not be divisible by a small prime
             public const int InitialNeighborCapacity = 131;
-            public LYCoordinates Position { get; }
+            public VectorInt3 Position { get; }
             public Dictionary<Node, float> Neighbors { get; }
 
-            public Node(LYCoordinates position)
+            public Node(VectorInt3 position)
             {
                 Position = position;
                 Neighbors = new Dictionary<Node, float>(InitialNeighborCapacity);
             }
 
-            public Node(SectorCoordinates position) : this(new LYCoordinates(position))
-            { }
 
             public float DistanceTo(Node other)
             {
-                int dx = Position.x - other.Position.x;
-                int dy = Position.y - other.Position.y;
-                int dz = Position.z - other.Position.z;
+                float dx = Position.x - other.Position.x;
+                float dy = Position.y - other.Position.y;
+                float dz = Position.z - other.Position.z;
                 return (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
             }
         }
@@ -53,12 +51,11 @@ namespace GalacticWaez
         /// <summary>
         /// Finds the node that matches the coordinates.
         /// </summary>
-        public Node GetNode(SectorCoordinates coordinates)
+        public Node GetNode(VectorInt3 coordinates)
         {
-            var coords = new LYCoordinates(coordinates);
             foreach (var n in Nodes)
             {
-                if (n.Position.Equals(coords))
+                if (n.Position.Equals(coordinates))
                 {
                     return n;
                 }

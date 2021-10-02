@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Eleon.Modding;
 
 namespace GalacticWaez.Navigation
 {
-    public delegate IEnumerable<LYCoordinates> Pathfinder(
+    public delegate IEnumerable<VectorInt3> Pathfinder(
         GalaxyMap.Node start,
         GalaxyMap.Node goal,
         float warpRange
@@ -28,10 +29,10 @@ namespace GalacticWaez.Navigation
          * to limit the distance of any single jump. Values of warpRange larger
          * than the distance used to build the Galaxy have no effect.
          */
-        public IEnumerable<LYCoordinates>
+        public IEnumerable<VectorInt3>
         FindPath(GalaxyMap.Node start, GalaxyMap.Node goal, float warpRange)
         {
-            var visitedStars = new Dictionary<LYCoordinates, PathNode>();
+            var visitedStars = new Dictionary<VectorInt3, PathNode>();
             var minheap = new Minheap<PathNode>();
             minheap.Insert(new PathNode(start, null), 0);
             PathNode goalNode = null;
@@ -62,10 +63,10 @@ namespace GalacticWaez.Navigation
             return ListifyPath(goalNode);
         }
 
-        private static IEnumerable<LYCoordinates> ListifyPath(PathNode node)
+        private static IEnumerable<VectorInt3> ListifyPath(PathNode node)
         {
             if (node == null) return null;
-            var path = new List<LYCoordinates>();
+            var path = new List<VectorInt3>();
             for (; node != null; node = node.Previous)
             {
                 path.Add(node.Star.Position);
