@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GalacticWaez.Navigation
@@ -6,26 +7,23 @@ namespace GalacticWaez.Navigation
     // TODO: many of the logging calls (or all of them) should be chat messages
     public class Navigator : INavigator
     {
-        private struct NavResult
-        {
-            public IEnumerable<LYCoordinates> path;
-            public string message;
-        }
-
         private readonly GalaxyMap Galaxy;
         private readonly IPathfinder Pathfinder;
         private readonly IBookmarkManager Bookmarks;
         private readonly IKnownStarProvider KnownStars;
         private readonly LoggingDelegate Log;
+        private readonly Func<ulong> GetTicks;
 
         public Navigator(GalaxyMap galaxy, IPathfinder pathfinder, 
-            IBookmarkManager bookmarkManager, IKnownStarProvider starProvider, LoggingDelegate log)
+            IBookmarkManager bookmarkManager, IKnownStarProvider starProvider, 
+            LoggingDelegate log, Func<ulong> getTicks)
         {
             Pathfinder = pathfinder;
             Log = log;
             Galaxy = galaxy;
             Bookmarks = bookmarkManager;
             KnownStars = starProvider;
+            GetTicks = getTicks;
         }
 
         public void Navigate(IPlayerInfo player, string destination, float playerRange, IResponder response)
@@ -59,11 +57,33 @@ namespace GalacticWaez.Navigation
                 response?.Send("It appears you are already in warp range.");
                 return;
             }
-            int set = SetWaypoints(path.Skip(1), player.Player.Id, isBookmark);
+            // we don't need the first step; we're already there
+            path = path.Skip(1);
+            // if there's already a bookmark on the goal, we don't need another one
+            if (isBookmark)
+                path = path.Take(path.Count() - 1);
+            // respond with how many bookmarks got added vs expected
+            int expected = path.Count();
+            int actual = SetWaypoints(path, player.Player.Id, player.Player.Faction.Id);
+            response?.Send($"Path found; {actual}/{expected} waypoints added.");
+            return;
         }
 
-        private int SetWaypoints(IEnumerable<LYCoordinates> path, int playerId, bool goalIsBookmark)
+        private int SetWaypoints(IEnumerable<LYCoordinates> path, int playerId, int playerFacId)
         {
+            var bmdata = new BookmarkData
+            {
+                PlayerId = playerId,
+                PlayerFacId = playerFacId,
+                FacGroup = 1,
+                Icon = 2,
+                IsShared = false,
+                IsWaypoint = true,
+                IsRemove = true,
+                IsShowHud = true,
+                GameTime = GetTicks(),
+                MaxDistance = -1
+            };
             return 0;
             //if (goalIsBookmark)
             //{
