@@ -1,6 +1,7 @@
 ﻿using Eleon.Modding;
 using Mono.Data.Sqlite;
 using System.Data;
+using System;
 
 namespace GalacticWaez
 {
@@ -13,6 +14,9 @@ namespace GalacticWaez
 
         public bool TryGetVector(int playerId, int playerFacId, string bookmarkName, out VectorInt3 coordinates)
         {
+            if (bookmarkName == null)
+                throw new ArgumentNullException("bookmarkName must not be null");
+
             SqliteConnection connection = null;
             SqliteCommand command = null;
             IDataReader reader = null;
