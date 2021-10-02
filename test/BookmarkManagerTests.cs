@@ -2,6 +2,7 @@
 using Mono.Data.Sqlite;
 using System;
 using System.IO;
+using System.Linq;
 using Eleon.Modding;
 using GalacticWaez;
 
@@ -239,31 +240,120 @@ namespace GalacticWaezTests
             cmd.CommandText = "select * from Bookmarks;";
             var reader = cmd.ExecuteReader();
             Assert.IsTrue(reader.Read());
-            Assert.AreEqual(0, reader.GetInt32(reader.GetOrdinal("type")));
-            Assert.AreEqual(0, reader.GetInt32(reader.GetOrdinal("refid")));
-            Assert.AreEqual(data.FacGroup, reader.GetInt32(reader.GetOrdinal("facgroup")));
-            Assert.AreEqual(data.PlayerFacId, reader.GetInt32(reader.GetOrdinal("facid")));
-            Assert.AreEqual(data.PlayerId, reader.GetInt32(reader.GetOrdinal("entityid")));
-            Assert.IsTrue(reader.IsDBNull(reader.GetOrdinal("pfid")));
-            Assert.AreEqual("Waez_1", reader.GetString(reader.GetOrdinal("name")));
-            Assert.AreEqual(path[0].x, reader.GetInt32(reader.GetOrdinal("sectorx")));
-            Assert.AreEqual(path[0].y, reader.GetInt32(reader.GetOrdinal("sectory")));
-            Assert.AreEqual(path[0].z, reader.GetInt32(reader.GetOrdinal("sectorz")));
-            Assert.AreEqual(0, reader.GetFloat(reader.GetOrdinal("posx")));
-            Assert.AreEqual(0, reader.GetFloat(reader.GetOrdinal("posy")));
-            Assert.AreEqual(0, reader.GetFloat(reader.GetOrdinal("posz")));
-            Assert.AreEqual(data.Icon, reader.GetInt32(reader.GetOrdinal("icon")));
-            Assert.AreEqual(data.IsShared, reader.GetBoolean(reader.GetOrdinal("isshared")));
-            Assert.AreEqual(data.IsWaypoint, reader.GetBoolean(reader.GetOrdinal("iswaypoint")));
-            Assert.AreEqual(data.IsRemove, reader.GetBoolean(reader.GetOrdinal("isremove")));
-            Assert.AreEqual(data.IsShowHud, reader.GetBoolean(reader.GetOrdinal("isshowhud")));
-            Assert.AreEqual(data.GameTime, (ulong)reader.GetInt64(reader.GetOrdinal("createdticks")));
-            Assert.AreEqual(0, reader.GetInt32(reader.GetOrdinal("expireafterticks")));
-            Assert.AreEqual(0, reader.GetInt32(reader.GetOrdinal("mindistance")));
-            Assert.AreEqual(-1, reader.GetInt32(reader.GetOrdinal("maxdistance")));
+            var actual = ExtractBookmark(reader);
+            Assert.AreEqual(ExpectedBookmark("Waez_1", path[0], data), actual);
             Assert.IsFalse(reader.Read());
             cmd.Dispose();
             sql.Dispose();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void InsertBookmarks_Throws_CoordinatesIsNull()
+        {
+            var bm = new BookmarkManager(deploymentDir, delegate { });
+            bm.InsertBookmarks(null, default);
+        }
+
+        [TestMethod]
+        public void InsertBookmarks_HappyDay3x()
+        {
+            var data = new BookmarkData
+            {
+                PlayerId = 1337,
+                PlayerFacId = 418,
+                FacGroup = 1,
+                Icon = 2,
+                IsShared = false,
+                IsWaypoint = false,
+                IsRemove = false,
+                IsShowHud = false,
+                GameTime = 131071,
+                MaxDistance = -1
+            };
+            var path = new[]
+            {
+                new VectorInt3(300000, 400000, 500000),
+                new VectorInt3(600000, 800000, 1000000),
+                new VectorInt3(900000, 1200000, 1500000)
+            };
+            var bm = new BookmarkManager(deploymentDir, delegate { });
+            Assert.AreEqual(3, bm.InsertBookmarks(path, data));
+            // now verify what was written
+            var sql = GetConnection(false);
+            var cmd = sql.CreateCommand();
+            cmd.CommandText = "select * from Bookmarks;";
+            var reader = cmd.ExecuteReader();
+            var expected = new Bookmark[3];
+            var actual = new Bookmark[3];
+            for (int i = 0; i < 3; i++)
+            {
+                expected[i] = ExpectedBookmark($"Waez_{i + 1}", path[i], data);
+                Assert.IsTrue(reader.Read());
+                actual[i] = ExtractBookmark(reader);
+            }
+            Assert.IsFalse(reader.Read());
+            Assert.IsFalse(expected.Except(actual).Any());
+            cmd.Dispose();
+            sql.Dispose();
+        }
+
+        private Bookmark ExtractBookmark(SqliteDataReader reader)
+        {
+            return new Bookmark
+            {
+                type = reader.GetInt32(reader.GetOrdinal("type")),
+                refid = reader.GetInt32(reader.GetOrdinal("refid")),
+                facgroup = reader.GetInt32(reader.GetOrdinal("facgroup")),
+                facid = reader.GetInt32(reader.GetOrdinal("facid")),
+                entityid = reader.GetInt32(reader.GetOrdinal("entityid")),
+                pfidIsNull = reader.IsDBNull(reader.GetOrdinal("pfid")),
+                name = reader.GetString(reader.GetOrdinal("name")),
+                sectorx = reader.GetInt32(reader.GetOrdinal("sectorx")),
+                sectory = reader.GetInt32(reader.GetOrdinal("sectory")),
+                sectorz = reader.GetInt32(reader.GetOrdinal("sectorz")),
+                posx = reader.GetFloat(reader.GetOrdinal("posx")),
+                posy = reader.GetFloat(reader.GetOrdinal("posy")),
+                posz = reader.GetFloat(reader.GetOrdinal("posz")),
+                icon = reader.GetInt32(reader.GetOrdinal("icon")),
+                isshared = reader.GetBoolean(reader.GetOrdinal("isshared")),
+                iswaypoint = reader.GetBoolean(reader.GetOrdinal("iswaypoint")),
+                isremove = reader.GetBoolean(reader.GetOrdinal("isremove")),
+                isshowhud = reader.GetBoolean(reader.GetOrdinal("isshowhud")),
+                createdticks = (ulong)reader.GetInt64(reader.GetOrdinal("createdticks")),
+                expireafterticks = (ulong)reader.GetInt64(reader.GetOrdinal("expireafterticks")),
+                mindistance = reader.GetInt32(reader.GetOrdinal("mindistance")),
+                maxdistance = reader.GetInt32(reader.GetOrdinal("maxdistance"))
+            };
+        }
+
+        private Bookmark ExpectedBookmark(string name, VectorInt3 pos, BookmarkData data)
+        {
+            return new Bookmark
+            {
+                type = 0,
+                refid = 0,
+                facgroup = data.FacGroup,
+                facid = data.PlayerFacId,
+                entityid = data.PlayerId,
+                pfidIsNull = true,
+                name = name,
+                sectorx = pos.x,
+                sectory = pos.y,
+                sectorz = pos.z,
+                posx = 0,
+                posy = 0,
+                posz = 0,
+                icon = data.Icon,
+                isshared = data.IsShared,
+                iswaypoint = data.IsWaypoint,
+                isremove = data.IsRemove,
+                isshowhud = data.IsShowHud,
+                createdticks = data.GameTime,
+                expireafterticks = 0,
+                mindistance = 0,
+                maxdistance = -1
+            };
         }
 
         private static SqliteConnection GetConnection(bool writeable)
@@ -276,6 +366,22 @@ namespace GalacticWaezTests
             }.ToString());
             sql.Open();
             return sql;
+        }
+
+        private struct Bookmark
+        {
+            public int type, refid, facgroup, facid, entityid;
+            /// <summary>
+            /// The db column is an integer, but we expect always null, so we will verify that.
+            /// </summary>
+            public bool pfidIsNull;
+            public string name;
+            public int sectorx, sectory, sectorz;
+            public float posx, posy, posz;
+            public int icon;
+            public bool isshared, iswaypoint, isremove, isshowhud;
+            public ulong createdticks, expireafterticks;
+            public int mindistance, maxdistance;
         }
     }
 }
