@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GalacticWaez.Navigation
+namespace GalacticWaez
 {
     // TODO: many of the logging calls (or all of them) should be chat messages
     public class Navigator : INavigator
@@ -18,12 +18,17 @@ namespace GalacticWaez.Navigation
             IBookmarkManager bookmarkManager, IKnownStarProvider starProvider, 
             LoggingDelegate log, Func<ulong> getTicks)
         {
-            Pathfinder = pathfinder;
-            Log = log;
-            Galaxy = galaxy;
-            Bookmarks = bookmarkManager;
-            KnownStars = starProvider;
-            GetTicks = getTicks;
+            Galaxy = galaxy ??
+                throw new ArgumentNullException("Navigator: Galaxy may not be null.");
+            Pathfinder = pathfinder ??
+                throw new ArgumentNullException("Navigator: Pathfinder may not be null.");
+            Log = log ?? delegate { };
+            Bookmarks = bookmarkManager ??
+                throw new ArgumentNullException("Navigator: BookmarkManager may not be null.");
+            KnownStars = starProvider ??
+                throw new ArgumentNullException("Navigator: KnownStarProvider may not be null.");
+            GetTicks = getTicks ??
+                throw new ArgumentNullException("Navigator: GetTicks may not be null.");
         }
 
         public void Navigate(IPlayerInfo player, string destination, float playerRange, IResponder response)
@@ -84,16 +89,7 @@ namespace GalacticWaez.Navigation
                 GameTime = GetTicks(),
                 MaxDistance = -1
             };
-            return 0;
-            //if (goalIsBookmark)
-            //{
-            //    path = path.Take(path.Count() - 1);
-            //}
-            //var sectorsPath = path.Select(n => n.ToSectorCoordinates());
-            //int added = db.InsertBookmarks(sectorsPath, playerId, modApi.Application.GameTicks);
-            //string text = $"Path found; {added}/{path.Count()} waypoints added.";
-            //modApi.Log(text);
-            //return new NavResult { path = path, message = text };
+            return Bookmarks.InsertBookmarks(path.Select(p => p.ToSectorCoordinates()), bmdata);
         }
 
         private GalaxyMap.Node GoalNode(int playerId, int playerFacId, string goalName, out bool isBookmark)

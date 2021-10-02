@@ -93,6 +93,9 @@
     <Compile Include="FakeGUI.cs" />
     <Compile Include="FakeModApi.cs" />
     <Compile Include="FakePlayer.cs" />
+    <Compile Include="Fakes\FakeBookmarkManager.cs" />
+    <Compile Include="Fakes\FakePathfinder.cs" />
+    <Compile Include="Fakes\FakeStarProvider.cs" />
     <Compile Include="Fakes\FileDataSource.cs" />
     <Compile Include="GalaxyTestData.cs" />
     <Compile Include="MinheapTests.cs" />
@@ -105,6 +108,7 @@
     <Compile Include="StarFinderDataSourceTests.cs" />
     <Compile Include="NormalDataSourceTests.cs" />
     <Compile Include="BookmarkManagerTests.cs" />
+    <Compile Include="NavigatorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Dependencies\stardata-test-badsum.csv">

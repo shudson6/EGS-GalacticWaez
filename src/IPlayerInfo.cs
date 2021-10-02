@@ -1,4 +1,4 @@
-﻿namespace GalacticWaez.Navigation
+﻿namespace GalacticWaez
 {
     /// <summary>
     /// Provides ID and Position information about a player.

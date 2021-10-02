@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Eleon.Modding;
 
-namespace GalacticWaez.Navigation
+namespace GalacticWaez
 {
     public delegate void NavigatorCallback(IEnumerable<LYCoordinates> path, string message);
 
