@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GalacticWaez.src.Interface
+namespace GalacticWaez
 {
-    interface IPlayerProvider
+    public interface IPlayerProvider
     {
+        IPlayerInfo GetPlayerInfo(int playerId);
     }
 }

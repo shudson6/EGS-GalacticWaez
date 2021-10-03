@@ -1,5 +1,4 @@
 ﻿using Eleon.Modding;
-using GalacticWaez.Command;
 using System;
 
 namespace GalacticWaez
@@ -9,7 +8,6 @@ namespace GalacticWaez
         public IModApi ModApi { get; private set; }
 
         private ICommandHandler commandHandler = null;
-        private IInitializer initializer = null;
 
         public void Init(IModApi modApi)
         {

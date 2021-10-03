@@ -86,6 +86,7 @@
     <Compile Include="src\Interface\IPathfinder.cs" />
     <Compile Include="src\Interface\IPlayerProvider.cs" />
     <Compile Include="src\Interface\IResponder.cs" />
+    <Compile Include="src\Interface\IResponseManager.cs" />
     <Compile Include="src\KnownStarProvider.cs" />
     <Compile Include="src\ChatResponder.cs" />
     <Compile Include="src\Interface\ICommandHandler.cs" />
@@ -99,7 +100,7 @@
     <Compile Include="src\GalacticWaez.cs" />
     <Compile Include="src\GalacticWaezClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\CommandHandler.cs" />
+    <Compile Include="src\ChatMessageHandler.cs" />
     <Compile Include="src\GalaxyMap.cs" />
     <Compile Include="src\Interface\INavigator.cs" />
     <Compile Include="src\Interface\IPlayerInfo.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="src\Navigator.cs" />
     <Compile Include="src\LocalPlayerInfo.cs" />
     <Compile Include="src\NormalDataSource.cs" />
+    <Compile Include="src\ResponseManager.cs" />
     <Compile Include="src\SaveGameDB.cs" />
     <Compile Include="src\SaveGameDBBase.cs" />
     <Compile Include="src\StarDataStorage.cs" />
