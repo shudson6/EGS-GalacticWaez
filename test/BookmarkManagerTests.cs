@@ -60,7 +60,7 @@ namespace GalacticWaezTests
             // we have a nice, empty table
             var bm = new BookmarkManager(deploymentDir, delegate { });
             Assert.IsFalse(bm.TryGetVector(1337, 1337, "idontexist", out VectorInt3 vector));
-            Assert.AreEqual(default(VectorInt3), vector);
+            Assert.AreEqual(default, vector);
         }
 
         [TestMethod]
@@ -134,7 +134,7 @@ namespace GalacticWaezTests
 
             var bm = new BookmarkManager(deploymentDir, delegate { });
             Assert.IsFalse(bm.TryGetVector(1337, 1337, "Test Star", out VectorInt3 actual));
-            Assert.AreEqual(default(VectorInt3), actual);
+            Assert.AreEqual(default, actual);
         }
 
         [TestMethod]
@@ -161,7 +161,7 @@ namespace GalacticWaezTests
 
             var bm = new BookmarkManager(deploymentDir, delegate { });
             Assert.IsFalse(bm.TryGetVector(404, 404, "Test Star", out VectorInt3 actual));
-            Assert.AreEqual(default(VectorInt3), actual);
+            Assert.AreEqual(default, actual);
         }
 
         [TestMethod]
@@ -181,7 +181,7 @@ namespace GalacticWaezTests
 
             var bm = new BookmarkManager(deploymentDir, delegate { });
             Assert.IsFalse(bm.TryGetVector(404, 404, "Test Star", out VectorInt3 actual));
-            Assert.AreEqual(default(VectorInt3), actual);
+            Assert.AreEqual(default, actual);
         }
 
         [TestMethod]

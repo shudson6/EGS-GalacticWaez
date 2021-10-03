@@ -11,7 +11,7 @@ namespace GalacticWaezTests
     [DeploymentItem("Dependencies\\stardata-test-small.csv")]
     public partial class NavigatorTests
     {
-        private static Func<ulong> TestTicks = () => 7231013;
+        private static readonly Func<ulong> TestTicks = () => 7231013;
         private static GalaxyMap galaxy;
         private static IEnumerable<VectorInt3> positions;
 
@@ -115,7 +115,7 @@ namespace GalacticWaezTests
             string logged = null;
             var nav = new Navigator(galaxy, pathfinder, bm, new Fakes.FakeStarProvider(), 
                 (text) => logged = text, TestTicks);
-            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), path.First(), 30);
+            var player = new Fakes.NavTestPlayerInfo(1337, 1337, path.First(), 30);
             nav.Navigate(player, "foo", 30, null);
             Assert.AreEqual(5, bm.Inserted);
             Assert.AreEqual("Path found; 5/5 waypoints added.", logged);
@@ -130,7 +130,7 @@ namespace GalacticWaezTests
             string logged = null;
             var nav = new Navigator(galaxy, pathfinder, bm, new Fakes.FakeStarProvider(path.Last()), 
                 (text) => logged = text, TestTicks);
-            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), path.First(), 30);
+            var player = new Fakes.NavTestPlayerInfo(1337, 1337, path.First(), 30);
             nav.Navigate(player, "foo", 30, null);
             Assert.AreEqual(6, bm.Inserted);
             Assert.AreEqual("Path found; 6/6 waypoints added.", logged);
@@ -145,7 +145,7 @@ namespace GalacticWaezTests
             string logged = null;
             var nav = new Navigator(galaxy, pathfinder, bm, stars,
                 (text) => logged = text, TestTicks);
-            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), default, 30);
+            var player = new Fakes.NavTestPlayerInfo(1337, 1337, default, 30);
             var response = new Fakes.TestResponder();
             nav.Navigate(player, "foo", 30, response);
             Assert.AreEqual(1, response.Messages.Count);
@@ -162,7 +162,7 @@ namespace GalacticWaezTests
             string logged = null;
             var nav = new Navigator(galaxy, pathfinder, bm, stars,
                 (text) => logged = text, TestTicks);
-            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), vector, 30);
+            var player = new Fakes.NavTestPlayerInfo(1337, 1337, vector, 30);
             var response = new Fakes.TestResponder();
             nav.Navigate(player, "foo", 30, response);
             Assert.AreEqual(1, response.Messages.Count);
@@ -179,7 +179,7 @@ namespace GalacticWaezTests
             string logged = null;
             var nav = new Navigator(galaxy, pathfinder, bm, stars,
                 (text) => logged = text, TestTicks);
-            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), vector, 30);
+            var player = new Fakes.NavTestPlayerInfo(1337, 1337, vector, 30);
             var response = new Fakes.TestResponder();
             nav.Navigate(player, "foo", 30, response);
             Assert.AreEqual(1, response.Messages.Count);
@@ -195,7 +195,7 @@ namespace GalacticWaezTests
             string logged = null;
             var nav = new Navigator(galaxy, pathfinder, bm, stars,
                 (text) => logged = text, TestTicks);
-            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), positions.Last(), 30);
+            var player = new Fakes.NavTestPlayerInfo(1337, 1337, positions.Last(), 30);
             var response = new Fakes.TestResponder();
             nav.Navigate(player, "foo", 30, response);
             Assert.AreEqual(1, response.Messages.Count);
@@ -211,7 +211,7 @@ namespace GalacticWaezTests
             string logged = null;
             var nav = new Navigator(galaxy, pathfinder, bm, stars,
                 (text) => logged = text, TestTicks);
-            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), positions.Last(), 30);
+            var player = new Fakes.NavTestPlayerInfo(1337, 1337, positions.Last(), 30);
             var response = new Fakes.TestResponder();
             nav.Navigate(player, "foo", 30, response);
             Assert.AreEqual(1, response.Messages.Count);
@@ -228,7 +228,7 @@ namespace GalacticWaezTests
             string logged = null;
             var nav = new Navigator(galaxy, pathfinder, bm, stars,
                 (text) => logged = text, TestTicks);
-            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), positions.Last(), 30);
+            var player = new Fakes.NavTestPlayerInfo(1337, 1337, positions.Last(), 30);
             var response = new Fakes.TestResponder();
             nav.Navigate(player, "foo", 30, response);
             Assert.AreEqual(1, response.Messages.Count);
@@ -246,7 +246,7 @@ namespace GalacticWaezTests
             string logged = null;
             var nav = new Navigator(galaxy, pathfinder, bm, stars,
                 (text) => logged = text, TestTicks);
-            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), path.First(), 30);
+            var player = new Fakes.NavTestPlayerInfo(1337, 1337, path.First(), 30);
             var response = new Fakes.TestResponder();
             nav.Navigate(player, "foo", 30, response);
             Assert.AreEqual(1, response.Messages.Count);
@@ -265,7 +265,7 @@ namespace GalacticWaezTests
             string logged = null;
             var nav = new Navigator(galaxy, pathfinder, bm, stars,
                 (text) => logged = text, TestTicks);
-            var player = new Fakes.NavTestPlayerInfo(new Fakes.FakePlayer(1337), path.First(), 30);
+            var player = new Fakes.NavTestPlayerInfo(1337, 1337, path.First(), 30);
             var response = new Fakes.TestResponder();
             nav.Navigate(player, "foo", 30, response);
             Assert.AreEqual(1, response.Messages.Count);
