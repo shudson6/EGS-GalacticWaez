@@ -84,6 +84,7 @@
     <Compile Include="src\Interface\IGalaxyMapBuilder.cs" />
     <Compile Include="src\Interface\IKnownStarProvider.cs" />
     <Compile Include="src\Interface\IPathfinder.cs" />
+    <Compile Include="src\Interface\IPlayerProvider.cs" />
     <Compile Include="src\Interface\IResponder.cs" />
     <Compile Include="src\KnownStarProvider.cs" />
     <Compile Include="src\ChatResponder.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="src\Interface\INavigator.cs" />
     <Compile Include="src\Interface\IPlayerInfo.cs" />
     <Compile Include="src\Minheap.cs" />
+    <Compile Include="src\NavigationHandler.cs" />
     <Compile Include="src\Navigator.cs" />
     <Compile Include="src\LocalPlayerInfo.cs" />
     <Compile Include="src\NormalDataSource.cs" />

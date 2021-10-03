@@ -4,6 +4,6 @@ namespace GalacticWaez
 {
     public interface ICommandHandler
     {
-        void HandleChatCommand(MessageData messageData);
+        bool HandleCommand(string commandText, IPlayerInfo player, IResponder responder);
     }
 }
