@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Eleon.Modding;
 
-namespace GalacticWaez.Navigation
+namespace GalacticWaez
 {
     public delegate IEnumerable<VectorInt3> Pathfinder(
         GalaxyMap.Node start,
@@ -24,14 +25,19 @@ namespace GalacticWaez.Navigation
             }
         }
 
-        /**
-         * Find a path from start to goal. The warpRange parameter can be used
-         * to limit the distance of any single jump. Values of warpRange larger
-         * than the distance used to build the Galaxy have no effect.
-         */
+        /// <summary>
+        /// Find a path from start to goal. The warpRange parameter can be used
+        /// to limit the distance of any single jump. Values of warpRange larger
+        /// than the distance used to build the Galaxy have no effect.
+        /// </summary>
         public IEnumerable<VectorInt3>
         FindPath(GalaxyMap.Node start, GalaxyMap.Node goal, float warpRange)
         {
+            if (start == null || goal == null)
+                throw new ArgumentNullException("FindPath: start or goal");
+            if (warpRange < 1)
+                throw new ArgumentOutOfRangeException("FindPath: warpRange must be positive");
+
             var visitedStars = new Dictionary<VectorInt3, PathNode>();
             var minheap = new Minheap<PathNode>();
             minheap.Insert(new PathNode(start, null), 0);
