@@ -42,7 +42,7 @@ namespace GalacticWaez
                 throw new ArgumentOutOfRangeException("Navigate: playerRange must be positive");
 
             var start = Galaxy.GetNode(player.GetCurrentStarCoordinates());
-            var goal = GoalNode(player.Player.Id, player.Player.Faction.Id, destination, out bool isBookmark);
+            var goal = GoalNode(player.Id, player.FactionId, destination, out bool isBookmark);
             if (goal == null)
             {
                 response?.Send($"No bookmark or known star by name {destination}");
@@ -77,7 +77,7 @@ namespace GalacticWaez
                 path = path.Take(path.Count() - 1);
             // respond with how many bookmarks got added vs expected
             int expected = path.Count();
-            int actual = SetWaypoints(path, player.Player.Id, player.Player.Faction.Id);
+            int actual = SetWaypoints(path, player.Id, player.FactionId);
             string message = $"Path found; {actual}/{expected} waypoints added.";
             response?.Send(message);
             if (response == null)

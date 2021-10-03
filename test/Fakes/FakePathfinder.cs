@@ -10,7 +10,7 @@ namespace GalacticWaezTests.Fakes
 {
     public class FakePathfinder : IPathfinder
     {
-        private IEnumerable<VectorInt3> path;
+        private readonly IEnumerable<VectorInt3> path;
 
         public FakePathfinder(IEnumerable<VectorInt3> path = null) => this.path = path;
 

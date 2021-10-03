@@ -5,14 +5,13 @@ namespace GalacticWaezTests.Fakes
 {
     public class FakePlayerInfo : GalacticWaez.IPlayerInfo
     {
-        public IPlayer Player => throw new NotImplementedException();
+        public int Id => throw new NotImplementedException();
+
+        public int FactionId => throw new NotImplementedException();
+
+        public float WarpRange => throw new NotImplementedException();
 
         public VectorInt3 GetCurrentStarCoordinates()
-        {
-            throw new NotImplementedException();
-        }
-
-        public float GetWarpRange()
         {
             throw new NotImplementedException();
         }
@@ -21,15 +20,19 @@ namespace GalacticWaezTests.Fakes
     public class NavTestPlayerInfo : GalacticWaez.IPlayerInfo
     {
         private readonly VectorInt3 starVector;
-        private readonly float range;
-        public IPlayer Player { get; private set; }
-        public NavTestPlayerInfo(IPlayer player, VectorInt3 forStar, float range)
+        public int Id { get; }
+
+        public int FactionId { get; }
+
+        public float WarpRange { get; }
+
+        public NavTestPlayerInfo(int id, int facid, VectorInt3 forStar, float range)
         {
-            this.range = range;
+            WarpRange = range;
             starVector = forStar;
-            Player = player;
+            Id = id;
+            FactionId = facid;
         }
         public VectorInt3 GetCurrentStarCoordinates() => starVector;
-        public float GetWarpRange() => range;
     }
 }

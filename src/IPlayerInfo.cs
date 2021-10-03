@@ -6,10 +6,10 @@
     /// </summary>
     public interface IPlayerInfo
     {
-        Eleon.Modding.IPlayer Player { get; }
+        int Id { get; }
+        int FactionId { get; }
+        float WarpRange { get; }
 
         Eleon.Modding.VectorInt3 GetCurrentStarCoordinates();
-
-        float GetWarpRange();
     }
 }

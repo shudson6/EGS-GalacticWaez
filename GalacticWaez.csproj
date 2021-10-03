@@ -104,7 +104,7 @@
     <Compile Include="src\IPlayerInfo.cs" />
     <Compile Include="src\Minheap.cs" />
     <Compile Include="src\Navigator.cs" />
-    <Compile Include="src\LocalPlayerTracker.cs" />
+    <Compile Include="src\LocalPlayerInfo.cs" />
     <Compile Include="src\NormalDataSource.cs" />
     <Compile Include="src\SaveGameDB.cs" />
     <Compile Include="src\SaveGameDBBase.cs" />
