@@ -92,6 +92,7 @@
     <Compile Include="FakeApplication.cs" />
     <Compile Include="FakeGUI.cs" />
     <Compile Include="FakeModApi.cs" />
+    <Compile Include="Fakes\FakeNavigator.cs" />
     <Compile Include="Fakes\FakePlayer.cs" />
     <Compile Include="Fakes\FakeBookmarkManager.cs" />
     <Compile Include="Fakes\FakePathfinder.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="BookmarkManagerTests.cs" />
     <Compile Include="NavigatorTests.cs" />
     <Compile Include="AstarPathfinderTests.cs" />
+    <Compile Include="NavigationHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Dependencies\stardata-test-badsum.csv">

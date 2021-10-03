@@ -4,7 +4,7 @@ using GalacticWaez.Navigation;
 
 namespace GalacticWaez.Command
 {
-    public class CommandHandler : ICommandHandler
+    public class CommandHandler 
     {
         private readonly IModApi modApi;
         private readonly SaveGameDB saveGameDB;
@@ -33,11 +33,6 @@ namespace GalacticWaez.Command
                     return;
                 }
                 string[] tokens = commandText.Split(separator: new[] { ' ' }, count: 2);
-                if (tokens.Length == 2 && tokens[0].Equals(CommandToken.To))
-                {
-                    HandleNavRequest(tokens[1]);
-                    return;
-                }
                 if (tokens.Length == 2 && tokens[0].Equals(CommandToken.Bookmarks))
                 {
                     HandleBookmarkRequest(tokens[1]);
@@ -66,18 +61,6 @@ namespace GalacticWaez.Command
                 + " map markers.";
             modApi.Application.SendChatMessage(new ChatMessage(message,
                 modApi.Application.LocalPlayer));
-        }
-
-        private void HandleNavRequest(string bookmarkName)
-        {
-            // see if there's a range param in there
-            float rangeOverride = 0;
-            if (bookmarkName.StartsWith("--range="))
-            {
-                var tokens = bookmarkName.Split(new[] { ' ' }, 2);
-                bookmarkName = tokens[1];
-                rangeOverride = int.Parse(tokens[0].Substring("--range=".Length));
-            }
         }
 
         private void HandleBookmarkRequest(string operation)

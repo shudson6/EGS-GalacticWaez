@@ -42,8 +42,6 @@ namespace GalacticWaez
                 case GameEventType.GameEnded:
                     if (commandHandler != null)
                     {
-                        ModApi.Application.ChatMessageSent -= commandHandler.HandleChatCommand;
-                        commandHandler = null;
                     }
                     ModApi.Log("Stopped listening for commands.");
                     break;
@@ -54,8 +52,6 @@ namespace GalacticWaez
         {
             if (icmd != null)
             {
-                commandHandler = icmd;
-                ModApi.Application.ChatMessageSent += commandHandler.HandleChatCommand;
             }
             else
             {
