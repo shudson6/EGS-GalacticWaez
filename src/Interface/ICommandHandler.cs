@@ -1,6 +1,6 @@
 ﻿using Eleon;
 
-namespace GalacticWaez.Command
+namespace GalacticWaez
 {
     public interface ICommandHandler
     {
