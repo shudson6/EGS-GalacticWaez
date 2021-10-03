@@ -5,6 +5,18 @@ using Eleon.Modding;
 
 namespace GalacticWaez
 {
+    /// <summary>
+    /// This class provides a thread-safe means of sending chat responses.
+    /// <br/>
+    /// To respond to a message, use <c>CreateResponder(MessageData)</c> to get an IResponder
+    /// instance to send a response to the correct recipient and channel. Said instance can be
+    /// used more than once. Messages sent via the IResponder are queued to be sent from the
+    /// <c>Application.Update</c> delegate.
+    /// <br/>
+    /// Reasoning: calling Application.SendChatMessage on a thread other than the one on which
+    /// Application.Update executes causes crashes. Use this class to ensure messages are sent
+    /// on the correct thread.
+    /// </summary>
     public class ResponseManager : IResponseManager
     {
         private class Responder : IResponder
