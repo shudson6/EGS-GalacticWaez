@@ -6,7 +6,7 @@ using Eleon.Modding;
 
 namespace GalacticWaez.Navigation
 {
-    public sealed class LocalPlayerInfo : SaveGameDBBase, IPlayerInfo
+    public sealed class LocalPlayerInfo : SaveGameDBBase, IPlayerInfo, IPlayerProvider
     {
         private readonly IPlayer player;
         private readonly LoggingDelegate Log;
@@ -25,6 +25,8 @@ namespace GalacticWaez.Navigation
             CurrentPlayfield = getPlayfield 
                 ?? throw new ArgumentNullException("LocalPlayerInfo: getPlayfield");
         }
+
+        public IPlayerInfo GetPlayerInfo(int _) => this;
 
         public VectorInt3 GetCurrentStarCoordinates() => CurrentPlayfield().SolarSystemCoordinates;
 
