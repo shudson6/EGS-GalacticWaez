@@ -3,23 +3,33 @@ using System;
 
 namespace GalacticWaez
 {
-    public class GalacticWaezClient : IMod
+    public enum ModState
     {
-        public IModApi ModApi { get; private set; }
+        Uninitialized,
+        Initializing,
+        InitFailed,
+        Ready
+    }
+
+    public class GalacticWaezClient : IMod, ICommandHandler
+    {
+        private IModApi modApi;
 
         private ICommandHandler commandHandler = null;
+        public ModState Status { get; private set; }
 
         public void Init(IModApi modApi)
         {
-            ModApi = modApi;
-            ModApi.GameEvent += OnGameEvent;
-            ModApi.Log("GalacticWaezClient attached.");
+            this.modApi = modApi;
+            modApi.GameEvent += OnGameEvent;
+            modApi.Log("GalacticWaezClient attached.");
+            Status = ModState.Uninitialized;
         }
 
         public void Shutdown()
         {
-            ModApi.GameEvent -= OnGameEvent;
-            ModApi.Log("GalacticWaezClient detached.");
+            modApi.GameEvent -= OnGameEvent;
+            modApi.Log("GalacticWaezClient detached.");
         }
 
         void OnGameEvent(GameEventType type,
@@ -32,7 +42,7 @@ namespace GalacticWaez
             switch (type)
             {
                 case GameEventType.GameStarted:
-                    if (ModApi.Application.Mode == ApplicationMode.SinglePlayer)
+                    if (modApi.Application.Mode == ApplicationMode.SinglePlayer)
                     {
                     }
                     break;
@@ -41,23 +51,18 @@ namespace GalacticWaez
                     if (commandHandler != null)
                     {
                     }
-                    ModApi.Log("Stopped listening for commands.");
+                    modApi.Log("Stopped listening for commands.");
                     break;
             }
         }
 
-        private void InitializerCallback(ICommandHandler icmd, AggregateException ex)
+        public bool HandleCommand(string commandText, IPlayerInfo player, IResponder responder)
         {
-            if (icmd != null)
-            {
-            }
-            else
-            {
-                foreach (var e in ex.InnerExceptions)
-                {
-                    ModApi.LogError(e.Message);
-                }
-            }
+            if (commandText.Trim() != "status")
+                return false;
+
+            responder.Send(Status.ToString());
+            return true;
         }
     }
 }

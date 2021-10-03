@@ -89,9 +89,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FakeApplication.cs" />
-    <Compile Include="FakeGUI.cs" />
-    <Compile Include="FakeModApi.cs" />
     <Compile Include="Fakes\FakeNavigator.cs" />
     <Compile Include="Fakes\FakePlayer.cs" />
     <Compile Include="Fakes\FakeBookmarkManager.cs" />
