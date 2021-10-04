@@ -96,12 +96,12 @@
     <Compile Include="Fakes\FakePlayerInfo.cs" />
     <Compile Include="Fakes\FakeResponder.cs" />
     <Compile Include="Fakes\FakeStarProvider.cs" />
+    <Compile Include="Fakes\FakeStorage.cs" />
     <Compile Include="Fakes\FileDataSource.cs" />
     <Compile Include="GalaxyTestData.cs" />
     <Compile Include="MinheapTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StarFinderTests.cs" />
-    <Compile Include="StarDataStorageTests.cs" />
     <Compile Include="CommandHandlerTests.cs" />
     <Compile Include="GalaxyMapBuilderTests.cs" />
     <Compile Include="FileDataSourceTests.cs" />
