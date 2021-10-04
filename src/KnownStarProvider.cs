@@ -50,7 +50,9 @@ namespace GalacticWaez
 
         public bool GetPosition(string name, out VectorInt3 pos)
         {
-            Log($"Seeking known star: <{name}>");
+            if (name == null)
+                throw new ArgumentNullException("GetPosition: name");
+
             SqliteConnection connection = null;
             SqliteCommand command = null;
             IDataReader reader = null;
