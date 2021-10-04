@@ -8,7 +8,7 @@ namespace GalacticWaezTests
     [TestClass]
     public class NavigationHandlerTests
     {
-        private static IPlayerInfo testPlayer = new Fakes.NavTestPlayerInfo(
+        private static readonly IPlayerInfo testPlayer = new Fakes.NavTestPlayerInfo(
             1337, 418, new VectorInt3(13400000, 500000, 12600000), 30);
 
         [TestMethod]

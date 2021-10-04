@@ -5,7 +5,6 @@ using Eleon.Modding;
 
 namespace GalacticWaez
 {
-    // TODO: many of the logging calls (or all of them) should be chat messages
     public class Navigator : INavigator
     {
         private readonly GalaxyMap Galaxy;

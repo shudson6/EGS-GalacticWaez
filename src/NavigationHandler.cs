@@ -15,7 +15,7 @@ namespace GalacticWaez
 
             commandText = commandText.Substring(3);
             string bookmarkName;
-            float range = 0;
+            float range;
             if (commandText.StartsWith("--range="))
             {
                 var tokens = commandText.Split(new[] { ' ' }, 2);
