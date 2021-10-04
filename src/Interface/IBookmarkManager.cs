@@ -37,7 +37,6 @@ namespace GalacticWaez
         /// <br/>
         /// <c>false</c> otherwise
         /// </returns>
-        /// <exception cref="System.ArgumentNullException">if bookmarkname is null</exception>
         bool TryGetVector(int playerId, int playerFacId, string bookmarkName, out VectorInt3 coordinates);
 
         /// <summary>
@@ -49,5 +48,18 @@ namespace GalacticWaez
         /// the number of bookmarks inserted
         /// </returns>
         int InsertBookmarks(IEnumerable<VectorInt3> coordinates, BookmarkData data);
+
+        /// <summary>
+        /// Modifies existing 'Waez_*' bookmarks. Action may be "show", "hide", or "clear".
+        /// <br/><c>show</c> makes them visible on the HUD.
+        /// <br/><c>hide</c> makes them not visible on the HUD.
+        /// <br/><c>clear</c> erases them.
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <param name="action"></param>
+        /// <returns>
+        /// The number of bookmarks changed.
+        /// </returns>
+        int ModifyPathMarkers(int playerId, string action);
     }
 }
