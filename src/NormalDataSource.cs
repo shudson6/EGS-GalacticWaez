@@ -10,13 +10,16 @@ namespace GalacticWaez
     /// </summary>
     public class NormalDataSource : IGalaxyDataSource
     {
-        private readonly IFileDataSource fileSource;
-        private readonly IGalaxyDataSource scanSource;
+        public readonly IFileDataSource fileSource;
+        public readonly IGalaxyDataSource scanSource;
+        public readonly IGalaxyStorage storage;
 
-        public NormalDataSource(IFileDataSource fileSource, IGalaxyDataSource scanSource)
+        public NormalDataSource(IFileDataSource fileSource, IGalaxyDataSource scanSource,
+            IGalaxyStorage storage)
         {
             this.fileSource = fileSource;
             this.scanSource = scanSource;
+            this.storage = storage;
         }
 
         public IEnumerable<VectorInt3> GetGalaxyData()
@@ -25,6 +28,12 @@ namespace GalacticWaez
             if (positions == null || !positions.Any())
             {
                 positions = scanSource?.GetGalaxyData() ?? null;
+                // store the data if any were found;
+                // there obviously wasn't a file if we're here
+                if (positions != null && positions.Any())
+                {
+                    storage?.StoreGalaxyData(positions);
+                }
                 if (positions != null && !positions.Any())
                 {
                     positions = null;

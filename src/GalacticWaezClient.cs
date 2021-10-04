@@ -1,4 +1,5 @@
 ﻿using Eleon.Modding;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace GalacticWaez
@@ -91,9 +92,10 @@ namespace GalacticWaez
             string saveGameDir = modApi.Application.GetPathFor(AppFolder.SaveGame);
             // start with the GalaxyMap: the longest and most likely to fail
             var ksp = new KnownStarProvider(saveGameDir, modApi.Log);
-            var source = new NormalDataSource(
-                new FileDataSource(saveGameDir, modApi.Log),
-                new StarFinderDataSource(ksp, modApi.Log));
+            var file = new FileDataSource(saveGameDir, modApi.Log);
+            // yes, FileDataSource implements both interfaces so is passed twice to NormalDataSource
+            var source = new NormalDataSource(file,
+                new StarFinderDataSource(ksp, modApi.Log), file);
             var galaxyMap = new GalaxyMapBuilder(modApi.Log)
                 .BuildGalaxyMap(source, 110 * GalacticWaez.SectorsPerLY);
 

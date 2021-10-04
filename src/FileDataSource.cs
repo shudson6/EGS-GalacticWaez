@@ -2,10 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace GalacticWaez
 {
-    public class FileDataSource : IFileDataSource
+    public class FileDataSource : IFileDataSource, IGalaxyStorage
     {
         public const string ModContentDir = "Content\\Mods\\GalacticWaez";
         private const string FileName = "stardata.csv";
@@ -63,6 +64,37 @@ namespace GalacticWaez
             finally
             {
                 reader?.Close();
+            }
+        }
+
+        public bool StoreGalaxyData(IEnumerable<VectorInt3> positions)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(PathToFile));
+            StreamWriter writer = null;
+            int count = positions.Count();
+
+            try
+            {
+                writer = new StreamWriter(new FileStream(
+                    PathToFile, FileMode.Create, FileAccess.Write
+                    ));
+
+                writer.WriteLine(count);
+                foreach (var pos in positions)
+                {
+                    writer.WriteLine($"{pos.x},{pos.y},{pos.z}");
+                }
+                Log($"Successfully wrote {count} positions to {PathToFile}");
+                return true;
+            }
+            catch (Exception)
+            {
+                Log($"Failed to write star positions to {PathToFile}");
+                return false;
+            }
+            finally
+            {
+                writer?.Close();
             }
         }
     }

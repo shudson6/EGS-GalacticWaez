@@ -13,7 +13,8 @@ namespace GalacticWaezTests
         {
             Assert.IsNull(new NormalDataSource(
                 new Fakes.NullFileDataSource(),
-                new Fakes.NullDataSource())
+                new Fakes.NullDataSource(),
+                new Fakes.FakeStorage())
                 .GetGalaxyData());
         }
 
@@ -22,7 +23,8 @@ namespace GalacticWaezTests
         {
             Assert.IsNull(new NormalDataSource(
                 new Fakes.NullFileDataSource(),
-                new Fakes.EmptyDataSource())
+                new Fakes.EmptyDataSource(),
+                new Fakes.FakeStorage())
                 .GetGalaxyData());
         }
 
@@ -31,7 +33,8 @@ namespace GalacticWaezTests
         {
             Assert.IsNull(new NormalDataSource(
                 new Fakes.EmptyFileDataSource(),
-                new Fakes.NullDataSource())
+                new Fakes.NullDataSource(),
+                new Fakes.FakeStorage())
                 .GetGalaxyData());
         }
 
@@ -40,7 +43,8 @@ namespace GalacticWaezTests
         {
             Assert.IsNull(new NormalDataSource(
                 new Fakes.EmptyFileDataSource(),
-                new Fakes.EmptyDataSource())
+                new Fakes.EmptyDataSource(),
+                new Fakes.FakeStorage())
                 .GetGalaxyData());
         }
 
@@ -49,7 +53,7 @@ namespace GalacticWaezTests
         {
             var expected = GalaxyTestData.LoadPositions("stardata-test-small.csv");
             var fileSource = new Fakes.FileDataSource("stardata-test-small.csv");
-            var actual = new NormalDataSource(fileSource, null).GetGalaxyData();
+            var actual = new NormalDataSource(fileSource, null, null).GetGalaxyData();
             Assert.AreEqual(expected.Count, actual.Count());
             Assert.IsFalse(expected.Except(actual).Any());
         }
@@ -59,7 +63,7 @@ namespace GalacticWaezTests
         {
             var expected = GalaxyTestData.LoadPositions("stardata-test-small.csv");
             var scanSource = new Fakes.FileDataSource("stardata-test-small.csv");
-            var actual = new NormalDataSource(new Fakes.EmptyFileDataSource(), scanSource).GetGalaxyData();
+            var actual = new NormalDataSource(new Fakes.EmptyFileDataSource(), scanSource, null).GetGalaxyData();
             Assert.AreEqual(expected.Count, actual.Count());
             Assert.IsFalse(expected.Except(actual).Any());
         }
@@ -69,7 +73,7 @@ namespace GalacticWaezTests
         {
             var expected = GalaxyTestData.LoadPositions("stardata-test-small.csv");
             var scanSource = new Fakes.FileDataSource("stardata-test-small.csv");
-            var actual = new NormalDataSource(new Fakes.NullFileDataSource(), scanSource).GetGalaxyData();
+            var actual = new NormalDataSource(new Fakes.NullFileDataSource(), scanSource, null).GetGalaxyData();
             Assert.AreEqual(expected.Count, actual.Count());
             Assert.IsFalse(expected.Except(actual).Any());
         }
@@ -77,19 +81,19 @@ namespace GalacticWaezTests
         [TestMethod]
         public void ReturnsNull_WhenSourcesAreNull()
         {
-            Assert.IsNull(new NormalDataSource(null, null).GetGalaxyData());
+            Assert.IsNull(new NormalDataSource(null, null, null).GetGalaxyData());
         }
 
         [TestMethod]
         public void ReturnsNull_WhenFileSourceNull_ScanNull()
         {
-            Assert.IsNull(new NormalDataSource(null, new Fakes.NullDataSource()).GetGalaxyData());
+            Assert.IsNull(new NormalDataSource(null, new Fakes.NullDataSource(), null).GetGalaxyData());
         }
 
         [TestMethod]
         public void ReturnsNull_WhenFileSourceNull_ScanEmpty()
         {
-            Assert.IsNull(new NormalDataSource(null, new Fakes.EmptyDataSource()).GetGalaxyData());
+            Assert.IsNull(new NormalDataSource(null, new Fakes.EmptyDataSource(), null).GetGalaxyData());
         }
 
         [TestMethod]
@@ -97,7 +101,7 @@ namespace GalacticWaezTests
         {
             var expected = GalaxyTestData.LoadPositions("stardata-test-small.csv");
             var scanSource = new Fakes.FileDataSource("stardata-test-small.csv");
-            var actual = new NormalDataSource(null, scanSource).GetGalaxyData();
+            var actual = new NormalDataSource(null, scanSource, null).GetGalaxyData();
             Assert.AreEqual(expected.Count, actual.Count());
             Assert.IsFalse(expected.Except(actual).Any());
         }
@@ -105,13 +109,13 @@ namespace GalacticWaezTests
         [TestMethod]
         public void ReturnsNull_WhenFileNull_ScanSourceNull()
         {
-            Assert.IsNull(new NormalDataSource(new Fakes.NullFileDataSource(), null).GetGalaxyData());
+            Assert.IsNull(new NormalDataSource(new Fakes.NullFileDataSource(), null, null).GetGalaxyData());
         }
 
         [TestMethod]
         public void ReturnsNull_WhenFileEmpty_ScanSourceNull()
         {
-            Assert.IsNull(new NormalDataSource(new Fakes.EmptyFileDataSource(), null).GetGalaxyData());
+            Assert.IsNull(new NormalDataSource(new Fakes.EmptyFileDataSource(), null, null).GetGalaxyData());
         }
 
         [TestMethod]
@@ -119,7 +123,7 @@ namespace GalacticWaezTests
         {
             var expected = GalaxyTestData.LoadPositions("stardata-test-small.csv");
             var fileSource = new Fakes.FileDataSource("stardata-test-small.csv");
-            var actual = new NormalDataSource(fileSource, null).GetGalaxyData();
+            var actual = new NormalDataSource(fileSource, null, null).GetGalaxyData();
             Assert.AreEqual(expected.Count, actual.Count());
             Assert.IsFalse(expected.Except(actual).Any());
         }
