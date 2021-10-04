@@ -30,6 +30,8 @@ namespace GalacticWaez
                     responder?.Send("Range must be a positive number.");
                     return true;
                 }
+                // range is expected in LY from user, but the mod uses sectors
+                range *= GalacticWaez.SectorsPerLY;
             }
             else
             {

@@ -1,14 +1,11 @@
 ﻿using System;
-using GalacticWaez.Command;
 
 namespace GalacticWaez
 {
-    public delegate void InitializerCallback(ICommandHandler commandHandler, AggregateException ex);
-
     /// <summary>
-    /// Enum that tells Initializer where it should look for star map data.
+    /// Enum of sources for star map data.
     /// </summary>
-    public enum InitializerType
+    public enum DataSourceType
     {
         /// <summary>Look for stored data first; scan memory if not found.</summary>
         Normal,
@@ -16,11 +13,5 @@ namespace GalacticWaez
         FileOnly,
         /// <summary>Scan memory only.</summary>
         ScanOnly
-    }
-
-
-    public interface IInitializer
-    {
-        void Initialize(InitializerCallback doneCallback);
     }
 }

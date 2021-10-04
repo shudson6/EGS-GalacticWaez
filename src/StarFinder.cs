@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using static GalacticWaez.Const;
+using static GalacticWaez.GalacticWaez;
 using SectorCoordinates = Eleon.Modding.VectorInt3;
 using System.Collections.Generic;
 

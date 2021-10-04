@@ -2,6 +2,7 @@
 using System.Linq;
 using System;
 using GalacticWaez;
+using static GalacticWaez.GalacticWaez;
 
 namespace GalacticWaezTests
 {
@@ -14,7 +15,7 @@ namespace GalacticWaezTests
         [TestMethod]
         public void SmallGalaxyMap_HasAllExpectedWarpLines()
         {
-            const float Range = 30;
+            const float Range = 30 * SectorsPerLY;
             const string filename = "stardata-test-small.csv";
             VerifyGalaxyMap(filename,
                 new GalaxyMapBuilder((_) => { })
@@ -25,7 +26,7 @@ namespace GalacticWaezTests
         [TestMethod]
         public void LargeGalaxyMap_HasAllExpectedWarpLines()
         {
-            const float Range = 30;
+            const float Range = 30 * SectorsPerLY;
             const string filename = "stardata-test-vanilla.csv";
             VerifyGalaxyMap(filename,
                 new GalaxyMapBuilder((_) => { })
@@ -37,7 +38,7 @@ namespace GalacticWaezTests
         public void DataNotFound_ReturnsNull()
         {
             var shouldBeNull = new GalaxyMapBuilder((_) => { })
-                .BuildGalaxyMap(new Fakes.NullDataSource(), 30);
+                .BuildGalaxyMap(new Fakes.NullDataSource(), 30 * SectorsPerLY);
             Assert.IsNull(shouldBeNull);
         }
 
@@ -45,7 +46,7 @@ namespace GalacticWaezTests
         public void DataEmpty_ReturnsNull()
         {
             var shouldBeNull = new GalaxyMapBuilder((_) => { })
-                .BuildGalaxyMap(new Fakes.EmptyDataSource(), 30);
+                .BuildGalaxyMap(new Fakes.EmptyDataSource(), 30 * SectorsPerLY);
             Assert.IsNull(shouldBeNull);
         }
 
@@ -53,7 +54,7 @@ namespace GalacticWaezTests
         [ExpectedException(typeof(ArgumentNullException))]
         public void Throws_WhenSourceNull()
         {
-            new GalaxyMapBuilder(delegate { }).BuildGalaxyMap(null, 30);
+            new GalaxyMapBuilder(delegate { }).BuildGalaxyMap(null, 30 * SectorsPerLY);
         }
 
         [TestMethod]
@@ -66,6 +67,7 @@ namespace GalacticWaezTests
         private void VerifyGalaxyMap(string filename, GalaxyMap testGalaxy, float testRange)
         {
             var positions = GalaxyTestData.LoadPositions(filename);
+            Assert.IsTrue(testGalaxy.WarpLines > 0);
             Assert.AreEqual(positions.Count, testGalaxy.Stars);
             int i = 0;
             int warpLines = 0;

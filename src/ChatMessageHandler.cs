@@ -1,42 +1,57 @@
 ﻿using Eleon;
-using Eleon.Modding;
-using GalacticWaez.Navigation;
 
-namespace GalacticWaez.Command
+namespace GalacticWaez
 {
     public class ChatMessageHandler 
     {
         private readonly IPlayerProvider PlayerProvider;
         private readonly IResponseManager ResponseManager;
         private readonly ICommandHandler Navigation;
+        private readonly ICommandHandler StatusHandler;
 
         public ChatMessageHandler(IPlayerProvider players, IResponseManager responseMgr,
-            ICommandHandler navHandler)
+            ICommandHandler navHandler,
+            ICommandHandler statusHandler)
         {
             PlayerProvider = players;
             ResponseManager = responseMgr;
             Navigation = navHandler;
+            StatusHandler = statusHandler;
         }
         
         public void HandleChatMessage(MessageData messageData)
         {
-            if (messageData.Text.StartsWith("/waez "))
+            var line = messageData.Text.TrimStart().Split(new[] { ' ' }, 2);
+            if (line[0] != "/waez")
+                return;
+
+            var responder = ResponseManager.CreateResponder(messageData);
+            var player = PlayerProvider.GetPlayerInfo(messageData.SenderEntityId);
+            if (line.Length < 2)
             {
-                var responder = ResponseManager.CreateResponder(messageData);
-                string commandText = messageData.Text.Remove(0, "/waez ".Length).Trim();
-                if (commandText.StartsWith("to "))
-                {
-                    Navigation.HandleCommand(commandText,
-                        PlayerProvider.GetPlayerInfo(messageData.SenderEntityId),
-                        responder);
-                }
-                //string[] tokens = commandText.Split(separator: new[] { ' ' }, count: 2);
-                //if (tokens.Length == 2 && tokens[0].Equals(CommandToken.Bookmarks))
-                //{
-                //    HandleBookmarkRequest(tokens[1]);
-                //    return;
-                //}
+                responder.Send("hm? (don't know what to do? \"/waez help\")");
+                return;
             }
+            string commandText = line[1].TrimStart();
+            string commandToken = commandText.Split(new[] { ' ' }, 2)[0];
+
+            responder.Send($"echo: {commandToken}|{commandText}");
+            switch (commandToken)
+            {
+                case "status":
+                    StatusHandler.HandleCommand(commandText, player, responder);
+                    break;
+
+                case "to":
+                    Navigation.HandleCommand(commandText, player, responder);
+                    break;
+            }
+            //string[] tokens = commandText.Split(separator: new[] { ' ' }, count: 2);
+            //if (tokens.Length == 2 && tokens[0].Equals(CommandToken.Bookmarks))
+            //{
+            //    HandleBookmarkRequest(tokens[1]);
+            //    return;
+            //}
         }
 
         private const string HelpText = "Waez commands:\n"
