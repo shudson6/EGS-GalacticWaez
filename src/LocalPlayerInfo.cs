@@ -1,10 +1,10 @@
 ﻿using Mono.Data.Sqlite;
 using System;
 using System.Data;
-using static GalacticWaez.Const;
+using static GalacticWaez.GalacticWaez;
 using Eleon.Modding;
 
-namespace GalacticWaez.Navigation
+namespace GalacticWaez
 {
     public sealed class LocalPlayerInfo : SaveGameDBBase, IPlayerInfo, IPlayerProvider
     {
@@ -62,7 +62,7 @@ namespace GalacticWaez.Navigation
                 connection?.Dispose();
             }
 
-            return warpRange;
+            return warpRange * SectorsPerLY;
         }
     }
 }

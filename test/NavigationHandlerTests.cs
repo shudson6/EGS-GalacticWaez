@@ -100,7 +100,7 @@ namespace GalacticWaezTests
             Assert.IsTrue(new NavigationHandler(nav)
                 .HandleCommand("to --range=42", testPlayer, rsp));
             Assert.AreEqual(0, rsp.Messages.Count);
-            Assert.AreEqual(42, nav.Range);
+            Assert.AreEqual(42 * GalacticWaez.GalacticWaez.SectorsPerLY, nav.Range);
             Assert.AreEqual(testPlayer, nav.Player);
             Assert.AreEqual("", nav.Goal);
         }
@@ -113,7 +113,7 @@ namespace GalacticWaezTests
             Assert.IsTrue(new NavigationHandler(nav)
                 .HandleCommand("to --range=42 funky munky", testPlayer, rsp));
             Assert.AreEqual(0, rsp.Messages.Count);
-            Assert.AreEqual(42, nav.Range);
+            Assert.AreEqual(42 * GalacticWaez.GalacticWaez.SectorsPerLY, nav.Range);
             Assert.AreEqual(testPlayer, nav.Player);
             Assert.AreEqual("funky munky", nav.Goal);
         }

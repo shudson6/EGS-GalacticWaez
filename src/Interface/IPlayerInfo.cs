@@ -8,6 +8,10 @@
     {
         int Id { get; }
         int FactionId { get; }
+
+        /// <summary>
+        /// The range this player is able to jump. Given in sectors, _not_ LY.
+        /// </summary>
         float WarpRange { get; }
 
         Eleon.Modding.VectorInt3 GetCurrentStarCoordinates();

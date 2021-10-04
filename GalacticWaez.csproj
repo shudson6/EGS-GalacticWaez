@@ -88,15 +88,12 @@
     <Compile Include="src\Interface\IResponder.cs" />
     <Compile Include="src\Interface\IResponseManager.cs" />
     <Compile Include="src\KnownStarProvider.cs" />
-    <Compile Include="src\ChatResponder.cs" />
     <Compile Include="src\Interface\ICommandHandler.cs" />
-    <Compile Include="src\Interface\IInitializer.cs" />
-    <Compile Include="src\ClientInitializer.cs" />
+    <Compile Include="src\DataSourceType.cs" />
     <Compile Include="src\Interface\ISaveGameDB.cs" />
     <Compile Include="src\Interface\IStarDataStorage.cs" />
     <Compile Include="src\Interface\IStarFinder.cs" />
     <Compile Include="src\AstarPathfinder.cs" />
-    <Compile Include="src\CommandToken.cs" />
     <Compile Include="src\GalacticWaez.cs" />
     <Compile Include="src\GalacticWaezClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

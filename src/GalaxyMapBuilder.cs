@@ -50,9 +50,8 @@ namespace GalacticWaez
         private void CheckParams(IGalaxyDataSource source, float maxWarpRange)
         {
             if (source == null) throw new ArgumentNullException("IGalaxyDataSource cannot be null.");
-            if (maxWarpRange < Const.BaseWarpRangeLY)
-                throw new ArgumentOutOfRangeException("MaxWarpRange may not be less than "
-                    + $"{Const.BaseWarpRangeLY}LY.");
+            if (maxWarpRange < 0)
+                throw new ArgumentOutOfRangeException("BuildGalaxyMap: MaxWarpRange must be positive.");
         }
 
         // checks the difference in a and b coordinates on each separate
