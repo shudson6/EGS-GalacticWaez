@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using static GalacticWaez.GalacticWaez;
 
 namespace GalacticWaez
@@ -6,6 +7,7 @@ namespace GalacticWaez
     public class NavigationHandler : ICommandHandler
     {
         private readonly INavigator Navigator;
+
         public NavigationHandler(INavigator nav)
             => Navigator = nav ?? throw new ArgumentNullException("NavigationHandler: nav");
 
@@ -40,7 +42,8 @@ namespace GalacticWaez
                 }
             }
 
-            Navigator.Navigate(player, args, range, responder);
+            // fire-and-forget, let the TaskScheduler handle threading
+            Task.Factory.StartNew(() => Navigator.Navigate(player, args, range, responder));
             return true;
         }
     }
