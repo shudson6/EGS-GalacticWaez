@@ -11,24 +11,21 @@ namespace GalacticWaez
             + "bookmarks [clear|hide|show]: remove Waez_ bookmarks or hide/show them in HUD (requires exit/resume)\n"
             + "help: get this help message\n";
 
-        public bool HandleCommand(string commandText, IPlayerInfo player, IResponder responder)
+        public bool HandleCommand(string cmdToken, string args, IPlayerInfo player, IResponder responder)
         {
-            if (commandText == null)
+            if (cmdToken != "help")
                 return false;
 
-            var tokens = commandText.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
-            if (tokens[0] != "help")
-                return false;
+            switch (args)
+            {
+                case null:
+                case "":
+                    responder.Send(HelpText);
+                    return true;
 
-            if (tokens.Length == 1)
-            {
-                responder.Send(HelpText);
+                default:
+                    return false;
             }
-            else
-            {
-                responder.Send("Unrecognized Command: " + commandText);
-            }
-            return true;
         }
     }
 }

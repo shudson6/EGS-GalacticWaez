@@ -6,23 +6,14 @@ namespace GalacticWaez
     {
         private readonly IPlayerProvider PlayerProvider;
         private readonly IResponseManager ResponseManager;
-        private readonly ICommandHandler Navigation;
-        private readonly ICommandHandler StatusHandler;
-        private readonly ICommandHandler BookmarkHandler;
-        private readonly ICommandHandler HelpHandler;
+        private readonly ICommandHandler[] Handlers;
 
         public ChatMessageHandler(IPlayerProvider players, IResponseManager responseMgr,
-            ICommandHandler navHandler,
-            ICommandHandler statusHandler,
-            ICommandHandler bookmarkHandler,
-            ICommandHandler helper)
+            params ICommandHandler[] handlers)
         {
             PlayerProvider = players;
             ResponseManager = responseMgr;
-            Navigation = navHandler;
-            StatusHandler = statusHandler;
-            BookmarkHandler = bookmarkHandler;
-            HelpHandler = helper;
+            Handlers = handlers;
         }
         
         public void HandleChatMessage(MessageData messageData)
@@ -38,32 +29,17 @@ namespace GalacticWaez
                 responder.Send("hm? (don't know what to do? \"/waez help\")");
                 return;
             }
-            string commandText = line[1].TrimStart();
-            string commandToken = commandText.Split(new[] { ' ' }, 2)[0];
+            var command = line[1].TrimStart().Split(new[] { ' ' }, 2);
+            var token = command[0];
+            var args = (command.Length == 2) ? command[1] : null;
 
-            responder.Send($"echo: {commandToken}|{commandText}");
-            switch (commandToken)
+            foreach (var h in Handlers)
             {
-                case "status":
-                    StatusHandler.HandleCommand(commandText, player, responder);
-                    break;
-
-                case "to":
-                    Navigation.HandleCommand(commandText, player, responder);
-                    break;
-
-                case "clear": // bookmarks handler will handle the shorthand "clear"
-                case "bookmarks":
-                    BookmarkHandler.HandleCommand(commandText, player, responder);
-                    break;
-
+                if (h.HandleCommand(token, args, player, responder))
+                    return;
             }
-            //string[] tokens = commandText.Split(separator: new[] { ' ' }, count: 2);
-            //if (tokens.Length == 2 && tokens[0].Equals(CommandToken.Bookmarks))
-            //{
-            //    HandleBookmarkRequest(tokens[1]);
-            //    return;
-            //}
+
+            responder.Send("Unrecognized Command: " + line[1]);
         }
 
         //private void HandleBookmarkRequest(string operation)

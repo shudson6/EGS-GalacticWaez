@@ -33,9 +33,9 @@ namespace GalacticWaez
             modApi.Log("GalacticWaezClient detached.");
         }
 
-        public bool HandleCommand(string commandText, IPlayerInfo player, IResponder responder)
+        public bool HandleCommand(string cmdToken, string args, IPlayerInfo player, IResponder responder)
         {
-            if (commandText.Trim() != "status")
+            if (cmdToken != "status" || !(args == null || args == ""))
                 return false;
 
             responder.Send(Status.ToString());
@@ -106,13 +106,11 @@ namespace GalacticWaez
             // finally, the chat message handler
             var pp = new LocalPlayerInfo(modApi.Application.LocalPlayer, saveGameDir,
                 () => modApi.ClientPlayfield, modApi.Log);
-            return new ChatMessageHandler(
-                players: pp, 
-                responseMgr: new ResponseManager(modApi.Application), 
-                navHandler: nh,
-                statusHandler: this,
-                bookmarkHandler: new BookmarkHandler(),
-                helper: new HelpHandler());
+            return new ChatMessageHandler(pp, new ResponseManager(modApi.Application), 
+                nh,
+                this,
+                new BookmarkHandler(),
+                new HelpHandler());
         }
 
         private void OnUpdateDuringInit()
