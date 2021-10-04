@@ -1,8 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Mono.Data.Sqlite;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Eleon.Modding;
 using GalacticWaez;
 
@@ -13,6 +15,66 @@ namespace GalacticWaezTests
     [DeploymentItem("Dependencies\\sqlite3.dll")]
     public class BookmarkManagerTests
     {
+        private static readonly VectorInt3[] TestBmVector = new VectorInt3[]
+        {
+            new VectorInt3(100000, 0, 200000),
+            new VectorInt3(200000, 100000, 300000),
+            new VectorInt3(300000, 400000, 500000),
+            new VectorInt3(300000, 500000, 400000),
+            new VectorInt3(500000, 300000, 400000),
+            new VectorInt3(-100000, 0, 200000),
+            new VectorInt3(200000, -100000, -300000),
+            new VectorInt3(-300000, 400000, -500000),
+            new VectorInt3(300000, -500000, 400000),
+            new VectorInt3(-500000, -300000, 400000),
+            new VectorInt3(-500000, -300000, -400000)
+        };
+        private static readonly string[] TestBmName = new string[]
+        {
+            "Waez_1", "Waez_2", "Waez_3", "Waez_4", "Waez_5", "Waez_6", 
+            "Waez_7", "Waez_8", "Waez_9", "Foo", "Bar"
+        };
+        private static readonly BookmarkData DefaultBmData = new BookmarkData
+        {
+            PlayerId = 1337,
+            PlayerFacId = 1337,
+            FacGroup = 1,
+            Icon = 2,
+            IsShared = false,
+            IsWaypoint = false,
+            IsRemove = false,
+            IsShowHud = false,
+            GameTime = 131071,
+            MaxDistance = -1
+        };
+        private static readonly BookmarkData DefaultBmData1 = new BookmarkData
+        {
+            PlayerId = 1134,
+            PlayerFacId = 1134,
+            FacGroup = 1,
+            Icon = 2,
+            IsShared = false,
+            IsWaypoint = false,
+            IsRemove = false,
+            IsShowHud = false,
+            GameTime = 131071,
+            MaxDistance = -1
+        };
+        private static readonly Bookmark[] TestBookmarks = new Bookmark[]
+        {
+            ExpectedBookmark(TestBmName[0], TestBmVector[0], DefaultBmData),
+            ExpectedBookmark(TestBmName[1], TestBmVector[1], DefaultBmData),
+            ExpectedBookmark(TestBmName[2], TestBmVector[2], DefaultBmData1),
+            ExpectedBookmark(TestBmName[3], TestBmVector[3], DefaultBmData1),
+            ExpectedBookmark(TestBmName[4], TestBmVector[4], DefaultBmData),
+            ExpectedBookmark(TestBmName[5], TestBmVector[5], DefaultBmData1),
+            ExpectedBookmark(TestBmName[6], TestBmVector[6], DefaultBmData1),
+            ExpectedBookmark(TestBmName[7], TestBmVector[7], DefaultBmData),
+            ExpectedBookmark(TestBmName[8], TestBmVector[8], DefaultBmData),
+            ExpectedBookmark(TestBmName[9], TestBmVector[9], DefaultBmData1),
+            ExpectedBookmark(TestBmName[10], TestBmVector[10], DefaultBmData),
+        };
+
         private static string dbPath;
         private static string sqlPath;
         private static string deploymentDir;
@@ -298,6 +360,116 @@ namespace GalacticWaezTests
             sql.Dispose();
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ModifyPathMarkers_Throw_NullAction()
+        {
+            new BookmarkManager(deploymentDir, delegate { }).ModifyPathMarkers(1337, null);
+        }
+
+        [TestMethod]
+        public void ModifyPathMarkers_ReturnZero_InvalidAction()
+        {
+            string logged = "";
+            var bm = new BookmarkManager(deploymentDir, text => logged = text);
+            Assert.AreEqual(0, bm.ModifyPathMarkers(1337, "foo"));
+            Assert.AreEqual("Invalid Command 'bookmarks foo', use clear|hide|show", logged);
+        }
+
+        [TestMethod]
+        public void ModifyPathMarkers_Clear_HappyDay()
+        {
+            InsertTestBookmarks();
+            var bm = new BookmarkManager(deploymentDir, delegate { });
+            Assert.AreEqual(4, bm.ModifyPathMarkers(1134, "clear"));
+            var sql = GetConnection(false);
+            var cmd = sql.CreateCommand();
+            cmd.CommandText = "select name from Bookmarks where entityid=1134;";
+            var reader = cmd.ExecuteReader();
+            // make sure there was only 1 result and it was "Foo"
+            Assert.IsTrue(reader.Read());
+            Assert.AreEqual("Foo", reader.GetString(0));
+            Assert.IsFalse(reader.Read());
+            reader.Close();
+            cmd.Dispose();
+            sql.Dispose();
+        }
+
+        [TestMethod]
+        public void ModifyPathMarkers_Clear_NoneFoundAfterClear()
+        {
+            InsertTestBookmarks();
+            var bm = new BookmarkManager(deploymentDir, delegate { });
+            // clear the Waez_* bookmarks. Then call again and none should be found
+            bm.ModifyPathMarkers(1134, "clear");
+            Assert.AreEqual(0, bm.ModifyPathMarkers(1134, "clear"));
+        }
+
+        [TestMethod]
+        public void ModifyPathMarkers_Show_HappyDay()
+        {
+            InsertTestBookmarks();
+            var expected = new[]
+            {
+                TestBookmarks[0], TestBookmarks[1], TestBookmarks[4], TestBookmarks[7], TestBookmarks[8]
+            };
+            for (int i = 0; i < expected.Length; i++)
+                expected[i].isshowhud = true;
+
+            var bm = new BookmarkManager(deploymentDir, delegate { });
+            Assert.AreEqual(5, bm.ModifyPathMarkers(1337, "show"));
+            var sql = GetConnection(false);
+            var cmd = sql.CreateCommand();
+            cmd.CommandText = "select * from Bookmarks "
+                + "where entityid=1337 and name like 'Waez\\_%' escape '\\';";
+            var reader = cmd.ExecuteReader();
+            var actual = new List<Bookmark>(5);
+            while (reader.Read())
+            {
+                actual.Add(ExtractBookmark(reader));
+            }
+            Assert.AreEqual(expected.Length, actual.Count);
+            Assert.IsFalse(expected.Except(actual).Any());
+        }
+
+        [TestMethod]
+        public void ModifyPathMarkers_Show_NoneFound()
+        {
+            InsertTestBookmarks();
+            var bm = new BookmarkManager(deploymentDir, delegate { });
+            Assert.AreEqual(0, bm.ModifyPathMarkers(42, "show"));
+        }
+
+        [TestMethod]
+        public void ModifyPathMarkers_Hide_NoneFound()
+        {
+            InsertTestBookmarks();
+            var bm = new BookmarkManager(deploymentDir, delegate { });
+            Assert.AreEqual(0, bm.ModifyPathMarkers(42, "hide"));
+        }
+
+        private void InsertTestBookmarks()
+        {
+            var sql = GetConnection(true);
+            var cmd = sql.CreateCommand();
+            var command = new StringBuilder("insert into Bookmarks values ");
+            int bid = 1;
+            foreach (var b in TestBookmarks)
+            {
+                command.Append($"({bid},{b.type},{b.refid},{b.facgroup},{b.facid},{b.entityid},null,");
+                command.Append($"'{b.name}',{b.sectorx},{b.sectory},{b.sectorz},{b.posx},{b.posy},{b.posz},");
+                command.Append($"{b.icon},{b.isshared},{b.iswaypoint},{b.isremove},{b.isshowhud},0,");
+                command.Append($"{b.createdticks},{b.expireafterticks},{b.mindistance},{b.maxdistance})");
+                command.Append(",");
+                bid++;
+            }
+            command.Replace(',', ';', command.Length - 1, 1);
+            cmd.CommandText = command.ToString();
+            cmd.ExecuteNonQuery();
+            cmd.Dispose();
+            sql.Dispose();
+        }
+
         private Bookmark ExtractBookmark(SqliteDataReader reader)
         {
             return new Bookmark
@@ -327,7 +499,7 @@ namespace GalacticWaezTests
             };
         }
 
-        private Bookmark ExpectedBookmark(string name, VectorInt3 pos, BookmarkData data)
+        private static Bookmark ExpectedBookmark(string name, VectorInt3 pos, BookmarkData data)
         {
             return new Bookmark
             {
@@ -382,6 +554,21 @@ namespace GalacticWaezTests
             public bool isshared, iswaypoint, isremove, isshowhud;
             public ulong createdticks, expireafterticks;
             public int mindistance, maxdistance;
+
+            public VectorInt3 Vector => new VectorInt3(sectorx, sectory, sectorz);
+            public BookmarkData Data => new BookmarkData
+            {
+                PlayerId = entityid,
+                PlayerFacId = facid,
+                FacGroup = facgroup,
+                Icon = icon,
+                IsShared = isshared,
+                IsWaypoint = iswaypoint,
+                IsRemove = isremove,
+                IsShowHud = isshowhud,
+                GameTime = createdticks,
+                MaxDistance = maxdistance
+            };
         }
     }
 }
