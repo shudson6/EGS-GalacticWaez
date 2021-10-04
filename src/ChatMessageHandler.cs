@@ -8,15 +8,21 @@ namespace GalacticWaez
         private readonly IResponseManager ResponseManager;
         private readonly ICommandHandler Navigation;
         private readonly ICommandHandler StatusHandler;
+        private readonly ICommandHandler BookmarkHandler;
+        private readonly ICommandHandler HelpHandler;
 
         public ChatMessageHandler(IPlayerProvider players, IResponseManager responseMgr,
             ICommandHandler navHandler,
-            ICommandHandler statusHandler)
+            ICommandHandler statusHandler,
+            ICommandHandler bookmarkHandler,
+            ICommandHandler helper)
         {
             PlayerProvider = players;
             ResponseManager = responseMgr;
             Navigation = navHandler;
             StatusHandler = statusHandler;
+            BookmarkHandler = bookmarkHandler;
+            HelpHandler = helper;
         }
         
         public void HandleChatMessage(MessageData messageData)
@@ -45,6 +51,12 @@ namespace GalacticWaez
                 case "to":
                     Navigation.HandleCommand(commandText, player, responder);
                     break;
+
+                case "clear": // bookmarks handler will handle the shorthand "clear"
+                case "bookmarks":
+                    BookmarkHandler.HandleCommand(commandText, player, responder);
+                    break;
+
             }
             //string[] tokens = commandText.Split(separator: new[] { ' ' }, count: 2);
             //if (tokens.Length == 2 && tokens[0].Equals(CommandToken.Bookmarks))
@@ -53,14 +65,6 @@ namespace GalacticWaez
             //    return;
             //}
         }
-
-        private const string HelpText = "Waez commands:\n"
-            + "to [mapmarker]: plot a course to [mapmarker] and add mapmarkers for each step\n"
-            + "status: find out what Waez is up to\n"
-            + "init: initialize Waez. this should happen automatically\n"
-            + "clear: remove all map markers that start with Waez_\n"
-            + "bookmarks [clear|hide|show]: remove Waez_ bookmarks or hide/show them in HUD (requires exit/resume)\n"
-            + "help: get this help message\n";
 
         //private void HandleBookmarkRequest(string operation)
         //{
