@@ -10,10 +10,7 @@ namespace GalacticWaez
         private readonly LoggingDelegate Log;
 
         public KnownStarProvider(string saveGameDir, LoggingDelegate log)
-            : base($"{saveGameDir}\\{DbFileName}")
-        {
-            Log = log;
-        }
+            : base(saveGameDir) { Log = log ?? delegate { }; }
 
         public bool GetFirstKnownStarPosition(out VectorInt3 pos)
         {
@@ -53,6 +50,7 @@ namespace GalacticWaez
 
         public bool GetPosition(string name, out VectorInt3 pos)
         {
+            Log($"Seeking known star: <{name}>");
             SqliteConnection connection = null;
             SqliteCommand command = null;
             IDataReader reader = null;

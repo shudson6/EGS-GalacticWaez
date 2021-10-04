@@ -111,6 +111,7 @@
     <Compile Include="NavigatorTests.cs" />
     <Compile Include="AstarPathfinderTests.cs" />
     <Compile Include="NavigationHandlerTests.cs" />
+    <Compile Include="KnownStarProviderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Dependencies\stardata-test-badsum.csv">
