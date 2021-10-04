@@ -7,7 +7,7 @@ using System.Text;
 
 namespace GalacticWaez
 {
-    public class BookmarkManager :  SaveGameDBBase, IBookmarkManager
+    public class BookmarkManager :  SaveGameDB, IBookmarkManager
     {
         private readonly LoggingDelegate Log;
 
@@ -123,5 +123,48 @@ namespace GalacticWaez
             }
         }
 
+        public int ModifyPathMarkers(int playerId, string action)
+        {
+            if (action == null)
+                throw new ArgumentNullException("ModifyPathMarkers: action");
+
+            SqliteConnection connection = null;
+            SqliteCommand command = null;
+
+            try
+            {
+                connection = GetConnection(writeable: true);
+                command = connection.CreateCommand();
+                switch (action)
+                {
+                    case "clear":
+                        command.CommandText = "delete from Bookmarks "
+                            + $"where entityid='{playerId}' and name like 'Waez\\_%' escape '\\';";
+                        break;
+                    case "hide":
+                        command.CommandText = "update Bookmarks set isshowhud = 0, maxdistance = 0 "
+                            + $"where entityid='{playerId}' and name like 'Waez\\_%' escape '\\';";
+                        break;
+                    case "show":
+                        command.CommandText = "update Bookmarks set isshowhud = 1, maxdistance = -1 "
+                            + $"where entityid ='{playerId}' and name like 'Waez\\_%' escape '\\';";
+                        break;
+                    default:
+                        Log($"Invalid Command 'bookmarks {action}', use clear|hide|show");
+                        return 0;
+                }
+                return command.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Log($"SqliteException in ModifyPathMarkers: {ex.Message}");
+                return 0;
+            }
+            finally
+            {
+                command?.Dispose();
+                connection?.Dispose();
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Data;
 
 namespace GalacticWaez
 {
-    public class KnownStarProvider : SaveGameDBBase, IKnownStarProvider
+    public class KnownStarProvider : SaveGameDB, IKnownStarProvider
     {
         private readonly LoggingDelegate Log;
 

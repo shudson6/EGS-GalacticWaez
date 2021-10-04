@@ -90,7 +90,6 @@
     <Compile Include="src\KnownStarProvider.cs" />
     <Compile Include="src\Interface\ICommandHandler.cs" />
     <Compile Include="src\DataSourceType.cs" />
-    <Compile Include="src\Interface\ISaveGameDB.cs" />
     <Compile Include="src\Interface\IStarDataStorage.cs" />
     <Compile Include="src\Interface\IStarFinder.cs" />
     <Compile Include="src\AstarPathfinder.cs" />
@@ -108,7 +107,6 @@
     <Compile Include="src\NormalDataSource.cs" />
     <Compile Include="src\ResponseManager.cs" />
     <Compile Include="src\SaveGameDB.cs" />
-    <Compile Include="src\SaveGameDBBase.cs" />
     <Compile Include="src\StarDataStorage.cs" />
     <Compile Include="src\StarFinder.cs" />
     <Compile Include="src\ChatMessage.cs" />

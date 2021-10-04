@@ -6,7 +6,7 @@ using Eleon.Modding;
 
 namespace GalacticWaez
 {
-    public sealed class LocalPlayerInfo : SaveGameDBBase, IPlayerInfo, IPlayerProvider
+    public sealed class LocalPlayerInfo : SaveGameDB, IPlayerInfo, IPlayerProvider
     {
         private readonly IPlayer player;
         private readonly LoggingDelegate Log;
