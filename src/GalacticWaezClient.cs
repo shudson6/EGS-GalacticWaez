@@ -110,7 +110,9 @@ namespace GalacticWaez
                 players: pp, 
                 responseMgr: new ResponseManager(modApi.Application), 
                 navHandler: nh,
-                statusHandler: this);
+                statusHandler: this,
+                bookmarkHandler: new BookmarkHandler(),
+                helper: new HelpHandler());
         }
 
         private void OnUpdateDuringInit()
