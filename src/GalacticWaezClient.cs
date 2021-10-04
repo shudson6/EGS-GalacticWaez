@@ -107,10 +107,7 @@ namespace GalacticWaez
             var pp = new LocalPlayerInfo(modApi.Application.LocalPlayer, saveGameDir,
                 () => modApi.ClientPlayfield, modApi.Log);
             return new ChatMessageHandler(pp, new ResponseManager(modApi.Application), 
-                nh,
-                this,
-                new BookmarkHandler(),
-                new HelpHandler());
+                nh, this, new BookmarkHandler(bm, modApi.Log), new HelpHandler());
         }
 
         private void OnUpdateDuringInit()

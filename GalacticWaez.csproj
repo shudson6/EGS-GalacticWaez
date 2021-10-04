@@ -78,7 +78,6 @@
     <Compile Include="src\Interface\IBookmarkManager.cs" />
     <Compile Include="src\Interface\INavigationHandler.cs" />
     <Compile Include="src\FileDataSource.cs" />
-    <Compile Include="src\Interface\IChatResponder.cs" />
     <Compile Include="src\Interface\IFileDataSource.cs" />
     <Compile Include="src\Interface\IGalaxyDataSource.cs" />
     <Compile Include="src\GalaxyMapBuilder.cs" />

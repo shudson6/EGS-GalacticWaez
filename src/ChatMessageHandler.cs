@@ -41,16 +41,5 @@ namespace GalacticWaez
 
             responder.Send("Unrecognized Command: " + line[1]);
         }
-
-        //private void HandleBookmarkRequest(string operation)
-        //{
-        //    string message = $"Modified "
-        //        + saveGameDB.ModifyPathMarkers(modApi.Application.LocalPlayer.Id, operation)
-        //        + " map markers.";
-        //    modApi.Application.SendChatMessage(new ChatMessage(message,
-        //        modApi.Application.LocalPlayer));
-        //    return;
-        //}
-
     }
 }
