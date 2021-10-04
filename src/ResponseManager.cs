@@ -14,8 +14,8 @@ namespace GalacticWaez
     /// <c>Application.Update</c> delegate.
     /// <br/>
     /// Reasoning: calling Application.SendChatMessage on a thread other than the one on which
-    /// Application.Update executes causes crashes. Use this class to ensure messages are sent
-    /// on the correct thread.
+    /// Application.Update executes (let's call it the "Update Thread") causes crashes. 
+    /// Use this class to ensure messages are sent on the Update Thread.
     /// </summary>
     public class ResponseManager : IResponseManager
     {
