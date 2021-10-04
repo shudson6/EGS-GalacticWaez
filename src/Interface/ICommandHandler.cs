@@ -4,6 +4,6 @@ namespace GalacticWaez
 {
     public interface ICommandHandler
     {
-        bool HandleCommand(string commandText, IPlayerInfo player, IResponder responder);
+        bool HandleCommand(string cmdToken, string args, IPlayerInfo player, IResponder responder);
     }
 }

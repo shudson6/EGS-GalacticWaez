@@ -23,7 +23,7 @@ namespace GalacticWaezTests
         {
             var nav = new Fakes.FakeNavigator();
             var rsp = new Fakes.TestResponder();
-            Assert.IsFalse(new NavigationHandler(nav).HandleCommand(null, testPlayer, rsp));
+            Assert.IsFalse(new NavigationHandler(nav).HandleCommand(null, null, testPlayer, rsp));
             Assert.AreEqual(0, rsp.Messages.Count);
         }
 
@@ -32,7 +32,7 @@ namespace GalacticWaezTests
         {
             var nav = new Fakes.FakeNavigator();
             var rsp = new Fakes.TestResponder();
-            Assert.IsFalse(new NavigationHandler(nav).HandleCommand("hello world", testPlayer, rsp));
+            Assert.IsFalse(new NavigationHandler(nav).HandleCommand("hello world", null, testPlayer, rsp));
             Assert.AreEqual(0, rsp.Messages.Count);
         }
 
@@ -42,7 +42,7 @@ namespace GalacticWaezTests
             var nav = new Fakes.FakeNavigator();
             var rsp = new Fakes.TestResponder();
             Assert.IsTrue(new NavigationHandler(nav)
-                .HandleCommand("to --range=hi foo", testPlayer, rsp));
+                .HandleCommand("to", "--range=hi foo", testPlayer, rsp));
             Assert.AreEqual("Invalid range argument.", rsp.Messages[0]);
         }
 
@@ -52,7 +52,7 @@ namespace GalacticWaezTests
             var nav = new Fakes.FakeNavigator();
             var rsp = new Fakes.TestResponder();
             Assert.IsTrue(new NavigationHandler(nav)
-                .HandleCommand("to --range=-5 hello", testPlayer, rsp));
+                .HandleCommand("to", "--range=-5 hello", testPlayer, rsp));
             Assert.AreEqual("Range must be a positive number.", rsp.Messages[0]);
         }
 
@@ -62,7 +62,7 @@ namespace GalacticWaezTests
             var nav = new Fakes.FakeNavigator();
             var rsp = new Fakes.TestResponder();
             Assert.IsTrue(new NavigationHandler(nav)
-                .HandleCommand("to --range=0 hello", testPlayer, rsp));
+                .HandleCommand("to", "--range=0 hello", testPlayer, rsp));
             Assert.AreEqual("Range must be a positive number.", rsp.Messages[0]);
         }
 
@@ -72,7 +72,7 @@ namespace GalacticWaezTests
             var nav = new Fakes.FakeNavigator();
             var rsp = new Fakes.TestResponder();
             Assert.IsTrue(new NavigationHandler(nav)
-                .HandleCommand("to hello world", testPlayer, rsp));
+                .HandleCommand("to", "hello world", testPlayer, rsp));
             Assert.AreEqual(0, rsp.Messages.Count);
             Assert.AreEqual(testPlayer.WarpRange, nav.Range);
             Assert.AreEqual(testPlayer, nav.Player);
@@ -85,7 +85,7 @@ namespace GalacticWaezTests
             var nav = new Fakes.FakeNavigator();
             var rsp = new Fakes.TestResponder();
             Assert.IsTrue(new NavigationHandler(nav)
-                .HandleCommand("to ", testPlayer, rsp));
+                .HandleCommand("to", "", testPlayer, rsp));
             Assert.AreEqual(0, rsp.Messages.Count);
             Assert.AreEqual(testPlayer.WarpRange, nav.Range);
             Assert.AreEqual(testPlayer, nav.Player);
@@ -98,7 +98,7 @@ namespace GalacticWaezTests
             var nav = new Fakes.FakeNavigator();
             var rsp = new Fakes.TestResponder();
             Assert.IsTrue(new NavigationHandler(nav)
-                .HandleCommand("to --range=42", testPlayer, rsp));
+                .HandleCommand("to", "--range=42", testPlayer, rsp));
             Assert.AreEqual(0, rsp.Messages.Count);
             Assert.AreEqual(42 * GalacticWaez.GalacticWaez.SectorsPerLY, nav.Range);
             Assert.AreEqual(testPlayer, nav.Player);
@@ -111,7 +111,7 @@ namespace GalacticWaezTests
             var nav = new Fakes.FakeNavigator();
             var rsp = new Fakes.TestResponder();
             Assert.IsTrue(new NavigationHandler(nav)
-                .HandleCommand("to --range=42 funky munky", testPlayer, rsp));
+                .HandleCommand("to", "--range=42 funky munky", testPlayer, rsp));
             Assert.AreEqual(0, rsp.Messages.Count);
             Assert.AreEqual(42 * GalacticWaez.GalacticWaez.SectorsPerLY, nav.Range);
             Assert.AreEqual(testPlayer, nav.Player);
