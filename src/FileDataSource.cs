@@ -46,7 +46,13 @@ namespace GalacticWaez
                         int.Parse(coords[2])
                         ));
                 }
-                return (count == starPositions.Count) ? starPositions : null;
+                if (count == starPositions.Count)
+                {
+                    Log($"Loaded {count} star positions from file.");
+                    return starPositions;
+                }
+                Log($"Bad file: expected {count} star positions but found {starPositions.Count}.");
+                return null;
             }
             catch (Exception ex)
             {
