@@ -14,6 +14,19 @@ namespace GalacticWaez
             this.Log = Log ?? delegate { }; 
         }
 
+        /// <summary>
+        /// Creates a <see cref="GalaxyMap"/> using star positions retrieved by the given
+        /// <see cref="IGalaxyDataSource"/>. Creates an edge (warp line) for each pair of
+        /// stars within <c>maxWarpRange</c> of each other.
+        /// </summary>
+        /// <param name="source">an <see cref="IGalaxyDataSource"/> instance to provide
+        /// star position data
+        /// </param>
+        /// <param name="maxWarpRange">maximum distance between two stars to create 
+        /// a warp line (unit is sectors)</param>
+        /// <returns>
+        /// a new GalaxyMap, or <c>null</c> if data were unavailable
+        /// </returns>
         public GalaxyMap BuildGalaxyMap(IGalaxyDataSource source, float maxWarpRange)
         {
             CheckParams(source, maxWarpRange);
@@ -47,6 +60,7 @@ namespace GalacticWaez
             return g;
         }
 
+        /// <summary> Validates the parameters, throwing exceptions if they are invalid. </summary>
         private void CheckParams(IGalaxyDataSource source, float maxWarpRange)
         {
             if (source == null) throw new ArgumentNullException("IGalaxyDataSource cannot be null.");
@@ -54,12 +68,14 @@ namespace GalacticWaez
                 throw new ArgumentOutOfRangeException("BuildGalaxyMap: MaxWarpRange must be positive.");
         }
 
-        // checks the difference in a and b coordinates on each separate
-        // axis to ensure that a cube of side length range could contain
-        // both.
-        // saves a lot of Math.sqrt() calls. When tested on a Reforged
-        // Eden dump with 43000+ stars, reduced construction time by
-        // over 3/4 (from 120+ seconds to fewer than 30).
+        /// <summary>
+        /// checks the difference in a and b coordinates on each separate
+        /// axis to ensure that a cube of side length range could contain
+        /// both.
+        /// saves a lot of Math.sqrt() calls. When tested on a Reforged
+        /// Eden dump with 43000+ stars, reduced construction time by
+        /// over 3/4 (from 120+ seconds to fewer than 30).
+        /// </summary>
         private static bool AreCloseEnough(GalaxyMap.Node a, GalaxyMap.Node b, float range)
         {
             return Math.Abs(a.Position.x - b.Position.x) <= range

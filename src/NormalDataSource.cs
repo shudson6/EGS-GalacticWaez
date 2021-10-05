@@ -7,6 +7,8 @@ namespace GalacticWaez
     /// <summary>
     /// Provides star positions by first checking for a save file and, failing
     /// that, scanning memory for them.
+    /// In the case that star positions are found by scanning memory, saves
+    /// the data to the savegame.
     /// </summary>
     public class NormalDataSource : IGalaxyDataSource
     {
@@ -22,6 +24,15 @@ namespace GalacticWaez
             this.storage = storage;
         }
 
+        /// <summary>
+        /// Attempts to load star data from the <see cref="IFileDataSource"/>. If this fails,
+        /// attempts to retrieve data from the secondary source (intended to be a
+        /// <see cref="StarFinderDataSource"/>). If found by the secondary, saves the data
+        /// using the <see cref="IGalaxyStorage"/>.
+        /// </summary>
+        /// <returns>
+        /// the star positions, or <c>null</c> if none found
+        /// </returns>
         public IEnumerable<VectorInt3> GetGalaxyData()
         {
             var positions = fileSource?.GetGalaxyData() ?? null;

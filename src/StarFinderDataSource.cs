@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace GalacticWaez
 {
+    /// <summary>
+    /// <see cref="IGalaxyDataSource"/> that uses a <see cref="StarFinder"/>
+    /// to find star position data residing in memory.
+    /// </summary>
     public class StarFinderDataSource : IGalaxyDataSource
     {
         private readonly LoggingDelegate Log;

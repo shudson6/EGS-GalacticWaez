@@ -76,7 +76,6 @@
     <Compile Include="src\BookmarkManager.cs" />
     <Compile Include="src\HelpHandler.cs" />
     <Compile Include="src\Interface\IBookmarkManager.cs" />
-    <Compile Include="src\Interface\INavigationHandler.cs" />
     <Compile Include="src\FileDataSource.cs" />
     <Compile Include="src\Interface\IFileDataSource.cs" />
     <Compile Include="src\Interface\IGalaxyDataSource.cs" />
