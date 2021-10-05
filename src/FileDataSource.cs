@@ -20,6 +20,14 @@ namespace GalacticWaez
             PathToFile = $"{saveGameDir}\\{ModContentDir}\\{FileName}";
         }
 
+        /// <summary>
+        /// Attempts to load galaxy data from the underlying file 
+        /// (available via <see cref="PathToFile"/>).
+        /// </summary>
+        /// <returns>
+        /// star positions, or <c>null</c> if the file does not exist or any
+        /// error occurs.
+        /// </returns>
         public IEnumerable<VectorInt3> GetGalaxyData()
         {
             if (!File.Exists(PathToFile))
@@ -67,6 +75,14 @@ namespace GalacticWaez
             }
         }
 
+        /// <summary>
+        /// Writes <c>positions</c> to the underlying file
+        /// (available via <see cref="PathToFile"/>).
+        /// </summary>
+        /// <param name="positions"></param>
+        /// <returns>
+        /// <c>true</c> on success, <c>false</c> on failure
+        /// </returns>
         public bool StoreGalaxyData(IEnumerable<VectorInt3> positions)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(PathToFile));

@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 namespace GalacticWaez
 {
+    /// <summary>
+    /// Scans application memory to find star position data residing within.
+    /// </summary>
     public unsafe class StarFinder : IStarFinder
     {
         // for the call to TryStartNoGCRegion. 2MB should be plenty of room for this op
