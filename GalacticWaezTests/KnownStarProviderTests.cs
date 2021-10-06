@@ -25,10 +25,11 @@ namespace GalacticWaezTests
         [ClassInitialize]
         public static void SetupClass(TestContext _tc)
         {
-            deploymentDir = _tc.DeploymentDirectory;
+            deploymentDir = $"{_tc.DeploymentDirectory}\\KnownStarProvider";
+            Directory.CreateDirectory(deploymentDir);
             dbPath = $"{deploymentDir}\\global.db";
             SqliteConnection.CreateFile(dbPath);
-            sqlPath = $"{deploymentDir}\\testdb.sql";
+            sqlPath = $"{_tc.DeploymentDirectory}\\testdb.sql";
         }
 
         [TestInitialize]
