@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using static GalacticWaez.GalacticWaez;
-using SectorCoordinates = Eleon.Modding.VectorInt3;
 using System.Collections.Generic;
+using Eleon.Modding;
 
 namespace GalacticWaez
 {
@@ -17,6 +17,9 @@ namespace GalacticWaez
         private const int SizeOfStarData = 24;
         private const int StarCountThreshold = 1000;
         private const long RegionSizeThreshold = SizeOfStarData * StarCountThreshold;
+        // this value was chosen after several runs and should provide enough capacity
+        // that we don't lose time to resizing
+        // this is a constant race against the GC after all
         private const int RegionListInitialCapacity = 293;
 
         private bool noResumeGC = false;
@@ -31,7 +34,7 @@ namespace GalacticWaez
             memInfoSize = Marshal.SizeOf(memInfo);
         }
 
-        unsafe public SectorCoordinates[] Search(SectorCoordinates knownPosition)
+        unsafe public VectorInt3[] Search(VectorInt3 knownPosition)
         {
             PauseGC();
 
@@ -73,7 +76,7 @@ namespace GalacticWaez
             return null;
         }
 
-        unsafe private bool CouldBeStarData(StarData* sd, SectorCoordinates sc)
+        unsafe private bool CouldBeStarData(StarData* sd, VectorInt3 sc)
         {
             return (sd->x == sc.x) && (sd->y == sc.y) && (sd->z == sc.z);
         }
@@ -170,12 +173,12 @@ namespace GalacticWaez
             }
         }
 
-        unsafe private SectorCoordinates[] ExtractStarPositions(StarDataArray starDataArray)
+        unsafe private VectorInt3[] ExtractStarPositions(StarDataArray starDataArray)
         {
-            var starPosition = new SectorCoordinates[starDataArray.count];
+            var starPosition = new VectorInt3[starDataArray.count];
             for (int i = 0; i < starPosition.Length; i++)
             {
-                starPosition[i] = new SectorCoordinates(
+                starPosition[i] = new VectorInt3(
                     starDataArray[i].x,
                     starDataArray[i].y,
                     starDataArray[i].z
