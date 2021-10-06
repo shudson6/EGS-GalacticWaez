@@ -1,19 +1,21 @@
-﻿using Eleon;
+﻿using System.Collections.Generic;
+using Eleon;
 
 namespace GalacticWaez
 {
     public class ChatMessageHandler 
     {
-        private readonly IPlayerProvider PlayerProvider;
-        private readonly IResponseManager ResponseManager;
-        private readonly ICommandHandler[] Handlers;
+        private readonly List<ICommandHandler> Handlers;
 
-        public ChatMessageHandler(IPlayerProvider players, IResponseManager responseMgr,
+        public IPlayerProvider PlayerProvider { get; set; }
+        public IResponseManager ResponseManager { get; }
+
+        public ChatMessageHandler(IResponseManager responseMgr,
             params ICommandHandler[] handlers)
         {
-            PlayerProvider = players;
+            PlayerProvider = null;
             ResponseManager = responseMgr;
-            Handlers = handlers;
+            Handlers = new List<ICommandHandler>(handlers);
         }
         
         public void HandleChatMessage(MessageData messageData)
@@ -23,7 +25,7 @@ namespace GalacticWaez
                 return;
 
             var responder = ResponseManager.CreateResponder(messageData);
-            var player = PlayerProvider.GetPlayerInfo(messageData.SenderEntityId);
+            var player = PlayerProvider?.GetPlayerInfo(messageData.SenderEntityId);
             if (line.Length < 2)
             {
                 responder.Send("hm? (don't know what to do? \"/waez help\")");
@@ -33,13 +35,33 @@ namespace GalacticWaez
             var token = command[0];
             var args = (command.Length == 2) ? command[1] : null;
 
-            foreach (var h in Handlers)
+            lock (Handlers)
             {
-                if (h.HandleCommand(token, args, player, responder))
-                    return;
+                foreach (var h in Handlers)
+                {
+                    if (h.HandleCommand(token, args, player, responder))
+                        return;
+                }
             }
 
             responder.Send("Unrecognized Command: " + line[1]);
+        }
+
+        public void AddHandler(ICommandHandler handler)
+        {
+            lock (Handlers)
+            {
+                if (!Handlers.Contains(handler))
+                    Handlers.Add(handler);
+            }
+        }
+
+        public void RemoveHandler(ICommandHandler handler)
+        {
+            lock (Handlers)
+            {
+                Handlers.Remove(handler);
+            }
         }
     }
 }

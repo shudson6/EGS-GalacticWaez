@@ -16,7 +16,7 @@ namespace GalacticWaez
     {
         private IModApi modApi;
         private ChatMessageHandler chatHandler = null;
-        private Task<ChatMessageHandler> init = null;
+        private Task<bool> init = null;
 
         public ModState Status { get; private set; }
 
@@ -56,16 +56,14 @@ namespace GalacticWaez
                     if (modApi.Application.Mode == ApplicationMode.SinglePlayer)
                     {
                         modApi.Application.Update += OnUpdateTilWorldVisible;
+                        SetChatHandler(CreateChatHandler());
                         modApi.Log("Listening for commands.");
                     }
                     break;
 
                 case GameEventType.GameEnded:
                     modApi.Application.Update -= OnUpdateTilWorldVisible;
-                    if (chatHandler != null)
-                    {
-                        modApi.Application.ChatMessageSent -= chatHandler.HandleChatMessage;
-                    }
+                    SetChatHandler(null);
                     modApi.Log("Stopped listening for commands.");
                     break;
             }
@@ -80,13 +78,19 @@ namespace GalacticWaez
             Setup();
         }
 
+        private ChatMessageHandler CreateChatHandler()
+            => new ChatMessageHandler(
+                new ResponseManager(modApi.Application),
+                this,
+                new HelpHandler());
+
         private void Setup()
         {
-            init = Task<ChatMessageHandler>.Factory.StartNew(SetupTask, DataSourceType.Normal);
+            init = Task<bool>.Factory.StartNew(SetupTask, DataSourceType.Normal);
             modApi.Application.Update += OnUpdateDuringInit;
         }
 
-        private ChatMessageHandler SetupTask(object obj)
+        private bool SetupTask(object obj)
         {
             Status = ModState.Initializing;
             string saveGameDir = modApi.Application.GetPathFor(AppFolder.SaveGame);
@@ -98,6 +102,8 @@ namespace GalacticWaez
                 new StarFinderDataSource(ksp, modApi.Log), file);
             var galaxyMap = new GalaxyMapBuilder(modApi.Log)
                 .BuildGalaxyMap(source, 110 * GalacticWaez.SectorsPerLY);
+            if (galaxyMap == null)
+                return false;
 
             // assemble the navigator
             var bm = new BookmarkManager(saveGameDir, modApi.Log);
@@ -106,10 +112,11 @@ namespace GalacticWaez
             var nh = new NavigationHandler(nav);
 
             // finally, the chat message handler
-            var pp = new LocalPlayerInfo(modApi.Application.LocalPlayer, saveGameDir,
+            chatHandler.PlayerProvider = new LocalPlayerInfo(modApi.Application.LocalPlayer, saveGameDir,
                 () => modApi.ClientPlayfield, modApi.Log);
-            return new ChatMessageHandler(pp, new ResponseManager(modApi.Application), 
-                nh, this, new BookmarkHandler(bm, modApi.Log), new HelpHandler());
+            chatHandler.AddHandler(nh);
+            chatHandler.AddHandler(new BookmarkHandler(bm, modApi.Log));
+            return true;
         }
 
         private void OnUpdateDuringInit()
@@ -118,9 +125,8 @@ namespace GalacticWaez
                 return;
 
             modApi.Application.Update -= OnUpdateDuringInit;
-            if (init.Status == TaskStatus.RanToCompletion)
+            if (init.Status == TaskStatus.RanToCompletion && init.Result == true)
             {
-                SetChatHandler(init.Result);
                 Status = ModState.Ready;
                 modApi.GUI.ShowGameMessage("Waez is Ready.", prio: 0, duration: 5);
             }
@@ -137,7 +143,8 @@ namespace GalacticWaez
                 modApi.Application.ChatMessageSent -= chatHandler.HandleChatMessage;
 
             chatHandler = handler;
-            modApi.Application.ChatMessageSent += handler.HandleChatMessage;
+            if (handler != null)
+                modApi.Application.ChatMessageSent += handler.HandleChatMessage;
         }
     }
 }
