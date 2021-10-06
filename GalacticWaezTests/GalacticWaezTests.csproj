@@ -89,6 +89,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BookmarkHandlerTests.cs" />
     <Compile Include="Fakes\FakeNavigator.cs" />
     <Compile Include="Fakes\FakePlayer.cs" />
     <Compile Include="Fakes\FakeBookmarkManager.cs" />

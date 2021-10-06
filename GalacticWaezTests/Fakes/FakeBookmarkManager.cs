@@ -43,7 +43,7 @@ namespace GalacticWaezTests.Fakes
             return true;
         }
 
-        public int ModifyPathMarkers(int playerId, string action) => 0;
+        public int ModifyPathMarkers(int playerId, string action) => 3;
     }
 
     public class NotFoundBookmarkManager : IBookmarkManager
@@ -55,10 +55,7 @@ namespace GalacticWaezTests.Fakes
             return Inserted;
         }
 
-        public int ModifyPathMarkers(int playerId, string action)
-        {
-            throw new NotImplementedException();
-        }
+        public int ModifyPathMarkers(int playerId, string action) => 0;
 
         public bool TryGetVector(int playerId, int playerFacId, string bookmarkName, out VectorInt3 coordinates)
         {

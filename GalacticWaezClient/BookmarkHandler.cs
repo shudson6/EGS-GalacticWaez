@@ -15,17 +15,35 @@ namespace GalacticWaez
 
         public bool HandleCommand(string cmdToken, string args, IPlayerInfo player, IResponder responder)
         {
-            if (cmdToken == "clear" && (args == null || args == ""))
-            {
-                cmdToken = "bookmarks";
-                args = "clear";
+            if (cmdToken == "clear")
+            { 
+                if (args == null || args == "")
+                {
+                    cmdToken = "bookmarks";
+                    args = "clear";
+                }
+                else
+                {
+                    responder.Send("'clear' does not take options.");
+                    return true;
+                }
             }
 
             if (cmdToken != "bookmarks")
                 return false;
 
+            if (args == null || args == "")
+            {
+                responder.Send("Required: [show|hide|clear]");
+                return true;
+            }
+
             if (args != "show" && args != "hide" && args != "clear")
-                return false;
+            {
+                responder.Send("Unrecognized option: " + args
+                    + "\nuse [show|hide|clear]");
+                return true;
+            }
 
             string message = "Modified "
                 + Bookmarks.ModifyPathMarkers(player.Id, args)
