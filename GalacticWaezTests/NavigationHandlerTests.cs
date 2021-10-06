@@ -129,5 +129,20 @@ namespace GalacticWaezTests
             Assert.AreEqual(testPlayer, nav.Player);
             Assert.AreEqual("funky munky", nav.Goal);
         }
+
+        [TestMethod]
+        public void HandleCommand_SearchEmptyString_NullArgs()
+        {
+            var nav = new Fakes.FakeNavigator();
+            var rsp = new Fakes.TestResponder();
+            Assert.IsTrue(new NavigationHandler(nav)
+                .HandleCommand("to", null, testPlayer, rsp));
+            // NavigationHandler fires-and-forgets nav tasks,
+            // so wait for a clue that it's done
+            while (nav.Player == null) ;
+            Assert.AreEqual(testPlayer.WarpRange, nav.Range);
+            Assert.AreEqual(testPlayer, nav.Player);
+            Assert.AreEqual("", nav.Goal);
+        }
     }
 }

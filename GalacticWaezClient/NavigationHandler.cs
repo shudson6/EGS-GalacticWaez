@@ -16,6 +16,9 @@ namespace GalacticWaez
             if (cmdToken != "to")
                 return false;
 
+            if (args == null)
+                args = "";
+
             float range = player.WarpRange;
 
             // check for options
