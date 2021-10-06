@@ -14,6 +14,8 @@ namespace GalacticWaez
 
     public class GalacticWaezClient : IMod, ICommandHandler
     {
+        private readonly PreInitCommandHandler preCmd = new PreInitCommandHandler();
+
         private IModApi modApi;
         private ChatMessageHandler chatHandler = null;
         private Task<bool> init = null;
@@ -82,7 +84,8 @@ namespace GalacticWaez
             => new ChatMessageHandler(
                 new ResponseManager(modApi.Application),
                 this,
-                new HelpHandler());
+                new HelpHandler(),
+                preCmd);
 
         private void Setup()
         {
@@ -116,6 +119,7 @@ namespace GalacticWaez
                 () => modApi.ClientPlayfield, modApi.Log);
             chatHandler.AddHandler(nh);
             chatHandler.AddHandler(new BookmarkHandler(bm, modApi.Log));
+            chatHandler.RemoveHandler(preCmd);
             return true;
         }
 
