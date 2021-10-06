@@ -73,6 +73,9 @@ namespace GalacticWaezTests
             var rsp = new Fakes.TestResponder();
             Assert.IsTrue(new NavigationHandler(nav)
                 .HandleCommand("to", "hello world", testPlayer, rsp));
+            // NavigationHandler fires-and-forgets nav tasks,
+            // so wait for a clue that it's done
+            while (nav.Player == null) ;
             Assert.AreEqual(0, rsp.Messages.Count);
             Assert.AreEqual(testPlayer.WarpRange, nav.Range);
             Assert.AreEqual(testPlayer, nav.Player);
@@ -86,6 +89,9 @@ namespace GalacticWaezTests
             var rsp = new Fakes.TestResponder();
             Assert.IsTrue(new NavigationHandler(nav)
                 .HandleCommand("to", "", testPlayer, rsp));
+            // NavigationHandler fires-and-forgets nav tasks,
+            // so wait for a clue that it's done
+            while (nav.Player == null) ;
             Assert.AreEqual(0, rsp.Messages.Count);
             Assert.AreEqual(testPlayer.WarpRange, nav.Range);
             Assert.AreEqual(testPlayer, nav.Player);
@@ -99,6 +105,9 @@ namespace GalacticWaezTests
             var rsp = new Fakes.TestResponder();
             Assert.IsTrue(new NavigationHandler(nav)
                 .HandleCommand("to", "--range=42", testPlayer, rsp));
+            // NavigationHandler fires-and-forgets nav tasks,
+            // so wait for a clue that it's done
+            while (nav.Player == null) ;
             Assert.AreEqual(0, rsp.Messages.Count);
             Assert.AreEqual(42 * GalacticWaez.GalacticWaez.SectorsPerLY, nav.Range);
             Assert.AreEqual(testPlayer, nav.Player);
@@ -112,6 +121,9 @@ namespace GalacticWaezTests
             var rsp = new Fakes.TestResponder();
             Assert.IsTrue(new NavigationHandler(nav)
                 .HandleCommand("to", "--range=42 funky munky", testPlayer, rsp));
+            // NavigationHandler fires-and-forgets nav tasks,
+            // so wait for a clue that it's done
+            while (nav.Player == null) ;
             Assert.AreEqual(0, rsp.Messages.Count);
             Assert.AreEqual(42 * GalacticWaez.GalacticWaez.SectorsPerLY, nav.Range);
             Assert.AreEqual(testPlayer, nav.Player);
