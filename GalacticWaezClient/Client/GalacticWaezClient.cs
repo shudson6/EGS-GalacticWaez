@@ -1,8 +1,7 @@
 ﻿using Eleon.Modding;
-using System.IO;
 using System.Threading.Tasks;
 
-namespace GalacticWaez
+namespace GalacticWaez.Client
 {
     public enum ModState
     {

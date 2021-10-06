@@ -4,7 +4,7 @@ using System.Data;
 using static GalacticWaez.GalacticWaez;
 using Eleon.Modding;
 
-namespace GalacticWaez
+namespace GalacticWaez.Client
 {
     public sealed class LocalPlayerInfo : SaveGameDB, IPlayerInfo, IPlayerProvider
     {
