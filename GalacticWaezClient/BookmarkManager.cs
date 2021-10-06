@@ -109,20 +109,20 @@ namespace GalacticWaez
             return sql.ToString();
         }
 
-        private int GetStartingBookmarkId(SqliteCommand command)
-        {
-            IDataReader reader = null;
-            try
-            {
-                command.CommandText = "select coalesce(max(bid), 1) from Bookmarks;";
-                reader = command.ExecuteReader();
-                return reader.Read() ? reader.GetInt32(0) + 1 : 1;
-            }
-            finally
-            {
-                reader?.Dispose();
-            }
-        }
+        //private int GetStartingBookmarkId(SqliteCommand command)
+        //{
+        //    IDataReader reader = null;
+        //    try
+        //    {
+        //        command.CommandText = "select coalesce(max(bid), 1) from Bookmarks;";
+        //        reader = command.ExecuteReader();
+        //        return reader.Read() ? reader.GetInt32(0) + 1 : 1;
+        //    }
+        //    finally
+        //    {
+        //        reader?.Dispose();
+        //    }
+        //}
 
         public int ModifyPathMarkers(int playerId, string action)
         {
