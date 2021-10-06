@@ -67,8 +67,8 @@ namespace GalacticWaez
             {
                 connection = GetConnection(writeable: true);
                 command = connection.CreateCommand();
-                int bid = GetStartingBookmarkId(command);
-                command.CommandText = BuildInsertBookmarks(coordinates, data, bid);
+                //int bid = GetStartingBookmarkId(command);
+                command.CommandText = BuildInsertBookmarks(coordinates, data, 0);// bid);
                 return command.ExecuteNonQuery();
             }
             catch (SqliteException ex)
@@ -85,9 +85,10 @@ namespace GalacticWaez
 
         private string BuildInsertBookmarks(IEnumerable<VectorInt3> coordinates, BookmarkData data, int bid0)
         {
+            // removed bid from insert to see if it would work better
             var sql = new StringBuilder(
                 "insert into Bookmarks "
-                + "('bid', 'type', 'refid', 'facgroup', 'facid', 'entityid', 'name',"
+                + "('type', 'refid', 'facgroup', 'facid', 'entityid', 'name',"
                 + "'sectorx', 'sectory', 'sectorz', 'posx', 'posy', 'posz',"
                 + "'icon', 'isshared', 'iswaypoint', 'isremove', 'isshowhud', 'iscallback',"
                 + "'createdticks', 'maxdistance') "
@@ -97,7 +98,7 @@ namespace GalacticWaez
             int step = 1;
             foreach (var p in coordinates)
             {
-                sql.Append($"({bid}, 0, 0, {data.FacGroup}, {data.PlayerFacId}, {data.PlayerId},");
+                sql.Append($"(0, 0, {data.FacGroup}, {data.PlayerFacId}, {data.PlayerId},");
                 sql.Append($"'Waez_{step}', {p.x}, {p.y}, {p.z}, 0, 0, 0,");
                 sql.Append($"{data.Icon}, {data.IsShared}, {data.IsWaypoint}, {data.IsRemove},");
                 sql.Append($"{data.IsShowHud}, 0, {data.GameTime}, {data.MaxDistance}),");
