@@ -1,6 +1,7 @@
 ﻿using Eleon.Modding;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,6 +25,7 @@ namespace GalacticWaez.Client
         private IModApi modApi;
         private ChatMessageHandler chatHandler = null;
         private Task<bool> init = null;
+        private GalaxyMap galaxyMap = null;
 
         public ModState Status { get; private set; }
 
@@ -44,26 +46,48 @@ namespace GalacticWaez.Client
 
         public bool HandleCommand(string cmdToken, string args, IPlayerInfo player, IResponder responder)
         {
-            try
+            if (cmdToken == "restart")
             {
-                if (cmdToken == "restart")
-                {
-                    HandleRestart(args, player, responder);
-                    return true;
-                }
-
-                if (cmdToken != "status" || !(args == null || args == ""))
-                    return false;
-
-                responder.Send(Status.ToString());
+                HandleRestart(args, player, responder);
+                return true;
+            } 
+            if (cmdToken == "store")
+            {
+                HandleStore(args, player, responder);
                 return true;
             }
-            catch (Exception ex)
+
+            if (cmdToken != "status" || !(args == null || args == ""))
+                return false;
+
+            responder.Send(Status.ToString());
+            return true;
+        }
+
+        // IPlayerInfo parameter is here anticipating a permission check; for now it is ignored
+        private void HandleStore(string arg, IPlayerInfo _, IResponder responder)
+        {
+            if (arg == null)
+                arg = "";
+            var storage = new FileDataSource(modApi.Application.GetPathFor(AppFolder.SaveGame), modApi.Log);
+            if ((!storage.Exists && arg == "") || arg == "--replace")
             {
-                modApi.Log(ex.Message);
-                modApi.Log(ex.StackTrace);
-                responder.Send(ex.StackTrace);
-                return true;
+                if (storage.StoreGalaxyData(galaxyMap.Nodes.Select(node => node.Position)))
+                {
+                    responder?.Send($"Wrote {galaxyMap.Stars} star positions.");
+                }
+                else
+                {
+                    responder?.Send("Write operation failed.");
+                }
+            }
+            else if (storage.Exists && arg == "")
+            {
+                responder?.Send("Stored data already exists. To replace it, use option --replace");
+            }
+            else
+            {
+                responder?.Send("Invalid argument.");
             }
         }
 
@@ -177,7 +201,7 @@ namespace GalacticWaez.Client
             // start with the GalaxyMap: the longest and most likely to fail
             var ksp = new KnownStarProvider(saveGameDir, modApi.Log);
             var source = CreateDataSource(type, ksp, saveGameDir);
-            var galaxyMap = new GalaxyMapBuilder(modApi.Log)
+            galaxyMap = new GalaxyMapBuilder(modApi.Log)
                 .BuildGalaxyMap(source, 110 * GalacticWaez.SectorsPerLY, cancelToken);
             if (galaxyMap == null)
                 return false;

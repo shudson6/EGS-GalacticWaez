@@ -14,6 +14,8 @@ namespace GalacticWaez
         public string PathToFile { get; }
         private readonly LoggingDelegate Log;
 
+        public bool Exists => File.Exists(PathToFile);
+
         public FileDataSource(string saveGameDir, LoggingDelegate logger)
         {
             Log = logger ?? delegate { };

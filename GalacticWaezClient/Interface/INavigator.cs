@@ -7,6 +7,8 @@ namespace GalacticWaez
 
     public interface INavigator
     { 
+        GalaxyMap Galaxy { get; }
+
         /// <summary>
         /// Looks for path from player's current solar system to the destination system. If found,
         /// adds waypoints to the savegame. Does not add a waypoint for the current system.

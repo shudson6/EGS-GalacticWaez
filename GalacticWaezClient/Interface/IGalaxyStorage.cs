@@ -5,8 +5,10 @@ namespace GalacticWaez
 {
     public interface IGalaxyStorage
     {
+        bool Exists { get; }
+
         /// <summary>
-        /// Writes star positions to storage.
+        /// Writes star positions to storage. Existing storage (if any) is overwritten.
         /// </summary>
         /// <param name="positions">The collection of star positions to be written.</param>
         /// <returns>

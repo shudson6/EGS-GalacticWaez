@@ -7,12 +7,13 @@ namespace GalacticWaez
 {
     public class Navigator : INavigator
     {
-        private readonly GalaxyMap Galaxy;
         private readonly IPathfinder Pathfinder;
         private readonly IBookmarkManager Bookmarks;
         private readonly IKnownStarProvider KnownStars;
         private readonly LoggingDelegate Log;
         private readonly Func<ulong> GetTicks;
+
+        public GalaxyMap Galaxy { get; }
 
         public Navigator(GalaxyMap galaxy, IPathfinder pathfinder, 
             IBookmarkManager bookmarkManager, IKnownStarProvider starProvider, 
