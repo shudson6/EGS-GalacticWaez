@@ -8,31 +8,23 @@ namespace GalacticWaez.Client
 {
     public sealed class LocalPlayerInfo : SaveGameDB, IPlayerInfo, IPlayerProvider
     {
-        private readonly IPlayer player;
-        private readonly LoggingDelegate Log;
-        private readonly Func<IPlayfield> CurrentPlayfield;
+        private readonly IModApi modApi;
 
-        public int Id { get => player.Id; }
-        public int FactionId { get => player.Faction.Id; }
+        public int Id { get => modApi.Application.LocalPlayer.Id; }
+        public int FactionId { get => modApi.Application.LocalPlayer.Faction.Id; }
         public float WarpRange => GetWarpRange();
 
-        public LocalPlayerInfo(IPlayer localPlayer, string saveGameDir, 
-            Func<IPlayfield> getPlayfield, LoggingDelegate log) 
-            : base(saveGameDir)
-        {
-            player = localPlayer;
-            Log = log ?? delegate { };
-            CurrentPlayfield = getPlayfield 
-                ?? throw new ArgumentNullException("LocalPlayerInfo: getPlayfield");
-        }
+        public LocalPlayerInfo(IModApi modApi)
+            : base(modApi.Application.GetPathFor(AppFolder.SaveGame))
+            => this.modApi = modApi;
 
         public IPlayerInfo GetPlayerInfo(int _) => this;
 
-        public VectorInt3 StarCoordinates => CurrentPlayfield().SolarSystemCoordinates;
+        public VectorInt3 StarCoordinates => modApi.ClientPlayfield.SolarSystemCoordinates;
 
-        public string PlayfieldName => CurrentPlayfield().Name;
+        public string PlayfieldName => modApi.ClientPlayfield.Name;
 
-        public string Name => player.Name;
+        public string Name => modApi.Application.LocalPlayer.Name;
 
         private float GetWarpRange()
         {
@@ -56,8 +48,8 @@ namespace GalacticWaez.Client
             }
             catch (SqliteException ex)
             {
-                Log($"SqliteException in GetPlayerData: {ex.Message}");
-                Log($"Using base warp range ({BaseWarpRangeLY}LY) for player {Id}");
+                modApi.Log($"SqliteException in GetPlayerData: {ex.Message}");
+                modApi.Log($"Using base warp range ({BaseWarpRangeLY}LY) for player {Id}");
             }
             finally
             {

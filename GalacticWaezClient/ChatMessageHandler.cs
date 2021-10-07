@@ -7,13 +7,14 @@ namespace GalacticWaez
     {
         private readonly List<ICommandHandler> Handlers;
 
-        public IPlayerProvider PlayerProvider { get; set; }
+        public IReadOnlyList<ICommandHandler> CommandHandlers => Handlers;
+        public IPlayerProvider PlayerProvider { get; }
         public IResponseManager ResponseManager { get; }
 
-        public ChatMessageHandler(IResponseManager responseMgr,
+        public ChatMessageHandler(IPlayerProvider playerProvider, IResponseManager responseMgr,
             params ICommandHandler[] handlers)
         {
-            PlayerProvider = null;
+            PlayerProvider = playerProvider;
             ResponseManager = responseMgr;
             Handlers = new List<ICommandHandler>(handlers);
         }

@@ -1,4 +1,6 @@
 ﻿using Eleon.Modding;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GalacticWaez.Client
@@ -37,11 +39,68 @@ namespace GalacticWaez.Client
 
         public bool HandleCommand(string cmdToken, string args, IPlayerInfo player, IResponder responder)
         {
-            if (cmdToken != "status" || !(args == null || args == ""))
-                return false;
+            try
+            {
+                if (cmdToken == "restart")
+                {
+                    HandleRestart(args, player, responder);
+                    return true;
+                }
 
-            responder.Send(Status.ToString());
-            return true;
+                if (cmdToken != "status" || !(args == null || args == ""))
+                    return false;
+
+                responder.Send(Status.ToString());
+                return true;
+            }
+            catch (Exception ex)
+            {
+                modApi.Log(ex.Message);
+                modApi.Log(ex.StackTrace);
+                responder.Send(ex.StackTrace);
+                return true;
+            }
+        }
+
+        private void HandleRestart(string arg, IPlayerInfo player, IResponder responder)
+        {
+            DataSourceType type;
+            switch (arg)
+            {
+                case "normal":
+                    type = DataSourceType.Normal;
+                    break;
+
+                case "file-only":
+                    type = DataSourceType.FileOnly;
+                    break;
+
+                case "scan-only":
+                    type = DataSourceType.ScanOnly;
+                    break;
+
+                case null:
+                case "":
+                    responder?.Send("Required: [normal|file-only|scan-only]");
+                    return;
+
+                default:
+                    responder?.Send("Unrecognized option; use [normal|file-only|scan-only]");
+                    return;
+            }
+
+            // we have a valid restart command; if the chat handler has a navigator setup, get rid of it
+            // cloning the list to avoid invalidating the enumerator
+            var handlers = new List<ICommandHandler>(chatHandler.CommandHandlers);
+            foreach (var handler in handlers)
+            {
+                if (handler is NavigationHandler)
+                    chatHandler.RemoveHandler(handler);
+            }
+
+            modApi.Log($"Restart requested by player {player.Id} ({player.Name}) with data source {arg}");
+            responder?.Send("Restarting with data source " + arg);
+            Setup(type);
         }
 
         private void OnGameEvent(GameEventType type,
@@ -76,19 +135,23 @@ namespace GalacticWaez.Client
                 return;
 
             modApi.Application.Update -= OnUpdateTilWorldVisible;
-            Setup();
+            Setup(DataSourceType.Normal);
         }
 
         private ChatMessageHandler CreateChatHandler()
-            => new ChatMessageHandler(
-                new ResponseManager(modApi.Application),
-                this,
-                new HelpHandler(),
-                preCmd);
-
-        private void Setup()
         {
-            init = Task<bool>.Factory.StartNew(SetupTask, DataSourceType.Normal);
+            var pp = new LocalPlayerInfo(modApi);
+
+            return new ChatMessageHandler(pp,
+                new ResponseManager(modApi.Application),
+                this, preCmd,
+                new HelpHandler(),
+                new PinfoHandler(pp));
+        }
+
+        private void Setup(DataSourceType type)
+        {
+            init = Task<bool>.Factory.StartNew(SetupTask, type);
             modApi.Application.Update += OnUpdateDuringInit;
         }
 
@@ -97,18 +160,9 @@ namespace GalacticWaez.Client
             Status = ModState.Initializing;
             string saveGameDir = modApi.Application.GetPathFor(AppFolder.SaveGame);
 
-            // hook up the player info stuff real quick; it can be accessible during init
-            var pp = new LocalPlayerInfo(modApi.Application.LocalPlayer, saveGameDir,
-                () => modApi.ClientPlayfield, modApi.Log);
-            chatHandler.PlayerProvider = pp;
-            chatHandler.AddHandler(new PinfoHandler(pp));
-
             // start with the GalaxyMap: the longest and most likely to fail
             var ksp = new KnownStarProvider(saveGameDir, modApi.Log);
-            var file = new FileDataSource(saveGameDir, modApi.Log);
-            // yes, FileDataSource implements both interfaces so is passed twice to NormalDataSource
-            var source = new NormalDataSource(file,
-                new StarFinderDataSource(ksp, modApi.Log), file);
+            var source = CreateDataSource((DataSourceType)obj, ksp, saveGameDir);
             var galaxyMap = new GalaxyMapBuilder(modApi.Log)
                 .BuildGalaxyMap(source, 110 * GalacticWaez.SectorsPerLY);
             if (galaxyMap == null)
@@ -125,6 +179,28 @@ namespace GalacticWaez.Client
             chatHandler.AddHandler(new BookmarkHandler(bm, modApi.Log));
             chatHandler.RemoveHandler(preCmd);
             return true;
+        }
+
+        private IGalaxyDataSource CreateDataSource(
+            DataSourceType type, IKnownStarProvider ksp, string saveGameDir)
+        {
+            switch (type)
+            {
+                case DataSourceType.FileOnly:
+                    return new FileDataSource(saveGameDir, modApi.Log);
+                case DataSourceType.ScanOnly:
+                    return new StarFinderDataSource(ksp, modApi.Log);
+                case DataSourceType.Normal:
+                    // yes, FileDataSource implements both interfaces so is passed twice to NormalDataSource
+                    var file = new FileDataSource(saveGameDir, modApi.Log);
+                    return new NormalDataSource(
+                        file,
+                        new StarFinderDataSource(ksp, modApi.Log),
+                        file );
+                default:
+                    modApi.Log("Invalid DataSourceType");
+                    return null;
+            }
         }
 
         private void OnUpdateDuringInit()
