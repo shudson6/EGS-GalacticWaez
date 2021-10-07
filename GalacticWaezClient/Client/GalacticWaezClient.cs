@@ -1,6 +1,7 @@
 ﻿using Eleon.Modding;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GalacticWaez.Client
@@ -17,6 +18,9 @@ namespace GalacticWaez.Client
     {
         private readonly PreInitCommandHandler preCmd = new PreInitCommandHandler();
 
+        private CancellationTokenSource cancelSource;
+        private CancellationToken cancellationToken;
+
         private IModApi modApi;
         private ChatMessageHandler chatHandler = null;
         private Task<bool> init = null;
@@ -29,6 +33,7 @@ namespace GalacticWaez.Client
             modApi.GameEvent += OnGameEvent;
             modApi.Log("GalacticWaezClient attached.");
             Status = ModState.Uninitialized;
+            cancelSource = new CancellationTokenSource();
         }
 
         public void Shutdown()
@@ -151,20 +156,29 @@ namespace GalacticWaez.Client
 
         private void Setup(DataSourceType type)
         {
-            init = Task<bool>.Factory.StartNew(SetupTask, type);
+            if (init != null)
+            {
+                cancelSource.Cancel();
+                try { init.Wait(); }
+                catch { /* don't care; it's done */ }
+                cancelSource.Dispose();
+            }
+            cancelSource = new CancellationTokenSource();
+            cancellationToken = cancelSource.Token;
+            init = Task<bool>.Factory.StartNew(() => SetupTask(type, cancellationToken), cancellationToken);
             modApi.Application.Update += OnUpdateDuringInit;
         }
 
-        private bool SetupTask(object obj)
+        private bool SetupTask(DataSourceType type, CancellationToken cancelToken)
         {
             Status = ModState.Initializing;
             string saveGameDir = modApi.Application.GetPathFor(AppFolder.SaveGame);
 
             // start with the GalaxyMap: the longest and most likely to fail
             var ksp = new KnownStarProvider(saveGameDir, modApi.Log);
-            var source = CreateDataSource((DataSourceType)obj, ksp, saveGameDir);
+            var source = CreateDataSource(type, ksp, saveGameDir);
             var galaxyMap = new GalaxyMapBuilder(modApi.Log)
-                .BuildGalaxyMap(source, 110 * GalacticWaez.SectorsPerLY);
+                .BuildGalaxyMap(source, 110 * GalacticWaez.SectorsPerLY, cancelToken);
             if (galaxyMap == null)
                 return false;
 
@@ -214,11 +228,19 @@ namespace GalacticWaez.Client
                 Status = ModState.Ready;
                 modApi.GUI.ShowGameMessage("Waez is Ready.", prio: 0, duration: 5);
             }
+            else if (init.Status == TaskStatus.Canceled)
+            {
+                Status = ModState.Uninitialized;
+                modApi.Log("Canceled: " + init.Id);
+            }
             else
             {
                 Status = ModState.InitFailed;
                 modApi.GUI.ShowGameMessage("Waez failed to start.", prio: 0, duration: 5);
             }
+            // either way, we're done with it
+            init.Dispose();
+            init = null;
         }
 
         private void SetChatHandler(ChatMessageHandler handler)

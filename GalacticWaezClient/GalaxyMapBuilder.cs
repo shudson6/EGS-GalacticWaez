@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using System.Threading;
 
 namespace GalacticWaez
 {
@@ -27,7 +28,8 @@ namespace GalacticWaez
         /// <returns>
         /// a new GalaxyMap, or <c>null</c> if data were unavailable
         /// </returns>
-        public GalaxyMap BuildGalaxyMap(IGalaxyDataSource source, float maxWarpRange)
+        public GalaxyMap BuildGalaxyMap(IGalaxyDataSource source, float maxWarpRange,
+            CancellationToken token = default)
         {
             CheckParams(source, maxWarpRange);
             var positions = source.GetGalaxyData();
@@ -36,6 +38,7 @@ namespace GalacticWaez
                 Log("Galaxy data not available. Cannot create Galaxy Map.");
                 return null;
             }
+            Log("Constructing galaxy map...");
             var nodes = new List<GalaxyMap.Node>(positions.Count());
             var sw = Stopwatch.StartNew();
             foreach (var p in positions)
@@ -50,6 +53,7 @@ namespace GalacticWaez
                     current.Neighbors.Add(n, dist);
                 }
                 nodes.Add(current);
+                token.ThrowIfCancellationRequested();
             }
             var g = new GalaxyMap(nodes);
             sw.Stop();

@@ -1,5 +1,6 @@
 ﻿using Eleon.Modding;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GalacticWaez
 {
@@ -23,7 +24,11 @@ namespace GalacticWaez
             if (db != null && db.GetFirstKnownStarPosition(out VectorInt3 known))
             {
                 Log("Performing memory scan...");
-                return new StarFinder().Search(known);
+                var timer = Stopwatch.StartNew();
+                var result = new StarFinder().Search(known);
+                timer.Stop();
+                Log($"Found {result.Length} stars, took {timer.ElapsedMilliseconds}ms");
+                return result;
             }
             Log("Failed to retrieve any known star position.");
             return null;
