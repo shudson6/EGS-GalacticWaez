@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalacticWaezClient", "Galac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalacticWaezTests", "GalacticWaezTests\GalacticWaezTests.csproj", "{8F67F800-447F-4EEA-946B-DE8EDA9B4572}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalacticWaezDedi", "GalacticWaezDedi\GalacticWaezDedi.csproj", "{50AE9514-8E8F-4A09-829E-7C9DACB74C36}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,14 @@ Global
 		{8F67F800-447F-4EEA-946B-DE8EDA9B4572}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8F67F800-447F-4EEA-946B-DE8EDA9B4572}.Release|x64.ActiveCfg = Release|x64
 		{8F67F800-447F-4EEA-946B-DE8EDA9B4572}.Release|x64.Build.0 = Release|x64
+		{50AE9514-8E8F-4A09-829E-7C9DACB74C36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50AE9514-8E8F-4A09-829E-7C9DACB74C36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50AE9514-8E8F-4A09-829E-7C9DACB74C36}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{50AE9514-8E8F-4A09-829E-7C9DACB74C36}.Debug|x64.Build.0 = Debug|Any CPU
+		{50AE9514-8E8F-4A09-829E-7C9DACB74C36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50AE9514-8E8F-4A09-829E-7C9DACB74C36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50AE9514-8E8F-4A09-829E-7C9DACB74C36}.Release|x64.ActiveCfg = Release|Any CPU
+		{50AE9514-8E8F-4A09-829E-7C9DACB74C36}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
