@@ -98,6 +98,7 @@
     <Compile Include="AstarPathfinder.cs" />
     <Compile Include="GalacticWaez.cs" />
     <Compile Include="Client\GalacticWaezClient.cs" />
+    <Compile Include="PinfoHandler.cs" />
     <Compile Include="PreInitCommandHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ChatMessageHandler.cs" />

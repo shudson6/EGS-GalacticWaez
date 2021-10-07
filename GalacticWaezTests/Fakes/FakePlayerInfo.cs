@@ -11,7 +11,7 @@ namespace GalacticWaezTests.Fakes
 
         public float WarpRange => throw new NotImplementedException();
 
-        public VectorInt3 GetCurrentStarCoordinates()
+        public VectorInt3 GetStarCoordinates()
         {
             throw new NotImplementedException();
         }
@@ -33,6 +33,6 @@ namespace GalacticWaezTests.Fakes
             Id = id;
             FactionId = facid;
         }
-        public VectorInt3 GetCurrentStarCoordinates() => starVector;
+        public VectorInt3 GetStarCoordinates() => starVector;
     }
 }

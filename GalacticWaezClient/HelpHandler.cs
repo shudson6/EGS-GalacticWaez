@@ -5,11 +5,12 @@ namespace GalacticWaez
     public class HelpHandler : ICommandHandler
     {
         private const string HelpText = "Waez commands:\n"
-            + "to [mapmarker]: plot a course to [mapmarker] and add mapmarkers for each step\n"
-            + "status: find out what Waez is up to\n"
-            + "clear: remove all map markers that start with Waez_\n"
             + "bookmarks [clear|hide|show]: remove Waez_ bookmarks or hide/show them in HUD (requires exit/resume)\n"
-            + "help: get this help message. provide a command to get specific help.\n";
+            + "clear: remove all map markers that start with Waez_\n"
+            + "help: get this help message. provide a command to get specific help.\n"
+            + "pinfo: find out what Waez knows about you\n"
+            + "status: find out what Waez is up to\n"
+            + "to [mapmarker]: plot a course to [mapmarker] and add mapmarkers for each step\n";
 
         private const string ToHelp = "/waez to [options] [mapmarker]\n"
             + "Plots a course from your current location to [mapmarker] and adds waypoints to the Galaxy Map.\n"
@@ -33,6 +34,10 @@ namespace GalacticWaez
 
         private const string HelpHelp = "/waez help [command]\n"
             + "Displays helpful information. If [command] is provided, displays specific information.";
+
+        private const string PinfoHelp = "/waez pinfo [playerId]\n"
+            + "get info about the player with id [playerId]\n"
+            + "if [playerId] is not given, get the local player";
 
         public bool HandleCommand(string cmdToken, string args, IPlayerInfo player, IResponder responder)
         {
@@ -65,6 +70,10 @@ namespace GalacticWaez
 
                 case "help":
                     message = HelpHelp;
+                    break;
+
+                case "pinfo":
+                    message = PinfoHelp;
                     break;
 
                 default:

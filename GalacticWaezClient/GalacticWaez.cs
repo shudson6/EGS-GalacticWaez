@@ -1,8 +1,10 @@
-﻿namespace GalacticWaez
+﻿using Eleon.Modding;
+
+namespace GalacticWaez
 {
     public delegate void LoggingDelegate(string text);
 
-    public class GalacticWaez
+    public static class GalacticWaez
     {
         /// <summary> Base value of player warp range, in sectors </summary>
         public const float BaseWarpRange = BaseWarpRangeLY * SectorsPerLY;
@@ -14,5 +16,17 @@
         public const float DefaultMaxWarpRangeLY = 110;
         /// <summary> Constant for converting between sectors and light-years </summary>
         public const int SectorsPerLY = 100000;
+
+        public static VectorInt3 Divide(this VectorInt3 vector, int divisor)
+            => new VectorInt3(
+                vector.x / divisor,
+                vector.y / divisor,
+                vector.z / divisor);
+
+        public static VectorInt3 Multiply(this VectorInt3 vector, int multiplier)
+            => new VectorInt3(
+                vector.x * multiplier,
+                vector.y * multiplier,
+                vector.z * multiplier);
     }
 }

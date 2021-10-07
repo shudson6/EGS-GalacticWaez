@@ -96,6 +96,13 @@ namespace GalacticWaez.Client
         {
             Status = ModState.Initializing;
             string saveGameDir = modApi.Application.GetPathFor(AppFolder.SaveGame);
+
+            // hook up the player info stuff real quick; it can be accessible during init
+            var pp = new LocalPlayerInfo(modApi.Application.LocalPlayer, saveGameDir,
+                () => modApi.ClientPlayfield, modApi.Log);
+            chatHandler.PlayerProvider = pp;
+            chatHandler.AddHandler(new PinfoHandler(pp));
+
             // start with the GalaxyMap: the longest and most likely to fail
             var ksp = new KnownStarProvider(saveGameDir, modApi.Log);
             var file = new FileDataSource(saveGameDir, modApi.Log);
@@ -113,9 +120,7 @@ namespace GalacticWaez.Client
                 () => modApi.Application.GameTicks);
             var nh = new NavigationHandler(nav);
 
-            // finally, the chat message handler
-            chatHandler.PlayerProvider = new LocalPlayerInfo(modApi.Application.LocalPlayer, saveGameDir,
-                () => modApi.ClientPlayfield, modApi.Log);
+            // finish assembling the chat message handler
             chatHandler.AddHandler(nh);
             chatHandler.AddHandler(new BookmarkHandler(bm, modApi.Log));
             chatHandler.RemoveHandler(preCmd);

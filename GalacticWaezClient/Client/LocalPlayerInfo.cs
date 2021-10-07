@@ -28,7 +28,11 @@ namespace GalacticWaez.Client
 
         public IPlayerInfo GetPlayerInfo(int _) => this;
 
-        public VectorInt3 GetCurrentStarCoordinates() => CurrentPlayfield().SolarSystemCoordinates;
+        public VectorInt3 StarCoordinates => CurrentPlayfield().SolarSystemCoordinates;
+
+        public string PlayfieldName => CurrentPlayfield().Name;
+
+        public string Name => player.Name;
 
         private float GetWarpRange()
         {

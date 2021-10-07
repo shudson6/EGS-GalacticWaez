@@ -6,6 +6,7 @@
     /// </summary>
     public interface IPlayerInfo
     {
+        string Name { get; }
         int Id { get; }
         int FactionId { get; }
 
@@ -14,6 +15,8 @@
         /// </summary>
         float WarpRange { get; }
 
-        Eleon.Modding.VectorInt3 GetCurrentStarCoordinates();
+        Eleon.Modding.VectorInt3 StarCoordinates { get; }
+
+        string PlayfieldName { get; }
     }
 }

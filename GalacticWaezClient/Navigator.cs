@@ -40,7 +40,7 @@ namespace GalacticWaez
             if (playerRange <= 0)
                 throw new ArgumentOutOfRangeException("Navigate: playerRange must be positive");
 
-            var start = Galaxy.GetNode(player.GetCurrentStarCoordinates());
+            var start = Galaxy.GetNode(player.StarCoordinates);
             var goal = GoalNode(player.Id, player.FactionId, destination, out bool isBookmark);
             if (goal == null)
             {
