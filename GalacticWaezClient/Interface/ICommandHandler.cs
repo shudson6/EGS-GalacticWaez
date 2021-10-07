@@ -8,6 +8,8 @@ namespace GalacticWaez
         /// Interpret a command, perform some action, and provide a response.
         /// Return value indicates whether the instance took action on the command, providing
         /// a signal to the caller that the command was valid.
+        /// <br/>Implementations should smoothly handle <c>null</c> values for any parameter
+        /// without throwing.
         /// </summary>
         /// <param name="cmdToken">the command</param>
         /// <param name="args">any parameters for the command</param>

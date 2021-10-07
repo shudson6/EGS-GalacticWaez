@@ -7,7 +7,7 @@ namespace GalacticWaezTests
     [TestClass]
     public class BookmarkHandlerTests
     {
-        static IPlayerInfo player = new Fakes.NavTestPlayerInfo(1337, 1337, default, 30);
+        static readonly IPlayerInfo player = new Fakes.NavTestPlayerInfo(1337, 1337, default, 30);
 
         [TestMethod]
         public void HandleCommand_ReturnFalse_NullCmdToken()
@@ -115,6 +115,33 @@ namespace GalacticWaezTests
             Assert.IsTrue(new BookmarkHandler(new Fakes.FakeBookmarkManager(), delegate { })
                 .HandleCommand("bookmarks", "clr", player, rsp));
             Assert.IsTrue(rsp.Messages[0].StartsWith("Unrecognized option: clr"));
+        }
+
+        [TestMethod]
+        public void HandleCommand_FailResponse_UnrecognizedShow()
+        {
+            var rsp = new Fakes.TestResponder();
+            Assert.IsTrue(new BookmarkHandler(new Fakes.FakeBookmarkManager(), delegate { })
+                .HandleCommand("bookmarks", "show foo", player, rsp));
+            Assert.IsTrue(rsp.Messages[0].StartsWith("Unrecognized option:"));
+        }
+
+        [TestMethod]
+        public void HandleCommand_FailResponse_UnrecognizedHide()
+        {
+            var rsp = new Fakes.TestResponder();
+            Assert.IsTrue(new BookmarkHandler(new Fakes.FakeBookmarkManager(), delegate { })
+                .HandleCommand("bookmarks", "hide foo", player, rsp));
+            Assert.IsTrue(rsp.Messages[0].StartsWith("Unrecognized option:"));
+        }
+
+        [TestMethod]
+        public void HandleCommand_FailResponse_UnrecognizedClear()
+        {
+            var rsp = new Fakes.TestResponder();
+            Assert.IsTrue(new BookmarkHandler(new Fakes.FakeBookmarkManager(), delegate { })
+                .HandleCommand("bookmarks", "clear foo", player, rsp));
+            Assert.IsTrue(rsp.Messages[0].StartsWith("Unrecognized option:"));
         }
     }
 }

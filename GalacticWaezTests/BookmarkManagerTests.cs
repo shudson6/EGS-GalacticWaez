@@ -201,11 +201,19 @@ namespace GalacticWaezTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void TryGetVector_Throw_IfBookmarkNameNull()
+        public void TryGetVector_SearchEmptyString_IfBookmarkNameNull()
         {
+            InsertBookmarks(new[] { ExpectedBookmark("", default, DefaultBmData) });
             var bm = new BookmarkManager(deploymentDir, delegate { });
-            bm.TryGetVector(0, 0, null, out var _);
+            Assert.IsTrue(bm.TryGetVector(1337, 1337, null, out var _));
+        }
+
+        [TestMethod]
+        public void TryGetVector_SearchEmptyString_IfBookmarkNameNull1()
+        {
+            InsertBookmarks(TestBookmarks);
+            var bm = new BookmarkManager(deploymentDir, delegate { });
+            Assert.IsFalse(bm.TryGetVector(1337, 1337, null, out var _));
         }
 
         [TestMethod]
@@ -267,12 +275,18 @@ namespace GalacticWaezTests
             Assert.AreEqual(expected, actual);
         }
 
+        /***********************************************************************
+         ***********************************************************************
+         ***
+         *** testing BookmarkManager.InsertBookmarks
+         ***
+         ***********************************************************************
+         **********************************************************************/
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void InsertBookmarks_ThrowIfCoordinatesNull()
+        public void InsertBookmarks_ReturnZero_CoordinatesNull()
         {
             var bm = new BookmarkManager(deploymentDir, delegate { });
-            bm.InsertBookmarks(null, default);
+            Assert.AreEqual(0, bm.InsertBookmarks(null, default));
         }
 
         [TestMethod]
@@ -308,14 +322,6 @@ namespace GalacticWaezTests
             Assert.IsFalse(reader.Read());
             cmd.Dispose();
             sql.Dispose();
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void InsertBookmarks_Throws_CoordinatesIsNull()
-        {
-            var bm = new BookmarkManager(deploymentDir, delegate { });
-            bm.InsertBookmarks(null, default);
         }
 
         [TestMethod]
@@ -361,11 +367,19 @@ namespace GalacticWaezTests
             sql.Dispose();
         }
 
+        /***********************************************************************
+         ***********************************************************************
+         ***
+         *** testing BookmarkManager.ModifyPathMarkers
+         ***
+         ***********************************************************************
+         **********************************************************************/
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ModifyPathMarkers_Throw_NullAction()
+        public void ModifyPathMarkers_ReturnZero_NullAction()
         {
-            new BookmarkManager(deploymentDir, delegate { }).ModifyPathMarkers(1337, null);
+            Assert.AreEqual(0, 
+                new BookmarkManager(deploymentDir, delegate { })
+                .ModifyPathMarkers(1337, null));
         }
 
         [TestMethod]
@@ -380,7 +394,7 @@ namespace GalacticWaezTests
         [TestMethod]
         public void ModifyPathMarkers_Clear_HappyDay()
         {
-            InsertTestBookmarks();
+            InsertBookmarks(TestBookmarks);
             var bm = new BookmarkManager(deploymentDir, delegate { });
             Assert.AreEqual(4, bm.ModifyPathMarkers(1134, "clear"));
             var sql = GetConnection(false);
@@ -399,7 +413,7 @@ namespace GalacticWaezTests
         [TestMethod]
         public void ModifyPathMarkers_Clear_NoneFoundAfterClear()
         {
-            InsertTestBookmarks();
+            InsertBookmarks(TestBookmarks);
             var bm = new BookmarkManager(deploymentDir, delegate { });
             // clear the Waez_* bookmarks. Then call again and none should be found
             bm.ModifyPathMarkers(1134, "clear");
@@ -409,7 +423,7 @@ namespace GalacticWaezTests
         [TestMethod]
         public void ModifyPathMarkers_Show_HappyDay()
         {
-            InsertTestBookmarks();
+            InsertBookmarks(TestBookmarks);
             var expected = new[]
             {
                 TestBookmarks[0], TestBookmarks[1], TestBookmarks[4], TestBookmarks[7], TestBookmarks[8]
@@ -436,7 +450,7 @@ namespace GalacticWaezTests
         [TestMethod]
         public void ModifyPathMarkers_Show_NoneFound()
         {
-            InsertTestBookmarks();
+            InsertBookmarks(TestBookmarks);
             var bm = new BookmarkManager(deploymentDir, delegate { });
             Assert.AreEqual(0, bm.ModifyPathMarkers(42, "show"));
         }
@@ -444,18 +458,18 @@ namespace GalacticWaezTests
         [TestMethod]
         public void ModifyPathMarkers_Hide_NoneFound()
         {
-            InsertTestBookmarks();
+            InsertBookmarks(TestBookmarks);
             var bm = new BookmarkManager(deploymentDir, delegate { });
             Assert.AreEqual(0, bm.ModifyPathMarkers(42, "hide"));
         }
 
-        private void InsertTestBookmarks()
+        private void InsertBookmarks(IEnumerable<Bookmark> bookmarks)
         {
             var sql = GetConnection(true);
             var cmd = sql.CreateCommand();
             var command = new StringBuilder("insert into Bookmarks values ");
             int bid = 1;
-            foreach (var b in TestBookmarks)
+            foreach (var b in bookmarks)
             {
                 command.Append($"({bid},{b.type},{b.refid},{b.facgroup},{b.facid},{b.entityid},null,");
                 command.Append($"'{b.name}',{b.sectorx},{b.sectory},{b.sectorz},{b.posx},{b.posy},{b.posz},");

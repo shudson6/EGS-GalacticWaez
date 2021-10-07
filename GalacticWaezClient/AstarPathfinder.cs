@@ -25,11 +25,6 @@ namespace GalacticWaez
             }
         }
 
-        /// <summary>
-        /// Find a path from start to goal. The warpRange parameter can be used
-        /// to limit the distance of any single jump. Values of warpRange larger
-        /// than the distance used to build the Galaxy have no effect.
-        /// </summary>
         public IEnumerable<VectorInt3>
         FindPath(GalaxyMap.Node start, GalaxyMap.Node goal, float warpRange)
         {

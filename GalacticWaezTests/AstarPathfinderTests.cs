@@ -35,4 +35,6 @@ namespace GalacticWaezTests
             new AstarPathfinder().FindPath(new GalaxyMap.Node(default), new GalaxyMap.Node(default), 0);
         }
     }
+
+    // TODO: add tests that verify returned paths
 }

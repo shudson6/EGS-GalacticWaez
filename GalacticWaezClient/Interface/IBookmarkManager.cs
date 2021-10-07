@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Eleon.Modding;
 
 namespace GalacticWaez
@@ -28,15 +29,21 @@ namespace GalacticWaez
         /// is <c>true</c>. If not, <c>coordinates</c> is <c>default(VectorInt3)</c> and
         /// return is <c>false.</c>
         /// </summary>
-        /// <param name="playerId"></param>
-        /// <param name="playerFacId"></param>
-        /// <param name="bookmarkName">must not be <c>null</c></param>
+        /// <param name="playerId">of the player owning the marker</param>
+        /// <param name="playerFacId">of the faction owning the marker</param>
+        /// <param name="bookmarkName">name of the marker to find</param>
         /// <param name="coordinates"></param>
         /// <returns>
         /// <c>true</c> on successful retrieval
         /// <br/>
         /// <c>false</c> otherwise
         /// </returns>
+        /// <remarks>
+        /// Implementations should avoid throwing and smoothly handle null values.
+        /// <br/>
+        /// Because the default VectorInt3 (0, 0, 0) may well be a valid star position, please
+        /// pay attention to the return value.
+        /// </remarks>
         bool TryGetVector(int playerId, int playerFacId, string bookmarkName, out VectorInt3 coordinates);
 
         /// <summary>
@@ -47,6 +54,9 @@ namespace GalacticWaez
         /// <returns>
         /// the number of bookmarks inserted
         /// </returns>
+        /// <remarks>
+        /// Implementations should avoid throwing and smoothly handle null values.
+        /// </remarks>
         int InsertBookmarks(IEnumerable<VectorInt3> coordinates, BookmarkData data);
 
         /// <summary>
@@ -60,6 +70,9 @@ namespace GalacticWaez
         /// <returns>
         /// The number of bookmarks changed.
         /// </returns>
+        /// <remarks>
+        /// Implementations should avoid throwing and smoothly handle null values.
+        /// </remarks>
         int ModifyPathMarkers(int playerId, string action);
     }
 }

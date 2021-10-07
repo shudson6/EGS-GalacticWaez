@@ -17,7 +17,7 @@ namespace GalacticWaez
         public bool TryGetVector(int playerId, int playerFacId, string bookmarkName, out VectorInt3 coordinates)
         {
             if (bookmarkName == null)
-                throw new ArgumentNullException("TryGetVector: bookmarkName must not be null");
+                bookmarkName = "";
 
             SqliteConnection connection = null;
             SqliteCommand command = null;
@@ -59,7 +59,7 @@ namespace GalacticWaez
         public int InsertBookmarks(IEnumerable<VectorInt3> coordinates, BookmarkData data)
         {
             if (coordinates == null)
-                throw new ArgumentNullException("InsertBookmarks: coordinates must not be null");
+                return 0;
 
             SqliteConnection connection = null;
             SqliteCommand command = null;
@@ -126,8 +126,25 @@ namespace GalacticWaez
 
         public int ModifyPathMarkers(int playerId, string action)
         {
-            if (action == null)
-                throw new ArgumentNullException("ModifyPathMarkers: action");
+            string sql;
+            switch (action)
+            {
+                case "clear":
+                    sql = "delete from Bookmarks "
+                        + $"where entityid='{playerId}' and name like 'Waez\\_%' escape '\\';";
+                    break;
+                case "hide":
+                    sql = "update Bookmarks set isshowhud = 0, maxdistance = 0 "
+                        + $"where entityid='{playerId}' and name like 'Waez\\_%' escape '\\';";
+                    break;
+                case "show":
+                    sql = "update Bookmarks set isshowhud = 1, maxdistance = -1 "
+                        + $"where entityid ='{playerId}' and name like 'Waez\\_%' escape '\\';";
+                    break;
+                default:
+                    Log($"Invalid Command 'bookmarks {action}', use clear|hide|show");
+                    return 0;
+            }
 
             SqliteConnection connection = null;
             SqliteCommand command = null;
@@ -136,24 +153,7 @@ namespace GalacticWaez
             {
                 connection = GetConnection(writeable: true);
                 command = connection.CreateCommand();
-                switch (action)
-                {
-                    case "clear":
-                        command.CommandText = "delete from Bookmarks "
-                            + $"where entityid='{playerId}' and name like 'Waez\\_%' escape '\\';";
-                        break;
-                    case "hide":
-                        command.CommandText = "update Bookmarks set isshowhud = 0, maxdistance = 0 "
-                            + $"where entityid='{playerId}' and name like 'Waez\\_%' escape '\\';";
-                        break;
-                    case "show":
-                        command.CommandText = "update Bookmarks set isshowhud = 1, maxdistance = -1 "
-                            + $"where entityid ='{playerId}' and name like 'Waez\\_%' escape '\\';";
-                        break;
-                    default:
-                        Log($"Invalid Command 'bookmarks {action}', use clear|hide|show");
-                        return 0;
-                }
+                command.CommandText = sql;
                 return command.ExecuteNonQuery();
             }
             catch (SqliteException ex)
