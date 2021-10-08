@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using GalacticWaez;
+using static GalacticWaezTests.GalaxyTestData;
 
 namespace GalacticWaezTests
 {
@@ -15,6 +16,33 @@ namespace GalacticWaezTests
             var rsp = new Fakes.TestResponder();
             Assert.IsFalse(new BookmarkHandler(new Fakes.FakeBookmarkManager(), delegate { })
                 .HandleCommand(null, "", player, rsp));
+            Assert.AreEqual(0, rsp.Messages.Count);
+        }
+
+        [TestMethod]
+        public void HandleCommand_ReturnFalse_EmptyCmdToken()
+        {
+            var rsp = new Fakes.TestResponder();
+            Assert.IsFalse(new BookmarkHandler(new Fakes.FakeBookmarkManager(), delegate { })
+                .HandleCommand("", "", player, rsp));
+            Assert.AreEqual(0, rsp.Messages.Count);
+        }
+
+        [TestMethod]
+        public void HandleCommand_ReturnFalse_NonBookmarkCommand()
+        {
+            var rsp = new Fakes.TestResponder();
+            Assert.IsFalse(new BookmarkHandler(new Fakes.FakeBookmarkManager(), delegate { })
+                .HandleCommand("", "", player, rsp));
+            Assert.AreEqual(0, rsp.Messages.Count);
+        }
+
+        [TestMethod]
+        public void HandleCommand_ReturnFalse_LoremIpsumCommand()
+        {
+            var rsp = new Fakes.TestResponder();
+            Assert.IsFalse(new BookmarkHandler(new Fakes.FakeBookmarkManager(), delegate { })
+                .HandleCommand(LoremIpsum, "", player, rsp));
             Assert.AreEqual(0, rsp.Messages.Count);
         }
 
@@ -34,15 +62,6 @@ namespace GalacticWaezTests
             Assert.IsTrue(new BookmarkHandler(new Fakes.FakeBookmarkManager(), delegate { })
                 .HandleCommand("bookmarks", "", player, rsp));
             Assert.IsTrue(rsp.Messages[0].StartsWith("Required:"));
-        }
-
-        [TestMethod]
-        public void HandleCommand_ReturnFalse_NotMine()
-        {
-            var rsp = new Fakes.TestResponder();
-            Assert.IsFalse(new BookmarkHandler(new Fakes.FakeBookmarkManager(), delegate { })
-                .HandleCommand("", "", player, rsp));
-            Assert.AreEqual(0, rsp.Messages.Count);
         }
 
         [TestMethod]
