@@ -9,7 +9,9 @@ namespace GalacticWaez
             + "clear: remove all map markers that start with Waez_\n"
             + "help: get this help message. provide a command to get specific help.\n"
             + "pinfo: find out what Waez knows about you\n"
+            + "restart: reinitialize Waez (for troubleshooting)\n"
             + "status: find out what Waez is up to\n"
+            + "store: write star data to save file (for troubleshooting)\n"
             + "to [mapmarker]: plot a course to [mapmarker] and add mapmarkers for each step\n";
 
         public const string ToHelp = "/waez to [options] [mapmarker]\n"
@@ -38,6 +40,17 @@ namespace GalacticWaez
         public const string PinfoHelp = "/waez pinfo [playerId]\n"
             + "get info about the player with id [playerId]\n"
             + "if [playerId] is not given, get the local player";
+
+        public const string RestartHelp = "/waez restart [source]\n"
+            + "Reacquire star position data and rebuild Waez's Galaxy Map.\n"
+            + "[source] must be provided from these options:\n"
+            + "file-only - Load data from savegame (if present). No memory scan.\n"
+            + "scan-only - Search memory for star data.\n"
+            + "normal - Normal init, checks savegame for star data and scans memory if not found.\n";
+
+        public const string StoreHelp = "/waez store [--replace]\n"
+            + "Store star position data in the savegame. Under normal operation, this is done automatically.\n"
+            + "Use --replace to force overwrite of existing data.";
 
         public bool HandleCommand(string cmdToken, string args, IPlayerInfo player, IResponder responder)
         {
@@ -74,6 +87,14 @@ namespace GalacticWaez
 
                 case "pinfo":
                     message = PinfoHelp;
+                    break;
+
+                case "restart":
+                    message = RestartHelp;
+                    break;
+
+                case "store":
+                    message = StoreHelp;
                     break;
 
                 default:

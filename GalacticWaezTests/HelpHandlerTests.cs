@@ -159,5 +159,33 @@ namespace GalacticWaezTests
             Assert.IsTrue(new HelpHandler().HandleCommand("help", "pinfo  ", player, rsp));
             Assert.AreEqual(HelpHandler.PinfoHelp, rsp.Messages[0]);
         }
+
+        [TestMethod]
+        public void HandleCommand_Respond_Restart()
+        {
+            Assert.IsTrue(new HelpHandler().HandleCommand("help", "restart", player, rsp));
+            Assert.AreEqual(HelpHandler.RestartHelp, rsp.Messages[0]);
+        }
+
+        [TestMethod]
+        public void HandleCommand_Respond_RestartWhitespace()
+        {
+            Assert.IsTrue(new HelpHandler().HandleCommand("help", "restart  ", player, rsp));
+            Assert.AreEqual(HelpHandler.RestartHelp, rsp.Messages[0]);
+        }
+
+        [TestMethod]
+        public void HandleCommand_Respond_Store()
+        {
+            Assert.IsTrue(new HelpHandler().HandleCommand("help", "store", player, rsp));
+            Assert.AreEqual(HelpHandler.StoreHelp, rsp.Messages[0]);
+        }
+
+        [TestMethod]
+        public void HandleCommand_Respond_StoreWhitespace()
+        {
+            Assert.IsTrue(new HelpHandler().HandleCommand("help", "store  ", player, rsp));
+            Assert.AreEqual(HelpHandler.StoreHelp, rsp.Messages[0]);
+        }
     }
 }
