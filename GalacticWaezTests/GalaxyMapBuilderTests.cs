@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using GalacticWaez;
 using static GalacticWaez.GalacticWaez;
 
@@ -64,6 +66,41 @@ namespace GalacticWaezTests
             new GalaxyMapBuilder(delegate { }).BuildGalaxyMap(new Fakes.EmptyDataSource(), -1);
         }
 
+        [TestMethod]
+        public void NoThrow_WhenLoggerNull()
+        {
+            Assert.IsNotNull(new GalaxyMapBuilder(null));
+        }
+
+        [TestMethod]
+        public void BuildGalaxyMap_CanBeCanceled()
+        {
+
+            const float Range = 30 * SectorsPerLY;
+            const string filename = "stardata-test-vanilla.csv";
+            var gmb = new GalaxyMapBuilder(delegate { });
+            var source = new CancellationTokenSource();
+            var token = source.Token;
+            var task = Task.Factory.StartNew(() => gmb.BuildGalaxyMap(
+                new Fakes.FileDataSource(filename), Range, token), token);
+            while (task.Status < TaskStatus.Running) ;
+            source.Cancel();
+            try
+            {
+                task.Wait();
+            }
+            catch (AggregateException ex)
+            {
+                bool good = false;
+                foreach (var e in ex.InnerExceptions)
+                    if (e is TaskCanceledException)
+                        good = true;
+                Assert.IsTrue(good);
+                return;
+            }
+            throw new AssertFailedException();
+        }
+
         private void VerifyGalaxyMap(string filename, GalaxyMap testGalaxy, float testRange)
         {
             var positions = GalaxyTestData.LoadPositions(filename);
@@ -95,12 +132,6 @@ namespace GalacticWaezTests
                 i++;
             }
             Assert.AreEqual(warpLines, testGalaxy.WarpLines);
-        }
-
-        [TestMethod]
-        public void NoThrow_WhenLoggerNull()
-        {
-            Assert.IsNotNull(new GalaxyMapBuilder(null));
         }
 
         private float Distance(GalaxyMap.Node a, GalaxyMap.Node b)
