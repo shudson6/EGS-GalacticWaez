@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using static GalacticWaez.GalacticWaez;
 
 namespace GalacticWaez
@@ -45,8 +44,7 @@ namespace GalacticWaez
                 }
             }
 
-            // fire-and-forget, let the TaskScheduler handle threading
-            Task.Factory.StartNew(() => Navigator.Navigate(player, args, range, responder));
+            Navigator.Navigate(player, args, range, responder);
             return true;
         }
     }

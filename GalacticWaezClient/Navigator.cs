@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Eleon.Modding;
 
 namespace GalacticWaez
@@ -33,6 +35,23 @@ namespace GalacticWaez
         }
 
         public void Navigate(IPlayerInfo player, string destination, float playerRange, IResponder response)
+        {
+            // TODO: alter DoNavigate to accept cancellation: includes IPathfinder implementations :S
+            var source = new CancellationTokenSource();
+            var token = new CancellationToken();
+            var task = Task.Factory.StartNew(
+                () => DoNavigate(player, destination, playerRange, response),
+                token);
+            task.ContinueWith((nav) =>
+            {
+                if (nav.IsCanceled)
+                    response.Send($"Navigation to {destination} failed due to timeout.");
+            });
+            // TODO: make timeout configurable
+            source.CancelAfter(60 * 1000);
+        }
+
+        public void DoNavigate(IPlayerInfo player, string destination, float playerRange, IResponder response)
         {
             if (player == null)
                 throw new ArgumentNullException("Navigate: player");

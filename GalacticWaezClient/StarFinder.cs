@@ -78,7 +78,9 @@ namespace GalacticWaez
 
         unsafe private bool CouldBeStarData(StarData* sd, VectorInt3 sc)
         {
-            return (sd->x == sc.x) && (sd->y == sc.y) && (sd->z == sc.z);
+            return (sd->x == sc.x) 
+                && (sd->y == sc.y) 
+                && (sd->z == sc.z);
         }
 
 
