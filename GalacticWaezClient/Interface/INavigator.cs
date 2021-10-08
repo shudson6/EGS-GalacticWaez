@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Eleon.Modding;
 
 namespace GalacticWaez
 {
-    public delegate void NavigatorCallback(IEnumerable<VectorInt3> path, string message);
-
     public interface INavigator
     { 
         GalaxyMap Galaxy { get; }
@@ -21,6 +20,7 @@ namespace GalacticWaez
         /// <param name="destination">not null</param>
         /// <param name="playerRange">how far the player can jump, in LY. must be positive</param>
         /// <param name="response">object used for communicating result</param>
-        void Navigate(IPlayerInfo player, string destination, float playerRange, IResponder response);
+        Task<IEnumerable<VectorInt3>> Navigate(
+            IPlayerInfo player, string destination, float playerRange, IResponder response);
     }
 }

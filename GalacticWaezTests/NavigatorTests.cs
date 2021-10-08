@@ -107,7 +107,7 @@ namespace GalacticWaezTests
         }
 
         [TestMethod]
-        public void Navigate_BookmarkFound_7StepPath()
+        public  void Navigate_BookmarkFound_7StepPath()
         {
             var path = positions.Take(7);
             var pathfinder = new Fakes.FakePathfinder(path);
@@ -116,13 +116,13 @@ namespace GalacticWaezTests
             var nav = new Navigator(galaxy, pathfinder, bm, new Fakes.FakeStarProvider(), 
                 (text) => logged = text, TestTicks);
             var player = new Fakes.NavTestPlayerInfo(1337, 1337, path.First(), 30);
-            nav.Navigate(player, "foo", 30, null);
+            nav.Navigate(player, "foo", 30, null).Wait();
             Assert.AreEqual(5, bm.Inserted);
             Assert.AreEqual("Path found; 5/5 waypoints added.", logged);
         }
 
         [TestMethod]
-        public void Navigate_StarFound_7StepPath()
+        public  void Navigate_StarFound_7StepPath()
         {
             var path = positions.Take(7);
             var pathfinder = new Fakes.FakePathfinder(path);
@@ -131,13 +131,13 @@ namespace GalacticWaezTests
             var nav = new Navigator(galaxy, pathfinder, bm, new Fakes.FakeStarProvider(path.Last()), 
                 (text) => logged = text, TestTicks);
             var player = new Fakes.NavTestPlayerInfo(1337, 1337, path.First(), 30);
-            nav.Navigate(player, "foo", 30, null);
+            nav.Navigate(player, "foo", 30, null).Wait();
             Assert.AreEqual(6, bm.Inserted);
             Assert.AreEqual("Path found; 6/6 waypoints added.", logged);
         }
 
         [TestMethod]
-        public void Navigate_DestinationNotFound()
+        public  void Navigate_DestinationNotFound()
         {
             var pathfinder = new Fakes.FakePathfinder();
             var bm = new Fakes.NotFoundBookmarkManager();
@@ -147,13 +147,13 @@ namespace GalacticWaezTests
                 (text) => logged = text, TestTicks);
             var player = new Fakes.NavTestPlayerInfo(1337, 1337, default, 30);
             var response = new Fakes.TestResponder();
-            nav.Navigate(player, "foo", 30, response);
+            nav.Navigate(player, "foo", 30, response).Wait();
             Assert.AreEqual(1, response.Messages.Count);
             Assert.IsTrue(response.Messages[0].StartsWith("No bookmark or known star"));
         }
 
         [TestMethod]
-        public void Navigate_DestinationEqualStartBookmark()
+        public  void Navigate_DestinationEqualStartBookmark()
         {
             var vector = positions.First();
             var pathfinder = new Fakes.FakePathfinder();
@@ -164,13 +164,13 @@ namespace GalacticWaezTests
                 (text) => logged = text, TestTicks);
             var player = new Fakes.NavTestPlayerInfo(1337, 1337, vector, 30);
             var response = new Fakes.TestResponder();
-            nav.Navigate(player, "foo", 30, response);
+            nav.Navigate(player, "foo", 30, response).Wait();
             Assert.AreEqual(1, response.Messages.Count);
             Assert.AreEqual("It appears you are already there.", response.Messages[0]);
         }
 
         [TestMethod]
-        public void Navigate_DestinationEqualStartStar()
+        public  void Navigate_DestinationEqualStartStar()
         {
             var vector = positions.First();
             var pathfinder = new Fakes.FakePathfinder();
@@ -181,13 +181,13 @@ namespace GalacticWaezTests
                 (text) => logged = text, TestTicks);
             var player = new Fakes.NavTestPlayerInfo(1337, 1337, vector, 30);
             var response = new Fakes.TestResponder();
-            nav.Navigate(player, "foo", 30, response);
+            nav.Navigate(player, "foo", 30, response).Wait();
             Assert.AreEqual(1, response.Messages.Count);
             Assert.AreEqual("It appears you are already there.", response.Messages[0]);
         }
 
         [TestMethod]
-        public void Navigate_NoPathBookmark()
+        public  void Navigate_NoPathBookmark()
         {
             var pathfinder = new Fakes.FakePathfinder();
             var bm = new Fakes.HappyBookmarkManager(positions.First());
@@ -197,13 +197,13 @@ namespace GalacticWaezTests
                 (text) => logged = text, TestTicks);
             var player = new Fakes.NavTestPlayerInfo(1337, 1337, positions.Last(), 30);
             var response = new Fakes.TestResponder();
-            nav.Navigate(player, "foo", 30, response);
+            nav.Navigate(player, "foo", 30, response).Wait();
             Assert.AreEqual(1, response.Messages.Count);
             Assert.AreEqual("No path found.", response.Messages[0]);
         }
 
         [TestMethod]
-        public void Navigate_NoPathStar()
+        public  void Navigate_NoPathStar()
         {
             var pathfinder = new Fakes.FakePathfinder();
             var bm = new Fakes.NotFoundBookmarkManager();
@@ -213,13 +213,13 @@ namespace GalacticWaezTests
                 (text) => logged = text, TestTicks);
             var player = new Fakes.NavTestPlayerInfo(1337, 1337, positions.Last(), 30);
             var response = new Fakes.TestResponder();
-            nav.Navigate(player, "foo", 30, response);
+            nav.Navigate(player, "foo", 30, response).Wait();
             Assert.AreEqual(1, response.Messages.Count);
             Assert.AreEqual("No path found.", response.Messages[0]);
         }
 
         [TestMethod]
-        public void Navigate_Impossible_OneNodePath()
+        public  void Navigate_Impossible_OneNodePath()
         {
             var path = new[] { positions.First() };
             var pathfinder = new Fakes.FakePathfinder(path);
@@ -230,13 +230,13 @@ namespace GalacticWaezTests
                 (text) => logged = text, TestTicks);
             var player = new Fakes.NavTestPlayerInfo(1337, 1337, positions.Last(), 30);
             var response = new Fakes.TestResponder();
-            nav.Navigate(player, "foo", 30, response);
+            nav.Navigate(player, "foo", 30, response).Wait();
             Assert.AreEqual(1, response.Messages.Count);
             Assert.AreEqual("Are you already there?", response.Messages[0]);
         }
 
         [TestMethod]
-        public void Navigate_InRangeOfBookmark_ShouldNotAdd()
+        public  void Navigate_InRangeOfBookmark_ShouldNotAdd()
         {
             // using a 2-node path (1 jump) so Navigator thinks we're already in range
             var path = positions.Take(2);
@@ -248,14 +248,14 @@ namespace GalacticWaezTests
                 (text) => logged = text, TestTicks);
             var player = new Fakes.NavTestPlayerInfo(1337, 1337, path.First(), 30);
             var response = new Fakes.TestResponder();
-            nav.Navigate(player, "foo", 30, response);
+            nav.Navigate(player, "foo", 30, response).Wait();
             Assert.AreEqual(1, response.Messages.Count);
             Assert.AreEqual("It appears you are already in warp range.", response.Messages[0]);
             Assert.AreEqual(0, bm.Inserted);
         }
 
         [TestMethod]
-        public void Navigate_InRangeOfStar_ShouldAdd()
+        public  void Navigate_InRangeOfStar_ShouldAdd()
         {
             // using a 2-node path (1 jump) so Navigator thinks we're already in range
             var path = positions.Take(2);
@@ -267,7 +267,7 @@ namespace GalacticWaezTests
                 (text) => logged = text, TestTicks);
             var player = new Fakes.NavTestPlayerInfo(1337, 1337, path.First(), 30);
             var response = new Fakes.TestResponder();
-            nav.Navigate(player, "foo", 30, response);
+            nav.Navigate(player, "foo", 30, response).Wait();
             Assert.AreEqual(1, response.Messages.Count);
             Assert.AreEqual("Path found; 1/1 waypoints added.", response.Messages[0]);
             Assert.AreEqual(1, bm.Inserted);

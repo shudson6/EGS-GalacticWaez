@@ -34,8 +34,16 @@ namespace GalacticWaez
                 throw new ArgumentNullException("Navigator: GetTicks");
         }
 
-        public void Navigate(IPlayerInfo player, string destination, float playerRange, IResponder response)
+        public Task<IEnumerable<VectorInt3>> Navigate(
+            IPlayerInfo player, string destination, float playerRange, IResponder response)
         {
+            if (player == null)
+                throw new ArgumentNullException("Navigate: player");
+            if (destination == null)
+                throw new ArgumentNullException("Navigate: destination");
+            if (playerRange <= 0)
+                throw new ArgumentOutOfRangeException("Navigate: playerRange must be positive");
+
             // TODO: alter DoNavigate to accept cancellation: includes IPathfinder implementations :S
             var source = new CancellationTokenSource();
             var token = new CancellationToken();
@@ -49,59 +57,54 @@ namespace GalacticWaez
             });
             // TODO: make timeout configurable
             source.CancelAfter(60 * 1000);
+            return task;
         }
 
-        public void DoNavigate(IPlayerInfo player, string destination, float playerRange, IResponder response)
+        public IEnumerable<VectorInt3> DoNavigate(
+            IPlayerInfo player, string destination, float playerRange, IResponder response)
         {
-            if (player == null)
-                throw new ArgumentNullException("Navigate: player");
-            if (destination == null)
-                throw new ArgumentNullException("Navigate: destination");
-            if (playerRange <= 0)
-                throw new ArgumentOutOfRangeException("Navigate: playerRange must be positive");
-
             var start = Galaxy.GetNode(player.StarCoordinates);
             var goal = GoalNode(player.Id, player.FactionId, destination, out bool isBookmark);
             if (goal == null)
             {
                 response?.Send($"No bookmark or known star by name {destination}");
-                return;
+                return null;
             }
             if (start.Equals(goal))
             {
                 response?.Send("It appears you are already there.");
-                return;
+                return null;
             }
             var path = Pathfinder.FindPath(start, goal, playerRange);
             if (path == null)
             {
                 response?.Send("No path found.");
-                return;
+                return null;
             }
             if (path.Count() == 1)
             {
                 // this is impossible, i think
                 response?.Send("Are you already there?");
-                return;
+                return null;
             }
             if (path.Count() == 2 && isBookmark)
             {
                 response?.Send("It appears you are already in warp range.");
-                return;
+                return null;
             }
             // we don't need the first step; we're already there
-            path = path.Skip(1);
+            var bookmarks = path.Skip(1);
             // if there's already a bookmark on the goal, we don't need another one
             if (isBookmark)
-                path = path.Take(path.Count() - 1);
+                bookmarks = bookmarks.Take(bookmarks.Count() - 1);
             // respond with how many bookmarks got added vs expected
-            int expected = path.Count();
-            int actual = SetWaypoints(path, player.Id, player.FactionId);
+            int expected = bookmarks.Count();
+            int actual = SetWaypoints(bookmarks, player.Id, player.FactionId);
             string message = $"Path found; {actual}/{expected} waypoints added.";
             response?.Send(message);
             if (response == null)
                 Log(message);
-            return;
+            return path;
         }
 
         private int SetWaypoints(IEnumerable<VectorInt3> path, int playerId, int playerFacId)
