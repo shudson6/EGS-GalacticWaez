@@ -28,9 +28,9 @@ namespace GalacticWaezTests.Fakes
 
         public float WarpRange { get; }
 
-        public string Name => throw new NotImplementedException();
+        public string Name => $"Player_{Id}";
 
-        public VectorInt3 StarCoordinates => throw new NotImplementedException();
+        public VectorInt3 StarCoordinates => starVector;
 
         public string PlayfieldName => throw new NotImplementedException();
 

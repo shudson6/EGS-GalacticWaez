@@ -27,7 +27,7 @@ namespace GalacticWaez
                 var timer = Stopwatch.StartNew();
                 var result = new StarFinder().Search(known);
                 timer.Stop();
-                Log($"Found {result.Length} stars, took {timer.ElapsedMilliseconds}ms");
+                Log($"Found {result?.Length ?? 0} stars, took {timer.ElapsedMilliseconds}ms");
                 return result;
             }
             Log("Failed to retrieve any known star position.");
