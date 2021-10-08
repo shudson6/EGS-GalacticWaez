@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using GalacticWaez;
 using Eleon;
 
@@ -132,6 +133,120 @@ namespace GalacticWaezTests
             var msg = new MessageData { Text = "/waez ", SenderEntityId = 42 };
             chat.HandleChatMessage(msg);
             Assert.IsTrue(rsp.Messages[0].StartsWith("hm?"));
+        }
+
+        [TestMethod]
+        public void HandleChatMessage_TokenGoesToHandlers()
+        {
+            // handlers are kept in a list, so they are ordered
+            var chat = new ChatMessageHandler(fakePlayerProvider, rspMgr,
+                failHandler,
+                new FakeCommandHandler((cmd, arg, player, responder) =>
+                {
+                    responder.Send("Success: " + cmd);
+                    return true;
+                }));
+            var msg = new MessageData { Text = "/waez hello world", SenderEntityId = 1337 };
+            chat.HandleChatMessage(msg);
+            Assert.AreEqual("Success: hello", rsp.Messages[0]);
+        }
+
+        [TestMethod]
+        public void HandleChatMessage_TokenAndArgsCheck()
+        {
+            var msg = new MessageData { Text = "/waez hello beautiful world", SenderEntityId = 1337 };
+            bool pass0 = false;
+            bool pass1 = false;
+            // handlers are kept in a list, so they are ordered
+            var chat = new ChatMessageHandler(fakePlayerProvider, rspMgr,
+                new FakeCommandHandler((cmd, arg, player, responder) =>
+                {
+                    pass0 = cmd == "hello" && arg == "beautiful world" && player.Id == 1337;
+                    return false;
+                }),
+                new FakeCommandHandler((cmd, arg, player, responder) =>
+                {
+                    Assert.IsTrue(pass0);
+                    pass1 = cmd == "hello" && arg == "beautiful world" && player.Id == 1337;
+                    return true;
+                }));
+            chat.HandleChatMessage(msg);
+            Assert.AreEqual(0, rsp.Messages.Count);
+            Assert.IsTrue(pass0 && pass1);
+        }
+        
+        [TestMethod]
+        public void HandleChatMessage_Unrecognized()
+        {
+            var chat = new ChatMessageHandler(fakePlayerProvider, rspMgr, failHandler);
+            var msg = new MessageData { Text = "/waez hello world", SenderEntityId = 1337 };
+            chat.HandleChatMessage(msg);
+            Assert.AreEqual("Unrecognized Command: hello", rsp.Messages[0]);
+        }
+        
+        [TestMethod]
+        public void HandleChatMessage_NoHandlers_Unrecognized()
+        {
+            var chat = new ChatMessageHandler(fakePlayerProvider, rspMgr);
+            var msg = new MessageData { Text = "/waez hello world", SenderEntityId = 1337 };
+            chat.HandleChatMessage(msg);
+            Assert.AreEqual("Unrecognized Command: hello", rsp.Messages[0]);
+        }
+
+        [TestMethod]
+        public void AddHandler_AddsHandlerToEmptyList()
+        {
+            var chat = new ChatMessageHandler(playerProviderFailOnInvoke, rspMgrFailOnInvoke);
+            Assert.IsFalse(chat.CommandHandlers.Any());
+            var handler = cmdHandlerFailOnInvoke;
+            chat.AddHandler(handler);
+            Assert.IsTrue(ReferenceEquals(handler, chat.CommandHandlers[0]));
+        }
+
+        [TestMethod]
+        public void AddHandler_AddsHandlerToPopulatedList()
+        {
+            var chat = new ChatMessageHandler(playerProviderFailOnInvoke, rspMgrFailOnInvoke,
+                cmdHandlerFailOnInvoke, failHandler);
+            Assert.IsFalse(chat.CommandHandlers.Contains(happyHandler));
+            chat.AddHandler(happyHandler);
+            Assert.IsTrue(chat.CommandHandlers.Contains(happyHandler));
+        }
+
+        [TestMethod]
+        public void AddHandler_DoNotAddDuplicate()
+        {
+            var chat = new ChatMessageHandler(playerProviderFailOnInvoke, rspMgrFailOnInvoke,
+                cmdHandlerFailOnInvoke, failHandler);
+            Assert.AreEqual(2, chat.CommandHandlers.Count);
+            Assert.AreEqual(1, chat.CommandHandlers.Count(h => ReferenceEquals(h, failHandler)));
+            chat.AddHandler(failHandler);
+            Assert.AreEqual(2, chat.CommandHandlers.Count);
+            Assert.AreEqual(1, chat.CommandHandlers.Count(h => ReferenceEquals(h, failHandler)));
+        }
+
+        [TestMethod]
+        public void RemoveHandler_HappyDay()
+        {
+            var chat = new ChatMessageHandler(playerProviderFailOnInvoke, rspMgrFailOnInvoke,
+                cmdHandlerFailOnInvoke, failHandler);
+            Assert.IsTrue(chat.CommandHandlers.Contains(failHandler));
+            chat.RemoveHandler(failHandler);
+            Assert.IsFalse(chat.CommandHandlers.Contains(failHandler));
+        }
+
+        [TestMethod]
+        public void RemoveHandler_Nop_HandlerNotFound()
+        {
+            var chat = new ChatMessageHandler(playerProviderFailOnInvoke, rspMgrFailOnInvoke,
+                cmdHandlerFailOnInvoke, failHandler);
+            Assert.AreEqual(2, chat.CommandHandlers.Count);
+            Assert.IsTrue(chat.CommandHandlers.Contains(cmdHandlerFailOnInvoke));
+            Assert.IsTrue(chat.CommandHandlers.Contains(failHandler));
+            chat.RemoveHandler(happyHandler);
+            Assert.AreEqual(2, chat.CommandHandlers.Count);
+            Assert.IsTrue(chat.CommandHandlers.Contains(cmdHandlerFailOnInvoke));
+            Assert.IsTrue(chat.CommandHandlers.Contains(failHandler));
         }
     }
 }

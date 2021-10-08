@@ -56,7 +56,7 @@ namespace GalacticWaez
                 }
             }
 
-            responder.Send("Unrecognized Command: " + line[1]);
+            responder.Send("Unrecognized Command: " + token);
         }
 
         public void AddHandler(ICommandHandler handler)
