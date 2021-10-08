@@ -129,6 +129,7 @@ namespace GalacticWaez.Client
 
             modApi.Log($"Restart requested by player {player.Id} ({player.Name}) with data source {arg}");
             responder?.Send("Restarting with data source " + arg);
+            SetChatHandler(CreateChatHandler());
             Setup(type);
         }
 
