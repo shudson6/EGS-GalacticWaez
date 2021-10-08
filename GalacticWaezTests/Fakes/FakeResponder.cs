@@ -5,10 +5,11 @@ namespace GalacticWaezTests.Fakes
 {
     class FakeResponder : IResponder
     {
-        public void Send(string text)
-        {
-            throw new System.NotImplementedException();
-        }
+        public delegate void SendDelegate(string text);
+
+        private readonly SendDelegate DoStuff;
+        public FakeResponder(SendDelegate doStuff = null) { DoStuff = doStuff; }
+        public void Send(string text) => DoStuff(text);
     }
 
     class TestResponder : IResponder

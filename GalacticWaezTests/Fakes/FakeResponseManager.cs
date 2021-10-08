@@ -5,8 +5,9 @@ namespace GalacticWaezTests.Fakes
 {
     class FakeResponseManager : IResponseManager
     {
-        private readonly IResponder responder;
-        public FakeResponseManager(IResponder rsp) { responder = rsp; }
-        public IResponder CreateResponder(MessageData msg) => responder;
+        public delegate IResponder ResponderDelegate(MessageData msg);
+        private readonly ResponderDelegate DoStuff;
+        public FakeResponseManager(ResponderDelegate doStuff) { DoStuff = doStuff; }
+        public IResponder CreateResponder(MessageData msg) => DoStuff(msg);
     }
 }

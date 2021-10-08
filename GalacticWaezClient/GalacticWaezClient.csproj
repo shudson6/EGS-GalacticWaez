@@ -113,7 +113,6 @@
     <Compile Include="ResponseManager.cs" />
     <Compile Include="SaveGameDB.cs" />
     <Compile Include="StarFinder.cs" />
-    <Compile Include="ChatMessage.cs" />
     <Compile Include="StarFinderDataSource.cs" />
   </ItemGroup>
   <ItemGroup />
