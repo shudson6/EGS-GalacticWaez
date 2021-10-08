@@ -27,7 +27,7 @@ namespace GalacticWaez
             if (messageData == null || messageData.Text == null || messageData.Text == "")
                 return;
 
-            var line = messageData.Text.TrimStart().Split(new[] { ' ' }, 2);
+            var line = messageData.Text.TrimStart().Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
             if (line[0] != "/waez")
                 return;
 

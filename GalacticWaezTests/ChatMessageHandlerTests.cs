@@ -8,20 +8,23 @@ namespace GalacticWaezTests
     [TestClass]
     public class ChatMessageHandlerTests
     {
+        static readonly Fakes.TestResponder rsp = new Fakes.TestResponder();
+
         static readonly ICommandHandler happyHandler =
             new FakeCommandHandler((_0, _1, _2, _3) => true);
         static readonly ICommandHandler failHandler =
             new FakeCommandHandler((_0, _1, _2, _3) => false);
-        static readonly ICommandHandler failIfInvoked =
+        static readonly ICommandHandler cmdHandlerFailOnInvoke =
             new FakeCommandHandler((_0, _1, _2, _3) => throw new AssertFailedException());
 
         static readonly IResponseManager rspMgr = new Fakes.FakeResponseManager(_ => rsp);
-        static readonly IResponseManager failRspMgr =
+        static readonly IResponseManager rspMgrFailOnInvoke =
             new Fakes.FakeResponseManager(_ => throw new AssertFailedException());
 
-        static readonly IResponder failOnResponse =
-            new Fakes.FakeResponder(_ => throw new AssertFailedException());
-        static readonly Fakes.TestResponder rsp = new Fakes.TestResponder();
+        static readonly IPlayerProvider playerProviderFailOnInvoke =
+            new Fakes.FakePlayerProvider(_ => throw new AssertFailedException());
+        static readonly IPlayerProvider fakePlayerProvider =
+            new Fakes.FakePlayerProvider(_ => new Fakes.NavTestPlayerInfo(1337, 1337, default, 30));
 
         class FakeCommandHandler : ICommandHandler
         {
@@ -70,20 +73,65 @@ namespace GalacticWaezTests
         }
 
         [TestMethod]
+        public void HandleChatMessage_Nop_NullMessage()
+        {
+            var chat = new ChatMessageHandler(playerProviderFailOnInvoke, rspMgrFailOnInvoke, 
+                cmdHandlerFailOnInvoke);
+            chat.HandleChatMessage(null);
+        }
+
+        [TestMethod]
+        public void HandleChatMessage_Nop_NullTextMessage()
+        {
+            var chat = new ChatMessageHandler(playerProviderFailOnInvoke, rspMgrFailOnInvoke, 
+                cmdHandlerFailOnInvoke);
+            chat.HandleChatMessage(new MessageData { Text = null });
+        }
+
+        [TestMethod]
+        public void HandleChatMessage_Nop_EmptyTextMessage()
+        {
+            var chat = new ChatMessageHandler(playerProviderFailOnInvoke, rspMgrFailOnInvoke, 
+                cmdHandlerFailOnInvoke);
+            chat.HandleChatMessage(new MessageData { Text = "" });
+        }
+
+        [TestMethod]
+        public void HandleChatMessage_Nop_NotWaezMessage()
+        {
+            var chat = new ChatMessageHandler(playerProviderFailOnInvoke, rspMgrFailOnInvoke, 
+                cmdHandlerFailOnInvoke);
+            chat.HandleChatMessage(new MessageData { Text = "hello world" });
+        }
+
+        [TestMethod]
         public void HandleChatMessage_CantIdenfityPlayer()
         {
-            var chat = new ChatMessageHandler(new Fakes.FakePlayerProvider(null), rspMgr, happyHandler);
+            var chat = new ChatMessageHandler(new Fakes.FakePlayerProvider(_ => null), rspMgr,
+                cmdHandlerFailOnInvoke);
             var msg = new MessageData { Text = "/waez hello", SenderEntityId = 42 };
             chat.HandleChatMessage(msg);
             Assert.AreEqual("Can't identify requesting player", rsp.Messages[0]);
         }
 
         [TestMethod]
-        public void HandleChatMessage_Nop_NullMessage()
+        public void HandleChatMessage_NoCommand()
         {
-            var chat = new ChatMessageHandler(new Fakes.FakePlayerProvider(null), failRspMgr, failIfInvoked);
-            chat.HandleChatMessage(null);
-            Assert.AreEqual(0, rsp.Messages.Count);
+            var chat = new ChatMessageHandler(fakePlayerProvider, rspMgr,
+                cmdHandlerFailOnInvoke);
+            var msg = new MessageData { Text = "/waez", SenderEntityId = 42 };
+            chat.HandleChatMessage(msg);
+            Assert.IsTrue(rsp.Messages[0].StartsWith("hm?"));
+        }
+
+        [TestMethod]
+        public void HandleChatMessage_NoCommand_Whitespace()
+        {
+            var chat = new ChatMessageHandler(fakePlayerProvider, rspMgr,
+                cmdHandlerFailOnInvoke);
+            var msg = new MessageData { Text = "/waez ", SenderEntityId = 42 };
+            chat.HandleChatMessage(msg);
+            Assert.IsTrue(rsp.Messages[0].StartsWith("hm?"));
         }
     }
 }

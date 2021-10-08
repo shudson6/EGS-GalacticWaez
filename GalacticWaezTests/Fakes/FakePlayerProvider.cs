@@ -5,8 +5,11 @@ namespace GalacticWaezTests.Fakes
 {
     public class FakePlayerProvider : IPlayerProvider
     {
-        private readonly IPlayerInfo player;
-        public FakePlayerProvider(IPlayerInfo player) { this.player = player; }
-        public IPlayerInfo GetPlayerInfo(int playerId) => player;
+        public delegate IPlayerInfo GetPlayerDelegate(int playerId);
+
+        private readonly GetPlayerDelegate DoStuff;
+
+        public FakePlayerProvider(GetPlayerDelegate doStuff) { DoStuff = doStuff; }
+        public IPlayerInfo GetPlayerInfo(int playerId) => DoStuff(playerId);
     }
 }
