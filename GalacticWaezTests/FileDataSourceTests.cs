@@ -21,6 +21,18 @@ namespace GalacticWaezTests
         }
 
         [TestMethod]
+        public void Constructor_NoException_NullSaveGameDir()
+        {
+            Assert.IsNull(new FileDataSource(null, delegate { }).GetGalaxyData());
+        }
+
+        [TestMethod]
+        public void Constructor_NullDelegateNoProblem()
+        {
+            Assert.IsNotNull(new FileDataSource("foo", null));
+        }
+
+        [TestMethod]
         public void PathToFile_Correct()
         {
             const string expected = "foo\\bar\\Content\\Mods\\GalacticWaez\\stardata.csv";
@@ -28,7 +40,7 @@ namespace GalacticWaezTests
         }
 
         [TestMethod]
-        public void LoadsExpectedData()
+        public void GetGalaxyData_LoadsExpectedData()
         {
             File.Copy(tc.DeploymentDirectory + "\\stardata-test-small.csv",
                 tc.DeploymentDirectory + "\\Content\\Mods\\GalacticWaez\\stardata.csv",
@@ -40,13 +52,13 @@ namespace GalacticWaezTests
         }
 
         [TestMethod]
-        public void ReturnsNull_WhenFileNotExists()
+        public void GetGalaxyData_ReturnsNull_WhenFileNotExists()
         {
             Assert.IsNull(new FileDataSource("foo\\bar", delegate { }).GetGalaxyData());
         }
 
         [TestMethod]
-        public void ReturnsNull_WhenChecksumFail()
+        public void GetGalaxyData_ReturnsNull_WhenChecksumFail()
         {
             File.Copy(tc.DeploymentDirectory + "\\stardata-test-badsum.csv",
                 tc.DeploymentDirectory + "\\Content\\Mods\\GalacticWaez\\stardata.csv",
@@ -55,13 +67,7 @@ namespace GalacticWaezTests
         }
 
         [TestMethod]
-        public void NoException_NullSaveGameDir()
-        {
-            Assert.IsNull(new FileDataSource(null, delegate { }).GetGalaxyData());
-        }
-
-        [TestMethod]
-        public void  ReturnsExpected_WhenLogNull()
+        public void GetGalaxyData_ReturnsExpected_WhenLogNull()
         {
             File.Copy(tc.DeploymentDirectory + "\\stardata-test-small.csv",
                 tc.DeploymentDirectory + "\\Content\\Mods\\GalacticWaez\\stardata.csv",
@@ -69,6 +75,32 @@ namespace GalacticWaezTests
             var expected = GalaxyTestData.LoadPositions("stardata-test-small.csv");
             var actual = new FileDataSource(tc.DeploymentDirectory, null).GetGalaxyData();
             Assert.AreEqual(expected.Count(), actual.Count());
+            Assert.IsFalse(expected.Except(actual).Any());
+        }
+
+        [TestMethod]
+        public void StoreGalaxyData_StoresExpectedData()
+        {
+            string testDir = tc.DeploymentDirectory + "\\StoreGalaxyData";
+            var expected = GalaxyTestData.LoadPositions("stardata-test-small.csv");
+            var fds = new FileDataSource(testDir, null);
+            fds.StoreGalaxyData(expected);
+            var actual = GalaxyTestData.LoadPositions(fds.PathToFile);
+            Assert.AreEqual(expected.Count, actual.Count);
+            Assert.IsFalse(expected.Except(actual).Any());
+        }
+
+        [TestMethod]
+        public void StoreGalaxyData_OverwritesExisting()
+        {
+            string testDir = tc.DeploymentDirectory + "\\StoreGalaxyData";
+            var expected = GalaxyTestData.LoadPositions("stardata-test-small.csv");
+            var fds = new FileDataSource(testDir, null);
+            Directory.CreateDirectory(Directory.GetParent(fds.PathToFile).FullName);
+            File.Copy("stardata-test-badsum.csv", fds.PathToFile);
+            fds.StoreGalaxyData(expected);
+            var actual = GalaxyTestData.LoadPositions(fds.PathToFile);
+            Assert.AreEqual(expected.Count, actual.Count);
             Assert.IsFalse(expected.Except(actual).Any());
         }
     }
