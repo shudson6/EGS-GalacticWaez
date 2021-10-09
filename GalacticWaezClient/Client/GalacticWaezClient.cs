@@ -55,5 +55,15 @@ namespace GalacticWaez.Client
             ModApi.Application.Update -= OnUpdateTilWorldVisible;
             Setup(DataSourceType.Normal);
         }
+
+        protected override void OnInitDone()
+        {
+            ModApi.GUI.ShowGameMessage("Waez is ready.", prio: 0, duration: 5);
+        }
+
+        protected override void OnInitFail()
+        {
+            ModApi.GUI.ShowGameMessage("Waez map construction failed.", prio: 0, duration: 5);
+        }
     }
 }

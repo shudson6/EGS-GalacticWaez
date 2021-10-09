@@ -255,7 +255,7 @@ namespace GalacticWaez
             if (init.Status == TaskStatus.RanToCompletion && init.Result == true)
             {
                 Status = ModState.Ready;
-                ModApi.GUI.ShowGameMessage("Waez is Ready.", prio: 0, duration: 5);
+                OnInitDone();
             }
             else if (init.Status == TaskStatus.Canceled)
             {
@@ -265,11 +265,14 @@ namespace GalacticWaez
             else
             {
                 Status = ModState.InitFailed;
-                ModApi.GUI.ShowGameMessage("Waez failed to start.", prio: 0, duration: 5);
+                OnInitFail();
             }
             // either way, we're done with it
             init.Dispose();
             init = null;
         }
+
+        protected virtual void OnInitDone() { }
+        protected virtual void OnInitFail() { }
     }
 }
