@@ -31,14 +31,14 @@ namespace GalacticWaez
 
         public ModState Status { get; protected set; }
 
-        protected ICommandHandler PreInitCommandHandler { get; set; }
+        private readonly ICommandHandler preInitCommandHandler = new PreInitCommandHandler();
         protected ChatMessageHandler ChatHandler
         {
             get => _chatHandler;
             set => SetChatHandler(value);
         }
-        protected CancellationTokenSource InitCancelSource { get; private set; }
-        protected CancellationToken InitCancelToken { get; private set; }
+        private CancellationTokenSource initCancelSource;
+        private CancellationToken initCancelToken;
         protected IModApi ModApi { get; private set; }
         protected GalaxyMap Galaxy { get; private set; }
 
@@ -70,12 +70,28 @@ namespace GalacticWaez
                 HandleStore(args, player, responder);
                 return true;
             }
+            if (cmdToken == "ginfo")
+            {
+                HandleGinfo(args, responder);
+                return true;
+            }
 
             if (cmdToken != "status" || !(args == null || args == ""))
                 return false;
 
             responder.Send(Status.ToString());
             return true;
+        }
+
+        private void HandleGinfo(string arg, IResponder responder)
+        {
+            if (Galaxy == null)
+            {
+                responder.Send("No galaxy map.");
+                return;
+            }
+            responder.Send($"Stars: {Galaxy.Stars}\nWarp Lines: {Galaxy.WarpLines}");
+            return;
         }
 
         // IPlayerInfo parameter is here anticipating a permission check; for now it is ignored
@@ -147,15 +163,9 @@ namespace GalacticWaez
             Setup(type);
         }
 
-        protected void ResetCancellationSource()
-        {
-            InitCancelSource?.Dispose();
-            InitCancelSource = new CancellationTokenSource();
-            InitCancelToken = InitCancelSource.Token;
-        }
-
         private void SetChatHandler(ChatMessageHandler handler)
         {
+            ModApi.Log("Setting ChatHandler");
             if (_chatHandler != null)
                 ModApi.Application.ChatMessageSent -= _chatHandler.HandleChatMessage;
 
@@ -168,7 +178,7 @@ namespace GalacticWaez
         {
             return new ChatMessageHandler(pp,
                 new ResponseManager(ModApi.Application),
-                this, PreInitCommandHandler,
+                this, preInitCommandHandler,
                 new HelpHandler(),
                 new PinfoHandler(pp));
         }
@@ -177,14 +187,14 @@ namespace GalacticWaez
         {
             if (init != null)
             {
-                InitCancelSource.Cancel();
+                initCancelSource.Cancel();
                 try { init.Wait(); }
                 catch { /* don't care; it's done */ }
-                InitCancelSource.Dispose();
+                initCancelSource.Dispose();
             }
-            InitCancelSource = new CancellationTokenSource();
-            InitCancelToken = InitCancelSource.Token;
-            init = Task<bool>.Factory.StartNew(() => SetupTask(type, InitCancelToken), InitCancelToken);
+            initCancelSource = new CancellationTokenSource();
+            initCancelToken = initCancelSource.Token;
+            init = Task<bool>.Factory.StartNew(() => SetupTask(type, initCancelToken), initCancelToken);
             ModApi.Application.Update += OnUpdateDuringInit;
         }
 
@@ -210,7 +220,7 @@ namespace GalacticWaez
             // finish assembling the chat message handler
             ChatHandler.AddHandler(nh);
             ChatHandler.AddHandler(new BookmarkHandler(bm, ModApi.Log));
-            ChatHandler.RemoveHandler(PreInitCommandHandler);
+            ChatHandler.RemoveHandler(preInitCommandHandler);
             return true;
         }
 
