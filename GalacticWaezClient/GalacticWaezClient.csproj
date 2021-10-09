@@ -114,6 +114,7 @@
     <Compile Include="SaveGameDB.cs" />
     <Compile Include="StarFinder.cs" />
     <Compile Include="StarFinderDataSource.cs" />
+    <Compile Include="VectorExtensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

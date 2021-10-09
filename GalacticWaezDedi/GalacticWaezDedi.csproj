@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\GalacticWaezClient\GalacticWaez.cs">
+      <Link>GalacticWaez.cs</Link>
+    </Compile>
     <Compile Include="GalacticWaezDedi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
