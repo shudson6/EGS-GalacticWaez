@@ -17,6 +17,8 @@ namespace GalacticWaezTests.Fakes
         public string Name => throw new NotImplementedException();
 
         public string PlayfieldName => throw new NotImplementedException();
+
+        public string StarName => throw new NotImplementedException();
     }
 
     public class NavTestPlayerInfo : IPlayerInfo
@@ -33,6 +35,8 @@ namespace GalacticWaezTests.Fakes
         public VectorInt3 StarCoordinates => starVector;
 
         public string PlayfieldName => throw new NotImplementedException();
+
+        public string StarName => throw new NotImplementedException();
 
         public NavTestPlayerInfo(int id, int facid, VectorInt3 forStar, float range)
         {

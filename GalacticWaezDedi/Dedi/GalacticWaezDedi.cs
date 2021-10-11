@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Eleon;
-using Eleon.Modding;
-using GalacticWaez;
+﻿using Eleon.Modding;
 
 namespace GalacticWaez.Dedi
 {
@@ -23,6 +16,9 @@ namespace GalacticWaez.Dedi
         }
 
         protected override IPlayerProvider CreatePlayerProvider()
-            => new DediPlayerProvider(ModApi.Application.GetPathFor(AppFolder.SaveGame), ModApi.Log);
+            => new DediPlayerProvider(
+                ModApi.Application.GetPathFor(AppFolder.SaveGame), 
+                ModApi.Application.GetPlayerDataFor,
+                ModApi.Log);
     }
 }

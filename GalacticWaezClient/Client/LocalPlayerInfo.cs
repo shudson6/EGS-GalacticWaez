@@ -25,5 +25,7 @@ namespace GalacticWaez.Client
         public string PlayfieldName => modApi.ClientPlayfield.Name;
 
         public string Name => modApi.Application.LocalPlayer.Name;
+
+        public string StarName => modApi.ClientPlayfield.SolarSystemName;
     }
 }

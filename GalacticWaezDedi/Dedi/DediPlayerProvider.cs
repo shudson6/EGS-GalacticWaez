@@ -30,60 +30,61 @@ namespace GalacticWaez.Dedi
             public string StarName => ssName;
         }
 
-        public DediPlayerProvider(string saveGameDir, LoggingDelegate log)
-            : base(saveGameDir, log) { }
+        private readonly Func<int, PlayerData?> GetPlayerData;
+
+        public DediPlayerProvider(string saveGameDir, Func<int, PlayerData?> getPlayer, LoggingDelegate log)
+            : base(saveGameDir, log) 
+        {
+            GetPlayerData = getPlayer ?? throw new ArgumentNullException("DediPlayerProvider: getPlayer");
+        }
 
         public override IPlayerInfo GetPlayerInfo(int playerId)
         {
-            // using DB access to get info b/c API2 doesn't expose it
-            // and API1 does it in a cumbersome way that I just don't feel like doing
-            float warpRange = GetWarpRange(playerId);
-            string playerName;
-            int factionId;
-            VectorInt3 starPos;
-            string pfName;
-            int pfid;
-            string ssName;
+            var playerData = GetPlayerData(playerId);
+            if (playerData == null)
+                return null;
 
+            var info = new PlayerInfo
+            {
+                id = playerId,
+                name = playerData?.PlayerName,
+                pfName = playerData?.PlayfieldName
+            };
+
+            info.range = GetWarpRange(playerId);
+
+            // decided to get player info this way because:
+            // don't need all (or even much) of the info available from IPlayer
+            // API2 doesn't have a method to get an IPlayer (except LocalPlayer) and
+            // I don't want to make all the changes to get API1 involved just for like 2 things
             SqliteConnection connection = null;
             SqliteCommand command = null;
             try
             {
                 connection = GetConnection();
                 command = connection.CreateCommand();
-                command.CommandText = "select name, facid, pfid"
+                command.CommandText = "select facid"
                     + " from Entities"
                     + $" where entityid={playerId}";
                 using (var reader = command.ExecuteReader())
                 {
                     reader.Read();
-                    playerName = reader.GetString(0);
-                    factionId = reader.GetInt32(1);
-                    pfid = reader.GetInt32(2);
+                    info.facId = reader.GetInt32(0);
                 }
-                command.CommandText = "select s.name, s.sectorx, s.sectory, s.sectorz, p.name"
+                command.CommandText = "select s.name, s.sectorx, s.sectory, s.sectorz"
                     + " from SolarSystems s inner join playfields p using(ssid)"
-                    + $" where pfid={pfid};";
+                    + " where p.name=@pfName;";
+                command.Parameters.AddWithValue("@pfName", info.pfName);
                 using (var reader = command.ExecuteReader())
                 {
                     reader.Read();
-                    ssName = reader.GetString(0);
-                    starPos = new VectorInt3(
+                    info.ssName = reader.GetString(0);
+                    info.starCoords = new VectorInt3(
                         reader.GetInt32(1),
                         reader.GetInt32(2),
                         reader.GetInt32(3));
-                    pfName = reader.GetString(4);
                 }
-                return new PlayerInfo
-                {
-                    name = playerName,
-                    id = playerId,
-                    facId = factionId,
-                    range = warpRange,
-                    starCoords = starPos,
-                    pfName = pfName,
-                    ssName = ssName
-                };
+                return info;
             }
             catch (SqliteException ex)
             {

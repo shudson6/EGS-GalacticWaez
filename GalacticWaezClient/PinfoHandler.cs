@@ -44,7 +44,7 @@ namespace GalacticWaez
             sb.AppendLine($"Name: {player.Name}");
             sb.AppendLine($"ID: {player.Id}");
             sb.AppendLine($"Playfield: {player.PlayfieldName}");
-            sb.AppendLine($"Star Coordinates: {starCoords.x}, {starCoords.y}, {starCoords.z}");
+            sb.AppendLine($"Star: {player.StarName} ({starCoords.x}, {starCoords.y}, {starCoords.z})");
             sb.AppendLine($"Warp Range: {player.WarpRange / SectorsPerLY}LY");
             return sb.ToString();
         }

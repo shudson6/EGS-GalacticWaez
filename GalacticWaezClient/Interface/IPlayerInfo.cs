@@ -2,7 +2,6 @@
 {
     /// <summary>
     /// Provides ID and Position information about a player.
-    /// TODO: create an implementation that can provide this information in a multiplayer setting
     /// </summary>
     public interface IPlayerInfo
     {
@@ -18,5 +17,7 @@
         Eleon.Modding.VectorInt3 StarCoordinates { get; }
 
         string PlayfieldName { get; }
+
+        string StarName { get; }
     }
 }

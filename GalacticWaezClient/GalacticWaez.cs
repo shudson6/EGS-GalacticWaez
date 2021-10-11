@@ -72,7 +72,7 @@ namespace GalacticWaez
             }
             if (cmdToken == "ginfo")
             {
-                HandleGinfo(args, responder);
+                HandleGinfo(responder);
                 return true;
             }
 
@@ -83,7 +83,7 @@ namespace GalacticWaez
             return true;
         }
 
-        private void HandleGinfo(string arg, IResponder responder)
+        private void HandleGinfo(IResponder responder)
         {
             if (Galaxy == null)
             {
