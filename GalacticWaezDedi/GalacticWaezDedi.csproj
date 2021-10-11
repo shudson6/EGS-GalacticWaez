@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{50AE9514-8E8F-4A09-829E-7C9DACB74C36}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GalacticWaez.Dedi</RootNamespace>
+    <AssemblyName>GalacticWaezDedi</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ModApi">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Galactic Survival\DedicatedServer\EmpyrionDedicated_Data\Managed\ModApi.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Galactic Survival\DedicatedServer\EmpyrionDedicated_Data\Managed\Mono.Data.Sqlite.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\GalacticWaezClient\AstarPathfinder.cs">
+      <Link>AstarPathfinder.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\BookmarkHandler.cs">
+      <Link>BookmarkHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\BookmarkManager.cs">
+      <Link>BookmarkManager.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\ChatMessageHandler.cs">
+      <Link>ChatMessageHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\DataSourceType.cs">
+      <Link>DataSourceType.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\FileDataSource.cs">
+      <Link>FileDataSource.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\GalacticWaez.cs">
+      <Link>GalacticWaez.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\GalaxyMap.cs">
+      <Link>GalaxyMap.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\GalaxyMapBuilder.cs">
+      <Link>GalaxyMapBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\HelpHandler.cs">
+      <Link>HelpHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IBookmarkManager.cs">
+      <Link>Interface\IBookmarkManager.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\ICommandHandler.cs">
+      <Link>Interface\ICommandHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IFileDataSource.cs">
+      <Link>Interface\IFileDataSource.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IGalaxyDataSource.cs">
+      <Link>Interface\IGalaxyDataSource.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IGalaxyMapBuilder.cs">
+      <Link>Interface\IGalaxyMapBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IGalaxyStorage.cs">
+      <Link>Interface\IGalaxyStorage.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IKnownStarProvider.cs">
+      <Link>Interface\IKnownStarProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\INavigator.cs">
+      <Link>Interface\INavigator.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IPathfinder.cs">
+      <Link>Interface\IPathfinder.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IPlayerInfo.cs">
+      <Link>Interface\IPlayerInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IPlayerProvider.cs">
+      <Link>Interface\IPlayerProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IResponder.cs">
+      <Link>Interface\IResponder.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IResponseManager.cs">
+      <Link>Interface\IResponseManager.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IStarFinder.cs">
+      <Link>Interface\IStarFinder.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\KnownStarProvider.cs">
+      <Link>KnownStarProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Minheap.cs">
+      <Link>Minheap.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\NavigationHandler.cs">
+      <Link>NavigationHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Navigator.cs">
+      <Link>Navigator.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\NormalDataSource.cs">
+      <Link>NormalDataSource.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\PinfoHandler.cs">
+      <Link>PinfoHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\PlayerProviderBase.cs">
+      <Link>PlayerProviderBase.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\PreInitCommandHandler.cs">
+      <Link>PreInitCommandHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\ResponseManager.cs">
+      <Link>ResponseManager.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\SaveGameDB.cs">
+      <Link>SaveGameDB.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\StarFinder.cs">
+      <Link>StarFinder.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\StarFinderDataSource.cs">
+      <Link>StarFinderDataSource.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\VectorExtensions.cs">
+      <Link>VectorExtensions.cs</Link>
+    </Compile>
+    <Compile Include="Dedi\DediPlayerProvider.cs" />
+    <Compile Include="Dedi\GalacticWaezDedi.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
