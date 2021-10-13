@@ -1,8 +1,4 @@
-﻿using Mono.Data.Sqlite;
-using System;
-using System.Data;
-using static GalacticWaez.GalacticWaez;
-using Eleon.Modding;
+﻿using Eleon.Modding;
 
 namespace GalacticWaez.Client
 {

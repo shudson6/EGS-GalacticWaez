@@ -1,6 +1,6 @@
 ﻿using static GalacticWaez.GalacticWaez;
-using Mono.Data.Sqlite;
 using System.Data;
+using System.Data.SQLite;
 
 namespace GalacticWaez
 {
@@ -16,8 +16,8 @@ namespace GalacticWaez
         {
             float warpRange = BaseWarpRangeLY;
 
-            SqliteConnection connection = null;
-            SqliteCommand command = null;
+            SQLiteConnection connection = null;
+            SQLiteCommand command = null;
             IDataReader reader = null;
 
             try
@@ -32,9 +32,9 @@ namespace GalacticWaez
                     warpRange += reader.GetFloat(0);
                 }
             }
-            catch (SqliteException ex)
+            catch (SQLiteException ex)
             {
-                Log($"SqliteException in GetPlayerData: {ex.Message}");
+                Log($"SQLiteException in GetPlayerData: {ex.Message}");
                 Log($"Using base warp range ({BaseWarpRangeLY}LY) for player {playerId}");
             }
             finally

@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Mono.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,7 +12,7 @@ namespace GalacticWaezTests
 {
     [TestClass]
     [DeploymentItem("Dependencies\\testdb.sql")]
-    [DeploymentItem("Dependencies\\sqlite3.dll")]
+    [DeploymentItem("Dependencies\\SQLite.Interop.dll")]
     public class BookmarkManagerTests
     {
         private static readonly VectorInt3[] TestBmVector = new VectorInt3[]
@@ -85,8 +85,18 @@ namespace GalacticWaezTests
             deploymentDir = $"{_tc.DeploymentDirectory}\\BookmarkManager";
             Directory.CreateDirectory(deploymentDir);
             dbPath = $"{deploymentDir}\\global.db";
-            SqliteConnection.CreateFile(dbPath);
+            SQLiteConnection.CreateFile(dbPath);
             sqlPath = $"{_tc.DeploymentDirectory}\\testdb.sql";
+            var sqlite = GetConnection(false);
+            var cmd = sqlite.CreateCommand();
+            cmd.CommandText = "select sqlite_version();";
+            using (var reader = cmd.ExecuteReader())
+            {
+                reader.Read();
+                Console.WriteLine("SQLite Version: " + reader.GetString(0));
+            }
+            cmd.Dispose();
+            sqlite.Dispose();
         }
 
         [TestInitialize]
@@ -485,7 +495,7 @@ namespace GalacticWaezTests
             sql.Dispose();
         }
 
-        private Bookmark ExtractBookmark(SqliteDataReader reader)
+        private Bookmark ExtractBookmark(SQLiteDataReader reader)
         {
             return new Bookmark
             {
@@ -543,9 +553,9 @@ namespace GalacticWaezTests
             };
         }
 
-        private static SqliteConnection GetConnection(bool writeable)
+        private static SQLiteConnection GetConnection(bool writeable)
         {
-            var sql = new SqliteConnection(new SqliteConnectionStringBuilder
+            var sql = new SQLiteConnection(new SQLiteConnectionStringBuilder
             {
                 DataSource = dbPath,
                 Version = 3,

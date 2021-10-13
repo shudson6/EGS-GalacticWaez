@@ -72,13 +72,12 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Galactic Survival\DedicatedServer\EmpyrionDedicated_Data\Managed\ModApi.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Mono.Data.Sqlite">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Galactic Survival\DedicatedServer\EmpyrionDedicated_Data\Managed\Mono.Data.Sqlite.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Galactic Survival\Client\Empyrion_Data\Managed\System.Data.SQLite.dll</HintPath>
+    </Reference>
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
       <Private>False</Private>
@@ -133,7 +132,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Dependencies\sqlite3.dll">
+    <Content Include="Dependencies\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Dependencies\testdb.sql">

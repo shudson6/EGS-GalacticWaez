@@ -1,7 +1,7 @@
 ﻿using Eleon.Modding;
-using Mono.Data.Sqlite;
 using System;
 using System.Data;
+using System.Data.SQLite;
 
 namespace GalacticWaez
 {
@@ -14,8 +14,8 @@ namespace GalacticWaez
 
         public bool GetFirstKnownStarPosition(out VectorInt3 pos)
         {
-            SqliteConnection connection = null;
-            SqliteCommand command = null;
+            SQLiteConnection connection = null;
+            SQLiteCommand command = null;
             IDataReader reader = null;
 
             try
@@ -53,8 +53,8 @@ namespace GalacticWaez
             if (name == null)
                 throw new ArgumentNullException("GetPosition: name");
 
-            SqliteConnection connection = null;
-            SqliteCommand command = null;
+            SQLiteConnection connection = null;
+            SQLiteCommand command = null;
             IDataReader reader = null;
 
             try
@@ -74,9 +74,9 @@ namespace GalacticWaez
                     return true;
                 }
             }
-            catch (SqliteException ex)
+            catch (SQLiteException ex)
             {
-                Log($"SqliteException in GetSolarSystemCoordinates: {ex.Message}");
+                Log($"SQLiteException in GetSolarSystemCoordinates: {ex.Message}");
             }
             finally
             {

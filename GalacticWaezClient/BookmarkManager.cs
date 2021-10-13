@@ -1,8 +1,8 @@
 ﻿using Eleon.Modding;
-using Mono.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SQLite;
 using System.Text;
 
 namespace GalacticWaez
@@ -19,8 +19,8 @@ namespace GalacticWaez
             if (bookmarkName == null)
                 bookmarkName = "";
 
-            SqliteConnection connection = null;
-            SqliteCommand command = null;
+            SQLiteConnection connection = null;
+            SQLiteCommand command = null;
             IDataReader reader = null;
 
             try
@@ -42,9 +42,9 @@ namespace GalacticWaez
                     return true;
                 }
             }
-            catch (SqliteException ex)
+            catch (SQLiteException ex)
             {
-                Log($"SqliteException in GetBookmarkVector: {ex.Message}");
+                Log($"SQLiteException in GetBookmarkVector: {ex.Message}");
             }
             finally
             {
@@ -61,8 +61,8 @@ namespace GalacticWaez
             if (coordinates == null)
                 return 0;
 
-            SqliteConnection connection = null;
-            SqliteCommand command = null;
+            SQLiteConnection connection = null;
+            SQLiteCommand command = null;
             try
             {
                 connection = GetConnection(writeable: true);
@@ -71,9 +71,9 @@ namespace GalacticWaez
                 command.CommandText = BuildInsertBookmarks(coordinates, data, 0);// bid);
                 return command.ExecuteNonQuery();
             }
-            catch (SqliteException ex)
+            catch (SQLiteException ex)
             {
-                Log("SqliteException in InsertBookmarks: " + ex.Message);
+                Log("SQLiteException in InsertBookmarks: " + ex.Message);
             }
             finally
             {
@@ -109,7 +109,7 @@ namespace GalacticWaez
             return sql.ToString();
         }
 
-        //private int GetStartingBookmarkId(SqliteCommand command)
+        //private int GetStartingBookmarkId(SQLiteCommand command)
         //{
         //    IDataReader reader = null;
         //    try
@@ -146,8 +146,8 @@ namespace GalacticWaez
                     return 0;
             }
 
-            SqliteConnection connection = null;
-            SqliteCommand command = null;
+            SQLiteConnection connection = null;
+            SQLiteCommand command = null;
 
             try
             {
@@ -156,9 +156,9 @@ namespace GalacticWaez
                 command.CommandText = sql;
                 return command.ExecuteNonQuery();
             }
-            catch (SqliteException ex)
+            catch (SQLiteException ex)
             {
-                Log($"SqliteException in ModifyPathMarkers: {ex.Message}");
+                Log($"SQLiteException in ModifyPathMarkers: {ex.Message}");
                 return 0;
             }
             finally
