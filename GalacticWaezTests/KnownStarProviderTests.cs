@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Mono.Data.Sqlite;
 using System;
+using System.Data.SQLite;
 using System.IO;
 using Eleon.Modding;
 using GalacticWaez;
@@ -9,7 +9,7 @@ namespace GalacticWaezTests
 {
     [TestClass]
     [DeploymentItem("Dependencies\\testdb.sql")]
-    [DeploymentItem("Dependencies\\sqlite3.dll")]
+    [DeploymentItem("Dependencies\\SQLite.Interop.dll")]
     public class KnownStarProviderTests
     {
         private static readonly VectorInt3 firstVector = new VectorInt3(300000, 0, 0);
@@ -28,7 +28,7 @@ namespace GalacticWaezTests
             deploymentDir = $"{_tc.DeploymentDirectory}\\KnownStarProvider";
             Directory.CreateDirectory(deploymentDir);
             dbPath = $"{deploymentDir}\\global.db";
-            SqliteConnection.CreateFile(dbPath);
+            SQLiteConnection.CreateFile(dbPath);
             sqlPath = $"{_tc.DeploymentDirectory}\\testdb.sql";
         }
 
@@ -97,9 +97,9 @@ namespace GalacticWaezTests
             new KnownStarProvider(deploymentDir, delegate { }).GetPosition(null, out VectorInt3 actual);
         }
 
-        private static SqliteConnection GetConnection(bool writeable)
+        private static SQLiteConnection GetConnection(bool writeable)
         {
-            var sql = new SqliteConnection(new SqliteConnectionStringBuilder
+            var sql = new SQLiteConnection(new SQLiteConnectionStringBuilder
             {
                 DataSource = dbPath,
                 Version = 3,

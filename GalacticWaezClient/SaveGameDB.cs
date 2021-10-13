@@ -1,6 +1,6 @@
-﻿using Mono.Data.Sqlite;
+﻿using Eleon.Modding;
 using System;
-using Eleon.Modding;
+using System.Data.SQLite;
 
 namespace GalacticWaez
 {
@@ -19,9 +19,9 @@ namespace GalacticWaez
             PathToDB = $"{saveGameDir}\\{file}";
         }
 
-        protected SqliteConnection GetConnection(bool writeable = false)
+        protected SQLiteConnection GetConnection(bool writeable = false)
         {
-            var connection = new SqliteConnection(new SqliteConnectionStringBuilder()
+            var connection = new SQLiteConnection(new SQLiteConnectionStringBuilder()
                 {
                     DataSource = PathToDB,
                     Version = 3,

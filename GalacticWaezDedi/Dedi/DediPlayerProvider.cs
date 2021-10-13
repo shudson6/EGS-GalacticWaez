@@ -1,8 +1,8 @@
 ﻿using Eleon.Modding;
-using Mono.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,8 +57,8 @@ namespace GalacticWaez.Dedi
             // don't need all (or even much) of the info available from IPlayer
             // API2 doesn't have a method to get an IPlayer (except LocalPlayer) and
             // I don't want to make all the changes to get API1 involved just for like 2 things
-            SqliteConnection connection = null;
-            SqliteCommand command = null;
+            SQLiteConnection connection = null;
+            SQLiteCommand command = null;
             try
             {
                 connection = GetConnection();
@@ -86,9 +86,15 @@ namespace GalacticWaez.Dedi
                 }
                 return info;
             }
-            catch (SqliteException ex)
+            catch (SQLiteException ex)
             {
-                Log($"SqliteException in GetPlayerData: {ex.Message}");
+                Log($"SQLiteException in GetPlayerData: {ex.Message}");
+                Exception inner = ex;
+                while (ex.InnerException != null)
+                {
+                    inner = inner.InnerException;
+                    Log($"Caused by: {inner.Message}");
+                }
                 Log($"current query was: {command?.CommandText}");
                 return null;
             }
