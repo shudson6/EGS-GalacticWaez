@@ -125,7 +125,7 @@ namespace GalacticWaez
             return Bookmarks.InsertBookmarks(path, bmdata);
         }
 
-        private GalaxyMap.Node GoalNode(int playerId, int playerFacId, string goalName, out bool isBookmark)
+        private IGalaxyNode GoalNode(int playerId, int playerFacId, string goalName, out bool isBookmark)
         {
             isBookmark = Bookmarks.TryGetVector(playerId, playerFacId, goalName, out var coords);
             if (!isBookmark && !KnownStars.GetPosition(goalName, out coords))

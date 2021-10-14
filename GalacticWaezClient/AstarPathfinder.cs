@@ -14,10 +14,10 @@ namespace GalacticWaez
     {
         class PathNode
         {
-            public GalaxyMap.Node Star { get; }
+            public IGalaxyNode Star { get; }
             public PathNode Previous { get; }
             public float PathCost { get; }
-            public PathNode(GalaxyMap.Node star, PathNode previous)
+            public PathNode(IGalaxyNode star, PathNode previous)
             {
                 Star = star;
                 Previous = previous;
@@ -26,7 +26,7 @@ namespace GalacticWaez
         }
 
         public IEnumerable<VectorInt3>
-        FindPath(GalaxyMap.Node start, GalaxyMap.Node goal, float warpRange)
+        FindPath(IGalaxyNode start, IGalaxyNode goal, float warpRange)
         {
             if (start == null || goal == null)
                 throw new ArgumentNullException("FindPath: start or goal");

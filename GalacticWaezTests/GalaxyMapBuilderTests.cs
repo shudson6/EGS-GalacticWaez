@@ -134,7 +134,7 @@ namespace GalacticWaezTests
             Assert.AreEqual(warpLines, testGalaxy.WarpLines);
         }
 
-        private float Distance(GalaxyMap.Node a, GalaxyMap.Node b)
+        private float Distance(IGalaxyNode a, IGalaxyNode b)
         {
             float dx = a.Position.x - b.Position.x;
             float dy = a.Position.y - b.Position.y;

@@ -78,6 +78,7 @@
     <Compile Include="BookmarkHandler.cs" />
     <Compile Include="BookmarkManager.cs" />
     <Compile Include="HelpHandler.cs" />
+    <Compile Include="Interface\IGalaxyNode.cs" />
     <Compile Include="Interface\IGalaxyMap.cs" />
     <Compile Include="Interface\IBookmarkManager.cs" />
     <Compile Include="FileDataSource.cs" />

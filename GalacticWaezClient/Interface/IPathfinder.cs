@@ -18,6 +18,6 @@ namespace GalacticWaez
         /// an ordered collection of vectors representing the path,
         /// or <c>null</c> if no path found
         /// </returns>
-        IEnumerable<VectorInt3> FindPath(GalaxyMap.Node start, GalaxyMap.Node goal, float warpRange);
+        IEnumerable<VectorInt3> FindPath(IGalaxyNode start, IGalaxyNode goal, float warpRange);
     }
 }

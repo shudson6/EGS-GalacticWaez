@@ -5,10 +5,10 @@ namespace GalacticWaez
 {
     public interface IGalaxyMap
     {
-        IEnumerable<GalaxyMap.Node> Nodes { get; }
+        IEnumerable<IGalaxyNode> Nodes { get; }
         int Stars { get; }
         int WarpLines { get; }
 
-        GalaxyMap.Node GetNode(VectorInt3 coordinates);
+        IGalaxyNode GetNode(VectorInt3 coordinates);
     }
 }

@@ -14,7 +14,7 @@ namespace GalacticWaezTests.Fakes
 
         public FakePathfinder(IEnumerable<VectorInt3> path = null) => this.path = path;
 
-        public IEnumerable<VectorInt3> FindPath(GalaxyMap.Node start, GalaxyMap.Node goal, float warpRange)
+        public IEnumerable<VectorInt3> FindPath(IGalaxyNode start, IGalaxyNode goal, float warpRange)
             => path;
     }
 }
