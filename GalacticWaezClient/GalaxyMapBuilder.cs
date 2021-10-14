@@ -28,7 +28,7 @@ namespace GalacticWaez
         /// <returns>
         /// a new GalaxyMap, or <c>null</c> if data were unavailable
         /// </returns>
-        public GalaxyMap BuildGalaxyMap(IGalaxyDataSource source, float maxWarpRange,
+        public IGalaxyMap BuildGalaxyMap(IGalaxyDataSource source, float maxWarpRange,
             CancellationToken token = default)
         {
             CheckParams(source, maxWarpRange);

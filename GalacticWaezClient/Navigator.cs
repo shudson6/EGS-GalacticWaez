@@ -15,9 +15,9 @@ namespace GalacticWaez
         private readonly LoggingDelegate Log;
         private readonly Func<ulong> GetTicks;
 
-        public GalaxyMap Galaxy { get; }
+        public IGalaxyMap Galaxy { get; }
 
-        public Navigator(GalaxyMap galaxy, IPathfinder pathfinder, 
+        public Navigator(IGalaxyMap galaxy, IPathfinder pathfinder, 
             IBookmarkManager bookmarkManager, IKnownStarProvider starProvider, 
             LoggingDelegate log, Func<ulong> getTicks)
         {

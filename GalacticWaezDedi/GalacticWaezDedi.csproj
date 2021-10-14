@@ -92,6 +92,9 @@
     <Compile Include="..\GalacticWaezClient\Interface\IGalaxyDataSource.cs">
       <Link>Interface\IGalaxyDataSource.cs</Link>
     </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IGalaxyMap.cs">
+      <Link>Interface\IGalaxyMap.cs</Link>
+    </Compile>
     <Compile Include="..\GalacticWaezClient\Interface\IGalaxyMapBuilder.cs">
       <Link>Interface\IGalaxyMapBuilder.cs</Link>
     </Compile>

@@ -2,7 +2,7 @@
 {
     public interface IGalaxyMapBuilder
     {
-        GalaxyMap BuildGalaxyMap(IGalaxyDataSource source, float maxWarpRange,
+        IGalaxyMap BuildGalaxyMap(IGalaxyDataSource source, float maxWarpRange,
             System.Threading.CancellationToken token);
     }
 }

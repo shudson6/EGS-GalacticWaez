@@ -48,7 +48,7 @@ namespace GalacticWaezTests
             return data;
         }
 
-        public static GalaxyMap BuildTestGalaxy(string starDataFile, float range)
+        public static IGalaxyMap BuildTestGalaxy(string starDataFile, float range)
             => new GalaxyMapBuilder(null).BuildGalaxyMap(new TestGalaxySource(starDataFile), range);
 
         private class TestGalaxySource : IGalaxyDataSource

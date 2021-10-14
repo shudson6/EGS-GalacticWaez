@@ -40,7 +40,7 @@ namespace GalacticWaez
         private CancellationTokenSource initCancelSource;
         private CancellationToken initCancelToken;
         protected IModApi ModApi { get; private set; }
-        protected GalaxyMap Galaxy { get; private set; }
+        protected IGalaxyMap Galaxy { get; private set; }
 
         private Task<bool> init = null;
         private ChatMessageHandler _chatHandler;

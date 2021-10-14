@@ -101,7 +101,7 @@ namespace GalacticWaezTests
             throw new AssertFailedException();
         }
 
-        private void VerifyGalaxyMap(string filename, GalaxyMap testGalaxy, float testRange)
+        private void VerifyGalaxyMap(string filename, IGalaxyMap testGalaxy, float testRange)
         {
             var positions = GalaxyTestData.LoadPositions(filename);
             Assert.IsTrue(testGalaxy.WarpLines > 0);

@@ -12,7 +12,7 @@ namespace GalacticWaezTests
     public partial class NavigatorTests
     {
         private static readonly Func<ulong> TestTicks = () => 7231013;
-        private static GalaxyMap galaxy;
+        private static IGalaxyMap galaxy;
         private static IEnumerable<VectorInt3> positions;
 
         [ClassInitialize]

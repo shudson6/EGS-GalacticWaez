@@ -5,7 +5,7 @@ using Eleon.Modding;
 
 namespace GalacticWaez
 {
-    public class GalaxyMap
+    public class GalaxyMap : IGalaxyMap
     {
         public class Node
         {
