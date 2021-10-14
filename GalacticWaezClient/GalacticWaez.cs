@@ -90,7 +90,8 @@ namespace GalacticWaez
                 responder.Send("No galaxy map.");
                 return;
             }
-            responder.Send($"Stars: {Galaxy.Stars}\nWarp Lines: {Galaxy.WarpLines}");
+            responder.Send($"Stars: {Galaxy.Stars}\nWarp Lines: {Galaxy.WarpLines}"
+                + $"Max Range: {Galaxy.Range}");
             return;
         }
 
@@ -102,7 +103,7 @@ namespace GalacticWaez
             var storage = new FileDataSource(ModApi.Application.GetPathFor(AppFolder.SaveGame), ModApi.Log);
             if ((!storage.Exists && arg == "") || arg == "--replace")
             {
-                if (storage.StoreGalaxyData(Galaxy.Nodes.Select(node => node.Position)))
+                if (storage.StoreGalaxyData(Galaxy.StarPositions))
                 {
                     responder?.Send($"Wrote {Galaxy.Stars} star positions.");
                 }

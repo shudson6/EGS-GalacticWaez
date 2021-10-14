@@ -55,7 +55,7 @@ namespace GalacticWaez
                 nodes.Add(current);
                 token.ThrowIfCancellationRequested();
             }
-            var g = new GalaxyMap(nodes);
+            var g = new GalaxyMap(nodes, (int)maxWarpRange);
             sw.Stop();
             float time = (float)sw.ElapsedMilliseconds / 1000;
             Log("Constructed galactic highway map: "
