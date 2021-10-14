@@ -98,7 +98,7 @@ namespace GalacticWaez
             int step = 1;
             foreach (var p in coordinates)
             {
-                sql.Append($"(0, 0, {data.FacGroup}, {data.PlayerFacId}, {data.PlayerId},");
+                sql.Append($"(0, 0, {data.FacGroup}, {data.PlayerId}, {data.PlayerId},");
                 sql.Append($"'Waez_{step}', {p.x}, {p.y}, {p.z}, 0, 0, 0,");
                 sql.Append($"{data.Icon}, {data.IsShared}, {data.IsWaypoint}, {data.IsRemove},");
                 sql.Append($"{data.IsShowHud}, 0, {data.GameTime}, {data.MaxDistance}),");
