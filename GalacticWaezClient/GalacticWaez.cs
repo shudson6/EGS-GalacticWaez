@@ -98,7 +98,7 @@ namespace GalacticWaez
                 return;
             }
             responder.Send($"Stars: {Galaxy.Stars}\nWarp Lines: {Galaxy.WarpLines}\n"
-                + $"Max Range: {Galaxy.Range}");
+                + $"Max Range: {Galaxy.Range / SectorsPerLY}");
             return;
         }
 
