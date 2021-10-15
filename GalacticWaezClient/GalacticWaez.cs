@@ -97,7 +97,7 @@ namespace GalacticWaez
                 responder.Send("No galaxy map.");
                 return;
             }
-            responder.Send($"Stars: {Galaxy.Stars}\nWarp Lines: {Galaxy.WarpLines}"
+            responder.Send($"Stars: {Galaxy.Stars}\nWarp Lines: {Galaxy.WarpLines}\n"
                 + $"Max Range: {Galaxy.Range}");
             return;
         }
