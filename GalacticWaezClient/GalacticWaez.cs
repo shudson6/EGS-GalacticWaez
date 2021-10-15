@@ -19,17 +19,22 @@ namespace GalacticWaez
     public abstract class GalacticWaez : IMod, ICommandHandler
     {
         /// <summary> Base value of player warp range, in sectors </summary>
-        public const float BaseWarpRange = BaseWarpRangeLY * SectorsPerLY;
+        public const float DefaultBaseWarpRange = DefaultBaseWarpRangeLY * SectorsPerLY;
         /// <summary> Default maximum distance between stars to be considered neighbors, in sectors </summary>
         public const float DefaultMaxWarpRange = DefaultMaxWarpRangeLY * SectorsPerLY;
         /// <summary> Base value of player warp range, in LY, to which bonuses are added </summary>
-        public const float BaseWarpRangeLY = 30;
+        public const float DefaultBaseWarpRangeLY = 30;
         /// <summary> Default maximum distance between stars to be considered neighbors, in LY</summary>
-        public const float DefaultMaxWarpRangeLY = 110;
+        public const float DefaultMaxWarpRangeLY = 30;
+        /// <summary> Default maximum time for a nav task before cancellation </summary>
+        public const int DefaultNavTimeoutSeconds = 20;
+        /// <summary> Default maximum time for a nav task before cancellation </summary>
+        public const int DefaultNavTimeoutMillis = 1000 * DefaultNavTimeoutSeconds;
         /// <summary> Constant for converting between sectors and light-years </summary>
         public const int SectorsPerLY = 100000;
 
         public ModState Status { get; protected set; }
+        public IConfiguration Config { get; private set; }
 
         private readonly ICommandHandler preInitCommandHandler = new PreInitCommandHandler();
         protected ChatMessageHandler ChatHandler
@@ -49,6 +54,8 @@ namespace GalacticWaez
         {
             ModApi = modApi;
             Status = ModState.Uninitialized;
+            Config = new ConfigLoader(ModApi.Log)
+                .LoadConfig(ModApi.Application.GetPathFor(AppFolder.Mod) + "\\GalacticWaez\\config.ecf");
         }
 
         public virtual void Shutdown()
@@ -208,7 +215,7 @@ namespace GalacticWaez
             var ksp = new KnownStarProvider(saveGameDir, ModApi.Log);
             var source = CreateDataSource(type, ksp, saveGameDir);
             Galaxy = new GalaxyMapBuilder(ModApi.Log)
-                .BuildGalaxyMap(source, 110 * GalacticWaez.SectorsPerLY, cancelToken);
+                .BuildGalaxyMap(source, Config.MaxWarpRange, cancelToken);
             if (Galaxy == null)
                 return false;
 

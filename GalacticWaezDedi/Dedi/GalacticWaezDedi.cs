@@ -18,6 +18,7 @@ namespace GalacticWaez.Dedi
         protected override IPlayerProvider CreatePlayerProvider()
             => new DediPlayerProvider(
                 ModApi.Application.GetPathFor(AppFolder.SaveGame), 
+                Config.BaseWarpRange,
                 ModApi.Application.GetPlayerDataFor,
                 ModApi.Log);
     }

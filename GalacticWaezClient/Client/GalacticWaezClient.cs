@@ -19,7 +19,7 @@ namespace GalacticWaez.Client
         }
 
         protected override IPlayerProvider CreatePlayerProvider()
-            => new LocalPlayerInfo(ModApi);
+            => new LocalPlayerInfo(ModApi, Config.BaseWarpRange);
 
         private void OnGameEvent(GameEventType type,
                         object arg1 = null,

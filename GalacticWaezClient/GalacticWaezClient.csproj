@@ -58,14 +58,24 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Galactic Survival\Client\Empyrion_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ECFParser">
+      <HintPath>..\Dependencies\ECFParser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ModApi">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Galactic Survival\Client\Empyrion_Data\Managed\ModApi.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Galactic Survival\DedicatedServer\EmpyrionDedicated_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Galactic Survival\Client\Empyrion_Data\Managed\System.Data.SQLite.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -77,7 +87,9 @@
   <ItemGroup>
     <Compile Include="BookmarkHandler.cs" />
     <Compile Include="BookmarkManager.cs" />
+    <Compile Include="ConfigLoader.cs" />
     <Compile Include="HelpHandler.cs" />
+    <Compile Include="Interface\IConfiguration.cs" />
     <Compile Include="Interface\IGalaxyNode.cs" />
     <Compile Include="Interface\IGalaxyMap.cs" />
     <Compile Include="Interface\IBookmarkManager.cs" />
@@ -118,6 +130,5 @@
     <Compile Include="StarFinderDataSource.cs" />
     <Compile Include="VectorExtensions.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

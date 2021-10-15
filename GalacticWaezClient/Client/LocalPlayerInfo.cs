@@ -10,8 +10,8 @@ namespace GalacticWaez.Client
         public int FactionId { get => modApi.Application.LocalPlayer.Faction.Id; }
         public float WarpRange => GetWarpRange(Id);
 
-        public LocalPlayerInfo(IModApi modApi)
-            : base(modApi.Application.GetPathFor(AppFolder.SaveGame), modApi.Log)
+        public LocalPlayerInfo(IModApi modApi, int baseWarpRange)
+            : base(modApi.Application.GetPathFor(AppFolder.SaveGame), baseWarpRange, modApi.Log)
             => this.modApi = modApi;
 
         public override IPlayerInfo GetPlayerInfo(int _) => this;

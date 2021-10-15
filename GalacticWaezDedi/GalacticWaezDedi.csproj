@@ -33,14 +33,23 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ECFParser">
+      <HintPath>..\Dependencies\ECFParser.dll</HintPath>
+    </Reference>
     <Reference Include="ModApi">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Galactic Survival\DedicatedServer\EmpyrionDedicated_Data\Managed\ModApi.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Galactic Survival\DedicatedServer\EmpyrionDedicated_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Empyrion - Dedicated Server\DedicatedServer\EmpyrionDedicated_Data\Managed\System.Data.SQLite.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -61,6 +70,9 @@
     </Compile>
     <Compile Include="..\GalacticWaezClient\ChatMessageHandler.cs">
       <Link>ChatMessageHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\ConfigLoader.cs">
+      <Link>ConfigLoader.cs</Link>
     </Compile>
     <Compile Include="..\GalacticWaezClient\DataSourceType.cs">
       <Link>DataSourceType.cs</Link>
@@ -85,6 +97,9 @@
     </Compile>
     <Compile Include="..\GalacticWaezClient\Interface\ICommandHandler.cs">
       <Link>Interface\ICommandHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\GalacticWaezClient\Interface\IConfiguration.cs">
+      <Link>Interface\IConfiguration.cs</Link>
     </Compile>
     <Compile Include="..\GalacticWaezClient\Interface\IFileDataSource.cs">
       <Link>Interface\IFileDataSource.cs</Link>

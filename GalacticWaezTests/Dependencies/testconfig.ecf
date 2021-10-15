@@ -1,0 +1,24 @@
+{
+  # determines the max jump distance waez can look for
+  # default is 30LY; set larger if you play a mod/scenario that allows longer jumps
+  # just know that as this number increases, the size of the map and the time
+  # required to build it increase faster.
+  # for example: a vanilla galaxy can be processed in 2-3 seconds and use less than 25MB.
+  # at the other extreme, Project Eden's Antimatter Warp Drive can jump 160LY, upgradeable
+  # to 210LY; setting maxWarpRange to 210 increases the RAM required by about 2GB and can
+  # take up to 3 minutes to process.
+
+  MaxWarpRangeLY: 71
+
+  # how long to wait for a navigation request before cancelling
+  # paths are typically found very quickly, but if the destination star is unreachable,
+  # the algorithm will have to check every possible star which will take several seconds
+  # and may use a considerable amount of memory. if this is a concern, use this value to
+  # control it.
+
+  NavTimeoutSeconds: 11
+
+  # in case you've modded the player's base warp range (is that even possible?)
+  
+  BaseWarpRangeLY: 37
+}
