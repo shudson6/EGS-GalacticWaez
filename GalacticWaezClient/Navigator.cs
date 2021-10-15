@@ -14,12 +14,13 @@ namespace GalacticWaez
         private readonly IKnownStarProvider KnownStars;
         private readonly LoggingDelegate Log;
         private readonly Func<ulong> GetTicks;
+        private readonly int TimeoutMillis;
 
         public IGalaxyMap Galaxy { get; }
 
         public Navigator(IGalaxyMap galaxy, IPathfinder pathfinder, 
             IBookmarkManager bookmarkManager, IKnownStarProvider starProvider, 
-            LoggingDelegate log, Func<ulong> getTicks)
+            LoggingDelegate log, Func<ulong> getTicks, int timeoutMillis)
         {
             Galaxy = galaxy ??
                 throw new ArgumentNullException("Navigator: Galaxy");
@@ -32,6 +33,9 @@ namespace GalacticWaez
                 throw new ArgumentNullException("Navigator: KnownStarProvider");
             GetTicks = getTicks ??
                 throw new ArgumentNullException("Navigator: GetTicks");
+            if (timeoutMillis <= 0)
+                throw new ArgumentOutOfRangeException("Navigate: timeoutMillis must be > 0");
+            TimeoutMillis = timeoutMillis;
         }
 
         public Task<IEnumerable<VectorInt3>> Navigate(
@@ -44,24 +48,22 @@ namespace GalacticWaez
             if (playerRange <= 0)
                 throw new ArgumentOutOfRangeException("Navigate: playerRange must be positive");
 
-            // TODO: alter DoNavigate to accept cancellation: includes IPathfinder implementations :S
             var source = new CancellationTokenSource();
-            var token = new CancellationToken();
+            var token = source.Token;
             var task = Task.Factory.StartNew(
-                () => DoNavigate(player, destination, playerRange, response),
-                token);
+                () => DoNavigate(player, destination, playerRange, response, token), token);
             task.ContinueWith((nav) =>
             {
                 if (nav.IsCanceled)
                     response.Send($"Navigation to {destination} failed due to timeout.");
             });
-            // TODO: make timeout configurable
-            source.CancelAfter(60 * 1000);
+            source.CancelAfter(TimeoutMillis);
             return task;
         }
 
         public IEnumerable<VectorInt3> DoNavigate(
-            IPlayerInfo player, string destination, float playerRange, IResponder response)
+            IPlayerInfo player, string destination, float playerRange, 
+            IResponder response, CancellationToken token)
         {
             var start = Galaxy.GetNode(player.StarCoordinates);
             var goal = GoalNode(player.Id, player.FactionId, destination, out bool isBookmark);
@@ -75,7 +77,7 @@ namespace GalacticWaez
                 response?.Send("It appears you are already there.");
                 return null;
             }
-            var path = Pathfinder.FindPath(start, goal, playerRange);
+            var path = Pathfinder.FindPath(start, goal, playerRange, token);
             if (path == null)
             {
                 response?.Send("No path found.");

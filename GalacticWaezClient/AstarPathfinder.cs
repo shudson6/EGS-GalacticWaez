@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Eleon.Modding;
 
 namespace GalacticWaez
@@ -26,7 +27,7 @@ namespace GalacticWaez
         }
 
         public IEnumerable<VectorInt3>
-        FindPath(IGalaxyNode start, IGalaxyNode goal, float warpRange)
+        FindPath(IGalaxyNode start, IGalaxyNode goal, float warpRange, CancellationToken token = default)
         {
             if (start == null || goal == null)
                 throw new ArgumentNullException("FindPath: start or goal");
@@ -48,6 +49,7 @@ namespace GalacticWaez
                 visitedStars[current.Star.Position] = current;
                 foreach (var kv in current.Star.Neighbors)
                 {
+                    token.ThrowIfCancellationRequested();
                     if (kv.Value > warpRange)
                         continue;
 

@@ -222,7 +222,7 @@ namespace GalacticWaez
             // assemble the navigator
             var bm = new BookmarkManager(saveGameDir, ModApi.Log);
             var nav = new Navigator(Galaxy, new AstarPathfinder(), bm, ksp, ModApi.Log,
-                () => ModApi.Application.GameTicks);
+                () => ModApi.Application.GameTicks, Config.NavTimeoutMillis);
             var nh = new NavigationHandler(nav);
 
             // finish assembling the chat message handler
