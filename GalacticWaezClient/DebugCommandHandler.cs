@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using Eleon.Modding;
+using System;
+using System.Text;
 using static GalacticWaez.GalacticWaez;
 
 namespace GalacticWaez
@@ -18,6 +20,12 @@ namespace GalacticWaez
                     break;
                 case "ginfo":
                     HandleGinfo(responder);
+                    break;
+                case "ship":
+                    HandleShip(responder);
+                    break;
+                case "refresh":
+                    HandleRefresh(responder);
                     break;
                 default:
                     return false;
@@ -67,6 +75,38 @@ namespace GalacticWaez
             responder.Send($"Stars: {Waez.Galaxy.Stars}\nWarp Lines: {Waez.Galaxy.WarpLines}\n"
                 + $"Max Range: {Waez.Galaxy.Range / SectorsPerLY}");
             return;
+        }
+
+        private void HandleShip(IResponder responder)
+        {
+            if (Waez.ModApi.Application.Mode != ApplicationMode.SinglePlayer)
+            {
+                responder.Send("Only available in single player.");
+                return;
+            }
+            var ship = Waez.ModApi.Application.LocalPlayer.CurrentStructure;
+            if (ship == null)
+            {
+                responder.Send("No current structure.");
+                return;
+            }
+            responder.Send($"Ship: {ship.Entity.Id} {ship.Entity.Name}");
+            foreach (var s in ship.GetAllCustomDeviceNames())
+                responder.Send(s);
+        }
+
+        private void HandleRefresh(IResponder responder)
+        {
+            try
+            {
+                new Eleon.PdaScript.Task("hello").RefreshHUD();
+                responder.Send("Tried it");
+            }
+            catch (Exception ex)
+            {
+                responder.Send(ex.ToString());
+                Waez.ModApi.Log("Debug.HandleRefresh: " + ex.Message);
+            }
         }
     }
 }
