@@ -1,6 +1,5 @@
 ﻿using Eleon.Modding;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,7 +44,8 @@ namespace GalacticWaez
         private CancellationTokenSource initCancelSource;
         private CancellationToken initCancelToken;
         protected IModApi ModApi { get; private set; }
-        protected IGalaxyMap Galaxy { get; private set; }
+        public IGalaxyMap Galaxy { get; private set; }
+        public IPlayerProvider PlayerProvider { get; protected set; }
 
         private Task<bool> init = null;
         private ChatMessageHandler _chatHandler;
@@ -77,29 +77,12 @@ namespace GalacticWaez
                 HandleStore(args, player, responder);
                 return true;
             }
-            if (cmdToken == "ginfo")
-            {
-                HandleGinfo(responder);
-                return true;
-            }
 
             if (cmdToken != "status" || !(args == null || args == ""))
                 return false;
 
             responder.Send(Status.ToString());
             return true;
-        }
-
-        private void HandleGinfo(IResponder responder)
-        {
-            if (Galaxy == null)
-            {
-                responder.Send("No galaxy map.");
-                return;
-            }
-            responder.Send($"Stars: {Galaxy.Stars}\nWarp Lines: {Galaxy.WarpLines}\n"
-                + $"Max Range: {Galaxy.Range / SectorsPerLY}");
-            return;
         }
 
         // IPlayerInfo parameter is here anticipating a permission check; for now it is ignored
@@ -188,7 +171,7 @@ namespace GalacticWaez
                 new ResponseManager(ModApi.Application),
                 this, preInitCommandHandler,
                 new HelpHandler(),
-                new PinfoHandler(pp));
+                new DebugCommandHandler(this));
         }
 
         protected void Setup(DataSourceType type)

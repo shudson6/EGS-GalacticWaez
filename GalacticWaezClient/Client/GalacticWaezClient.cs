@@ -34,7 +34,8 @@ namespace GalacticWaez.Client
                     if (ModApi.Application.Mode == ApplicationMode.SinglePlayer)
                     {
                         ModApi.Application.Update += OnUpdateTilWorldVisible;
-                        ChatHandler = CreateChatHandler(CreatePlayerProvider());
+                        PlayerProvider = CreatePlayerProvider();
+                        ChatHandler = CreateChatHandler(PlayerProvider);
                         ModApi.Log("Listening for commands.");
                     }
                     break;

@@ -7,7 +7,8 @@ namespace GalacticWaez.Dedi
         public override void Init(IModApi modApi)
         {
             base.Init(modApi);
-            ChatHandler = CreateChatHandler(CreatePlayerProvider());
+            PlayerProvider = CreatePlayerProvider();
+            ChatHandler = CreateChatHandler(PlayerProvider);
             Setup(DataSourceType.Normal);
         }
 

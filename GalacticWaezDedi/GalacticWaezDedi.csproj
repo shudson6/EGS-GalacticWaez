@@ -77,6 +77,9 @@
     <Compile Include="..\GalacticWaezClient\DataSourceType.cs">
       <Link>DataSourceType.cs</Link>
     </Compile>
+    <Compile Include="..\GalacticWaezClient\DebugCommandHandler.cs">
+      <Link>DebugCommandHandler.cs</Link>
+    </Compile>
     <Compile Include="..\GalacticWaezClient\FileDataSource.cs">
       <Link>FileDataSource.cs</Link>
     </Compile>
@@ -157,9 +160,6 @@
     </Compile>
     <Compile Include="..\GalacticWaezClient\NormalDataSource.cs">
       <Link>NormalDataSource.cs</Link>
-    </Compile>
-    <Compile Include="..\GalacticWaezClient\PinfoHandler.cs">
-      <Link>PinfoHandler.cs</Link>
     </Compile>
     <Compile Include="..\GalacticWaezClient\PlayerProviderBase.cs">
       <Link>PlayerProviderBase.cs</Link>
