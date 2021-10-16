@@ -16,7 +16,7 @@ and added waypoints or that there was an error.
 ![Navigation Example](img/navigate.png)
 
 ### Commands
-To send a command, enter `/waez ` in chat followed by a command:
+To send a command, enter `/waez` in chat followed by a command:
 
 `bookmarks [clear|hide|show]` remove Waez_ bookmarks or hide/show them in HUD (requires exit/resume)
 [^2]
@@ -49,6 +49,26 @@ To send a command, enter `/waez ` in chat followed by a command:
 `to --range=XX [mapmarker]` plots a course, using the specified jump range instead of the one
   calculated by Waez. Useful for example when the range given by `pinfo` is incorrect.
   `XX` is given in LY.
+
+### Configuration
+In `config.ecf`:  
+
+`BaseWarpRangeLY` - defaults to 30
+
+`MaxWarpRangeLY` - longest jump Waez will be able to find. This is the distance within which stars
+  will be considered connected; increasing this value will increase the setup time and RAM usage
+  by a roughly cubic proportion. For example, a vanilla galaxy (<= 20,000 stars) with this set to 30
+  can be processed in 2-3 seconds and use less than 25MB. At the other extreme, Project Eden's 
+  Antimatter Warp Drive can jump 160LY--210LY with full bonuses. Setting this value to 210 with a 
+  galaxy of 40,000+ stars increases the RAM required by about 2GB and can take up to 3 minutes 
+  to process.  
+  Of course, the processing only has to happen once, at startup, so if the RAM isn't a problem,
+  having that kind of warp range is great :)
+
+`NavTimeoutSeconds` - how long a `to` request can take before being canceled. Paths are typically
+  found very quickly but, if the destination is unreachable, the algorithm will check every possible
+  star which will take several seconds and spike RAM usage. If this is a concern, use this value
+  to keep it in check. Default is 10 seconds.
 
 ### Troubleshooting
 
