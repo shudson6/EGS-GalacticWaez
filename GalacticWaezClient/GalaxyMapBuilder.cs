@@ -28,7 +28,7 @@ namespace GalacticWaez
         /// <returns>
         /// a new GalaxyMap, or <c>null</c> if data were unavailable
         /// </returns>
-        public GalaxyMap BuildGalaxyMap(IGalaxyDataSource source, float maxWarpRange,
+        public IGalaxyMap BuildGalaxyMap(IGalaxyDataSource source, float maxWarpRange,
             CancellationToken token = default)
         {
             CheckParams(source, maxWarpRange);
@@ -55,7 +55,7 @@ namespace GalacticWaez
                 nodes.Add(current);
                 token.ThrowIfCancellationRequested();
             }
-            var g = new GalaxyMap(nodes);
+            var g = new GalaxyMap(nodes, (int)maxWarpRange);
             sw.Stop();
             float time = (float)sw.ElapsedMilliseconds / 1000;
             Log("Constructed galactic highway map: "

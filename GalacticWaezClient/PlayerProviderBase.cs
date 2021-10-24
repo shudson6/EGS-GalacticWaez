@@ -7,14 +7,19 @@ namespace GalacticWaez
     public abstract class PlayerProviderBase : SaveGameDB, IPlayerProvider
     {
         protected readonly LoggingDelegate Log;
-        public PlayerProviderBase(string saveGameDir, LoggingDelegate log)
-            : base(saveGameDir) { Log = log ?? delegate { }; }
+        protected readonly int baseWarpRange;
+        public PlayerProviderBase(string saveGameDir, int baseWarpRange, LoggingDelegate log)
+            : base(saveGameDir) 
+        { 
+            Log = log ?? delegate { };
+            this.baseWarpRange = baseWarpRange;
+        }
 
         public abstract IPlayerInfo GetPlayerInfo(int playerId);
 
         protected float GetWarpRange(int playerId)
         {
-            float warpRange = BaseWarpRangeLY;
+            float warpRange = baseWarpRange;
 
             SQLiteConnection connection = null;
             SQLiteCommand command = null;
@@ -29,13 +34,14 @@ namespace GalacticWaez
                 reader = command.ExecuteReader();
                 if (reader.Read())
                 {
-                    warpRange += reader.GetFloat(0);
+                    warpRange += reader.GetFloat(0) * SectorsPerLY;
                 }
             }
             catch (SQLiteException ex)
             {
+                int range = baseWarpRange / SectorsPerLY;
                 Log($"SQLiteException in GetPlayerData: {ex.Message}");
-                Log($"Using base warp range ({BaseWarpRangeLY}LY) for player {playerId}");
+                Log($"Using base warp range ({baseWarpRange}LY) for player {playerId}");
             }
             finally
             {
@@ -44,7 +50,7 @@ namespace GalacticWaez
                 connection?.Dispose();
             }
 
-            return warpRange * SectorsPerLY;
+            return warpRange;
         }
     }
 }

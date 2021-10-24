@@ -101,17 +101,23 @@ namespace GalacticWaezTests
             throw new AssertFailedException();
         }
 
-        private void VerifyGalaxyMap(string filename, GalaxyMap testGalaxy, float testRange)
+        private void VerifyGalaxyMap(string filename, IGalaxyMap testGalaxy, float testRange)
         {
             var positions = GalaxyTestData.LoadPositions(filename);
             Assert.IsTrue(testGalaxy.WarpLines > 0);
             Assert.AreEqual(positions.Count, testGalaxy.Stars);
             int i = 0;
             int warpLines = 0;
-            foreach (var n in testGalaxy.Nodes)
+            // the ToList() at the end is preventing exponential runtime caused by
+            // whatever Select() does. without it, the small (408 star) test galaxy
+            // is processed in < 200ms, while the "large" (19800 star) test galaxy
+            // has unknown processing time because I killed it after an hour
+            var testNodes = testGalaxy.StarPositions.Select(p => testGalaxy.GetNode(p)).ToList();
+            Assert.AreEqual(positions.Count, testGalaxy.StarPositions.Count());
+            Assert.IsFalse(positions.Except(testGalaxy.StarPositions).Any());
+            foreach (var n in testNodes)
             {
-                Assert.IsTrue(positions.Contains(n.Position));
-                foreach (var p in testGalaxy.Nodes.Take(i))
+                foreach (var p in testNodes.Take(i))
                 {
                     float dist = Distance(n, p);
                     if (dist <= testRange)
@@ -134,7 +140,7 @@ namespace GalacticWaezTests
             Assert.AreEqual(warpLines, testGalaxy.WarpLines);
         }
 
-        private float Distance(GalaxyMap.Node a, GalaxyMap.Node b)
+        private float Distance(IGalaxyNode a, IGalaxyNode b)
         {
             float dx = a.Position.x - b.Position.x;
             float dy = a.Position.y - b.Position.y;

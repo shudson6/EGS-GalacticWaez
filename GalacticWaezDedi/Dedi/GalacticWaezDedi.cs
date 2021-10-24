@@ -7,7 +7,8 @@ namespace GalacticWaez.Dedi
         public override void Init(IModApi modApi)
         {
             base.Init(modApi);
-            ChatHandler = CreateChatHandler(CreatePlayerProvider());
+            PlayerProvider = CreatePlayerProvider();
+            ChatHandler = CreateChatHandler(PlayerProvider);
             Setup(DataSourceType.Normal);
         }
 
@@ -18,6 +19,7 @@ namespace GalacticWaez.Dedi
         protected override IPlayerProvider CreatePlayerProvider()
             => new DediPlayerProvider(
                 ModApi.Application.GetPathFor(AppFolder.SaveGame), 
+                Config.BaseWarpRange,
                 ModApi.Application.GetPlayerDataFor,
                 ModApi.Log);
     }

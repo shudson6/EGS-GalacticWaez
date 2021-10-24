@@ -7,7 +7,7 @@ namespace GalacticWaezTests.Fakes
 {
     class FakeNavigator : INavigator
     {
-        public GalaxyMap Galaxy => null;
+        public IGalaxyMap Galaxy => null;
         public IPlayerInfo Player { get; private set; }
         public string Goal { get; private set; }
         public float Range { get; private set; }

@@ -32,8 +32,9 @@ namespace GalacticWaez.Dedi
 
         private readonly Func<int, PlayerData?> GetPlayerData;
 
-        public DediPlayerProvider(string saveGameDir, Func<int, PlayerData?> getPlayer, LoggingDelegate log)
-            : base(saveGameDir, log) 
+        public DediPlayerProvider(string saveGameDir, int baseWarpRange,
+            Func<int, PlayerData?> getPlayer, LoggingDelegate log)
+            : base(saveGameDir, baseWarpRange, log) 
         {
             GetPlayerData = getPlayer ?? throw new ArgumentNullException("DediPlayerProvider: getPlayer");
         }

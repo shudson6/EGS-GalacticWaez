@@ -5,9 +5,9 @@ using Eleon.Modding;
 
 namespace GalacticWaez
 {
-    public class GalaxyMap
+    public class GalaxyMap : IGalaxyMap
     {
-        public class Node
+        public class Node : IGalaxyNode
         {
             // in test runs (some vanilla, some reforged eden), each star is in
             // warp range of over 60 others, on average, and that's without
@@ -16,16 +16,16 @@ namespace GalacticWaez
             // also, msdn says the capacity should not be divisible by a small prime
             public const int InitialNeighborCapacity = 131;
             public VectorInt3 Position { get; }
-            public Dictionary<Node, float> Neighbors { get; }
+            public Dictionary<IGalaxyNode, float> Neighbors { get; }
 
             public Node(VectorInt3 position)
             {
                 Position = position;
-                Neighbors = new Dictionary<Node, float>(InitialNeighborCapacity);
+                Neighbors = new Dictionary<IGalaxyNode, float>(InitialNeighborCapacity);
             }
 
 
-            public float DistanceTo(Node other)
+            public float DistanceTo(IGalaxyNode other)
             {
                 float dx = Position.x - other.Position.x;
                 float dy = Position.y - other.Position.y;
@@ -34,24 +34,32 @@ namespace GalacticWaez
             }
         }
 
-        public IEnumerable<Node> Nodes { get; }
+        public IEnumerable<VectorInt3> StarPositions => Nodes.Select(n => n.Position);
 
         /// <summary>
         /// Number of stars in the galaxy.
         /// </summary>
-        public int Stars => Nodes.Count();
+        public int Stars => StarPositions.Count();
 
         /// <summary>
         /// Count of directed connections between stars, i.e. total possible warp jumps.
         /// </summary>
-        public int WarpLines => Nodes.Aggregate(0, (acc, n) => acc + n.Neighbors.Count);
+        public int WarpLines { get; }
+        public int Range { get; }
 
-        public GalaxyMap(IEnumerable<Node> nodes) { Nodes = nodes; }
+        private readonly IEnumerable<IGalaxyNode> Nodes;
+
+        public GalaxyMap(IEnumerable<Node> nodes, int range) 
+        { 
+            Nodes = nodes;
+            WarpLines = Nodes.Aggregate(0, (acc, n) => acc + n.Neighbors.Count);
+            Range = range;
+        }
 
         /// <summary>
         /// Finds the node that matches the coordinates.
         /// </summary>
-        public Node GetNode(VectorInt3 coordinates)
+        public IGalaxyNode GetNode(VectorInt3 coordinates)
         {
             foreach (var n in Nodes)
             {

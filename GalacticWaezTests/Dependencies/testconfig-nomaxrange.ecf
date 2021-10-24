@@ -1,0 +1,13 @@
+{
+  # how long to wait for a navigation request before cancelling
+  # paths are typically found very quickly, but if the destination star is unreachable,
+  # the algorithm will have to check every possible star which will take several seconds
+  # and may use a considerable amount of memory. if this is a concern, use this value to
+  # control it.
+
+  NavTimeoutSeconds: 11
+
+  # in case you've modded the player's base warp range (is that even possible?)
+  
+  BaseWarpRangeLY: 37
+}

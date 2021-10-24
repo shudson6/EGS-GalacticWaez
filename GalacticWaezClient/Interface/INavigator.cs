@@ -6,7 +6,7 @@ namespace GalacticWaez
 {
     public interface INavigator
     { 
-        GalaxyMap Galaxy { get; }
+        IGalaxyMap Galaxy { get; }
 
         /// <summary>
         /// Looks for path from player's current solar system to the destination system. If found,
