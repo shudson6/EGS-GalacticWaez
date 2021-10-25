@@ -43,7 +43,7 @@ namespace GalacticWaez
         }
         private CancellationTokenSource initCancelSource;
         private CancellationToken initCancelToken;
-        protected IModApi ModApi { get; private set; }
+        public IModApi ModApi { get; private set; }
         public IGalaxyMap Galaxy { get; private set; }
         public IPlayerProvider PlayerProvider { get; protected set; }
 
