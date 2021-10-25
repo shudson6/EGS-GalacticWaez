@@ -59,11 +59,10 @@ In `config.ecf`:
   will be considered connected; increasing this value will increase the setup time and RAM usage
   by a roughly cubic proportion. For example, a vanilla galaxy (<= 20,000 stars) with this set to 30
   can be processed in 2-3 seconds and use less than 25MB. At the other extreme, Project Eden's 
-  Antimatter Warp Drive can jump 160LY--210LY with full bonuses. Setting this value to 210 with a 
-  galaxy of 40,000+ stars increases the RAM required by about 2GB and can take up to 3 minutes 
-  to process.  
-  Of course, the processing only has to happen once, at startup, so if the RAM isn't a problem,
-  having that kind of warp range is great :)
+  Antimatter Warp Drive can jump 320LY with full bonuses. Setting this value to 320 with a galaxy of
+  40,000+ stars increases the RAM required by about 3.5GB and can take over 5 minutes to process.  
+    
+  The recommended values are 60 for vanilla (~50MB, 4sec) and 110 for Eden (~600MB, 1min).
 
 `NavTimeoutSeconds` - how long a `to` request can take before being canceled. Paths are typically
   found very quickly but, if the destination is unreachable, the algorithm will check every possible
